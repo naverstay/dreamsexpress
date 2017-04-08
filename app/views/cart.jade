@@ -1,0 +1,204 @@
+include mixins
+doctype html
+html(lang='ru')
+    +dev_head("Daddy's kid Корзина", false, false, false, false, false, true)
+
+    body
+        .wrapper
+            .base
+                +header(1)
+                
+                div.main_content
+                    .section_inner
+                        +breadcrumbs(['Главная', 'Корзина'])
+                        h1.page_title.fw_700
+                            span Корзина
+                            
+                        .cart_block
+                            .cart_col
+                                .cart_unit.cartUnit
+                                    .cart_unit_info
+                                        .cart_unit_img
+                                            a.product_img(href='product.html')
+                                                img(src='images/cart_2.jpg')
+                                                .product_hit Хит продаж
+
+                                        .prod_info
+                                            .prod_info_caption трикотажное платье  <br>  с рисунком
+                                            .product_price
+                                                .product_share_holder: .product_share - 30%
+                                                span.new_price 7000
+                                                    span._cur  грн.
+                                                span.old_price 1000
+                                                    span._cur  грн.
+                                                    
+                                            .cart_unit_options_edit
+                                                dl.prod_options
+                                                    dt Цвет: 
+                                                    dd 
+                                                        .select_box_v2
+                                                            select.select2
+                                                                option Черный в горошек
+                                                                option Белый в горошек
+                                                                option Зеленый в горошек
+                                                    
+                                                    dt Размер: 
+                                                    dd
+                                                        .select_box_v2
+                                                            select.select2
+                                                                option S
+                                                                option L
+                                                                option XL
+                                                                option XXl
+                                                    
+                                                ul.dropdown_controls
+                                                    li
+                                                        a.btn_v1.blue_btn.apply_btn(href='#') Сохранить
+                                                    li
+                                                        a.gl_link.black_link.fw_500.cartUnitChange(href='#') Отменить
+                                                
+                                            .cart_unit_options
+                                                dl.prod_options
+                                                    dt Цвет: 
+                                                    dd Черный в горошек
+                                                    
+                                                    dt Размер: 
+                                                    dd L
+                                                    
+                                                p 
+                                                    a.gl_link.fz_13.cool_text.fw_500.cartUnitChange(href='#') Изменить детали
+                                            
+                                    +cart_unit_controls()
+                                    
+                                .cart_unit.cartUnit
+                                    .cart_unit_info
+                                        .cart_unit_img
+                                            a.product_img(href='product.html')
+                                                img(src='images/cart_3.jpg')
+
+                                        .prod_info
+                                            .prod_info_caption Подгузники Goo’n
+                                            .product_price
+                                                span.new_price 1200
+                                                    span._cur  грн.
+                                                    
+                                            .cart_unit_options_edit
+                                                dl.prod_options
+                                                    dt Размер: 
+                                                    dd
+                                                        .select_box_v2
+                                                            select.select2
+                                                                option S
+                                                                option L
+                                                                option XL
+                                                                option XXl
+                                                    
+                                                ul.dropdown_controls
+                                                    li
+                                                        a.btn_v1.blue_btn.apply_btn(href='#') Сохранить
+                                                    li
+                                                        a.gl_link.black_link.fw_500.cartUnitChange(href='#') Отменить
+                                                        
+                                            .cart_unit_options
+                                                dl.prod_options
+                                                    dt Размер: 
+                                                    dd XL
+                                                
+                                                p 
+                                                    a.gl_link.fz_13.cool_text.fw_500.cartUnitChange(href='#') Изменить детали
+                                            
+                                    +cart_unit_controls()
+                                    
+                                .cart_unit.checkout_block
+                                    form(action='#')
+                                        .cart_unit_info
+                                            .checkout_caption Выберите способ доставки <br> и заполните поля
+                                            .form_row
+                                                .form_cell
+                                                    label.check_v3.check_emul
+                                                        input.inp_hidden(type='radio' name='checkout_delivery')
+                                                        span.check_text
+                                                            span.check_icon.i-car-baby-toy-outline
+                                                            span Курьером
+                                                    
+                                                .form_cell
+                                                    label.check_v3.check_emul
+                                                        input.inp_hidden(type='radio' name='checkout_delivery')
+                                                        span.check_text
+                                                            span.check_icon.i-skate-with-handle-side-view
+                                                            span Самовывоз
+                                                
+                                            .form_cell
+                                                input.f_input.input_v6(placeholder='Имя' value='Мирослав')
+                                                
+                                            .form_cell
+                                                input.f_input.input_v2(placeholder='Фамилия' value='Бошич')
+        
+                                            .form_cell
+                                                input.f_input.input_v6(placeholder='Email' required)
+                                                
+                                            .form_cell
+                                                input.f_input.input_v2(placeholder='Телефон' data-inputmask="'mask': '[+38] (099)-999-99-99'")
+                                                
+                                            .form_cell
+                                                input.f_input.input_v2(placeholder='Адрес' required)
+                                            .delivery_options
+                                                .checkout_caption Выберите способ оплаты
+    
+                                                .form_row
+                                                    .form_cell
+                                                        label.check_v3.check_emul
+                                                            input.inp_hidden(type='radio' name='checkout_payment')
+                                                            span.check_text
+                                                                span.check_icon.i-truck-side-view-outline
+                                                                span Наличными
+    
+                                                    .form_cell
+                                                        label.check_v3.check_emul
+                                                            input.inp_hidden(type='radio' name='checkout_payment')
+                                                            span.check_text
+                                                                span.check_icon.i-skate-with-handle-side-view
+                                                                span Картой <br> курьеру
+                                                                
+                                                    .form_cell
+                                                        label.check_v3.check_emul
+                                                            input.inp_hidden(type='radio' name='checkout_payment')
+                                                            span.check_text
+                                                                span.check_icon.i-car-baby-toy-outline
+                                                                span Картой <br> онлайн
+
+                                        button.btn_v3.blue_btn.order_confirm_btn Подтверждаю заказ
+
+
+                            .cart_total_block
+                                dl.cart_total 
+                                    dt Итого:
+                                    dd.total_price 
+                                        span 78 700 
+                                        span._cur  грн.
+
+                                    dt 12 товаров на сумму:
+                                    dd
+                                        span 78 000
+                                        span.rur  ₽
+
+                                    dt Стоимость доставки:
+                                    dd
+                                        span 700
+                                        span.rur  ₽
+
+                                    dt Ваша экономия: 
+                                    dd 
+                                        span 1200
+                                        span.rur  ₽
+                                        
+                                p 
+                                    a.gl_link.fw_500.fz_13.cool_text(href='delivery.html') Доставка и оплата
+
+
+            +footer()
+            
+        +aside_left()
+        +aside_right()
+        +popups()
+        

@@ -1,0 +1,107 @@
+include mixins
+doctype html
+html(lang='ru')
+    +dev_head("Daddy's kid Добавление товара", false, false, false, false, false, false, true)
+
+    body
+        .wrapper
+            .base
+                +header(1)
+                
+                div.main_content
+                    .section_inner
+                        h1.page_title.fw_700
+                            span Добавление товара
+                            
+                        .cart_block
+                            .cart_col
+                                .cart_unit.checkout_block
+                                    form.addForm(action='/add' method="POST")
+                                        .cart_unit_info
+                                            .checkout_caption Заполните поля
+                                            .form_cell
+                                                input.f_input.input_v6(placeholder='Название' name='product_name' required)
+                                                
+                                            .form_cell
+                                                textarea.f_input.input_v6(placeholder='Описание' name='product_info' required)
+                                                
+                                            .form_cell
+                                                input.f_input.input_v6(placeholder='Основная картинка' name='product_main_img' required)
+                                                
+                                            .form_cell
+                                                input.f_input.input_v6(placeholder='Ховер картинка' name='product_hover_img' required)
+                                                
+                                            .form_cell
+                                                textarea.f_input.input_v6(placeholder='Галерея картинок' name='product_img_list')
+        
+                                            .form_cell
+                                                input.f_input.input_v6(placeholder='Цена' name='product_price' required)
+                                                
+                                            .form_cell
+                                                input.f_input.input_v6(placeholder='Размер' name='product_sizes' required)
+                                                
+                                            .form_cell
+                                                input.f_input.input_v6(placeholder='Цвета' name='product_colors' required)
+                                                
+                                            .form_cell
+                                                input.f_input.input_v6(placeholder='Категория' name='product_category' required)
+                                                
+                                            .form_cell
+                                                input.f_input.input_v6(placeholder='Артикул' name='product_code' required)
+                                                
+                                            .form_row
+                                                .form_cell
+                                                    label.check_v3.check_emul
+                                                        input.inp_hidden(type='radio' name='product_adult')
+                                                        span.check_text
+                                                            span.check_icon.i-car-baby-toy-outline
+                                                            span Взрослый
+
+                                                .form_cell
+                                                    label.check_v3.check_emul
+                                                        input.inp_hidden(type='radio' name='product_adult' checked)
+                                                        span.check_text
+                                                            span.check_icon.i-skate-with-handle-side-view
+                                                            span Десткий
+
+                                            .form_cell
+                                                .select_box_v2
+                                                    select.select2(name='product_gender')
+                                                        option М
+                                                        option Ж
+                                                
+                                            .form_row
+                                                .form_cell
+                                                    label.check_v3.check_emul
+                                                        input.inp_hidden(type='radio' name='product_season' value='w')
+                                                        span.check_text
+                                                            span.check_icon.i-car-baby-toy-outline
+                                                            span Зима
+
+                                                .form_cell
+                                                    label.check_v3.check_emul
+                                                        input.inp_hidden(type='radio' name='product_season' value='s')
+                                                        span.check_text
+                                                            span.check_icon.i-skate-with-handle-side-view
+                                                            span Лето
+                                                            
+                                                .form_cell
+                                                    label.check_v3.check_emul
+                                                        input.inp_hidden(type='radio' name='product_season' value='d')
+                                                        span.check_text
+                                                            span.check_icon.i-duck-side-view-outline
+                                                            span Демисезон
+                                                            
+                                                .form_cell
+                                                    label.check_emul.check_v1
+                                                        input.inp_hidden(type='checkbox' checked name='in_stock')
+                                                        span.check_text В наличии
+                                                            
+                                        button.btn_v3.blue_btn.order_confirm_btn.saveBtn Сохранить
+
+            +footer()
+            
+        +aside_left()
+        +aside_right()
+        +popups()
+        

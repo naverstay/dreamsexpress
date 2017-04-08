@@ -1,0 +1,92 @@
+include mixins
+doctype html
+html(lang='ru')
+    +dev_head("Daddy's kid Главная", true)
+
+    body.wide_menu
+        .wrapper
+            .base
+                +header(1)
+                
+                +main_slider()
+                div.main_content
+                    .section_inner
+                        ul.share_list
+                            li
+                                .share_item
+                                    .share_img
+                                        img.mob_hidden(src='images/sales_2.png')
+                                        img.dt_hidden(src='images/sales_2_mob.png')
+                                        a.share_text(href='#')
+                                            h3.share_caption Бесплатная доставка
+                                            p для заказов от 3 000 Р
+                            li
+                                .share_item
+                                    .share_img
+                                        img.mob_hidden(src='images/sales_1.jpg')
+                                        img.dt_hidden(src='images/sales_1_mob.jpg')
+                                        a.share_text(href='#')
+                                            h3.share_caption весенняя распродажа
+                                            p пальто и куртки
+                                            
+                        ul.product_list
+                            li
+                                .product_item
+                                    a.product_img(href='#')
+                                        img(src='images/prod_1.jpg')
+                                    h3.product_caption Детская одежда
+                                    p.tablet_hidden Платья, Верхняя одежда, Пижамы, Аксессуары
+                            li
+                                .product_item
+                                    a.product_img(href='#')
+                                        img(src='images/prod_1.jpg')
+                                    h3.product_caption Детская обувь
+                                    p.tablet_hidden Кеды, сапоги, сандали, ботинки
+                            li
+                                .product_item
+                                    a.product_img(href='#')
+                                        img(src='images/prod_1.jpg')
+                                    h3.product_caption Игрушки
+                                    p.tablet_hidden Мягкие игрушки, куклы, пупсы, конструкторы, мякиши
+                            li
+                                .product_item
+                                    a.product_img(href='#')
+                                        img(src='images/prod_1.jpg')
+                                    h3.product_caption мамам
+                                    p.tablet_hidden Личная гигиена, одежда, белье, купальники, книги
+                                    
+                    .prod_container
+                        .section_inner
+                            .prod_info.slider_controls
+                                .hit_caption.subcaption
+                                    span Хиты продаж
+                                    span.hit_counter 12
+                                p В нашем интернет-магазине представлены только тщательно отобранные модели, исключительные диваны хиты продаж в Москве и по России. Каждая модель дивана из нашего интернет каталога – это воплощение отличного дизайна, легенда мебельной отрасли.
+                            
+                            +hit_slider(all_products)
+                                
+                    //-.prod_container
+                        .section_inner
+                            .prod_info.slider_controls
+                                .hit_caption.subcaption.control_mod
+                                    span Популярные бренды
+                                    span.mob_hidden.show_all 
+                                        a.gl_link(href='#') Смотреть все 
+                                p В нашем интернет-магазине представлены только самые популярные бренды
+                            
+                            +pop_slider()
+                            
+                    .prod_container
+                        .section_inner
+                            .prod_info.about_mod
+                                .hit_caption.subcaption Идеально для детей
+                                p Группа компаний «Детский мир» является крупнейшим розничным оператором торговли  детскими товарами в России и Казахстане. История компании началась в 1957 году с открытия «Центрального Детского мира на Лубянке». Сегодня Группа компаний объединяет сеть магазинов «Детский мир» и розничную сеть ELC (Early Learning Centre - Центр раннего  <br>  развития).
+                                p Сеть магазинов «Детский мир» занимает лидирующие позиции в России на рынке детских товаров. На 10 марта 2016 года в состав Группы компаний входят 382 магазина «Детский мир» в 148 городах России и Казахстана, 44 магазина ELC.  Торговая площадь магазинов сети «Детский мир» составляет 492 тыс. кв. м., ELC – 6 тыс. кв. м.
+
+
+            +footer()
+            
+        +aside_left()
+        +aside_right()
+        +popups()
+        

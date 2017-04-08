@@ -1,0 +1,136 @@
+include mixins
+doctype html
+html(lang='ru')
+    +dev_head("Daddy's kid Кабинет", false, false, false, false, true)
+
+    body
+        .wrapper
+            .base
+                +header(1)
+                
+                div.main_content
+                    .section_inner
+                        +breadcrumbs(['Главная', 'Личный кабинет'])
+                        h1.page_title.fw_700
+                            span Личный кабинет
+
+                        .cabinet_block
+                            ul#cabinet_switcher.tab_holder.tab_v3
+                                li.tab_cell: a.tab_link(href='#cabinet_tab_1'): span Личные данные
+                                li.tab_cell: a.tab_link(href='#cabinet_tab_2'): span Мои заказы
+
+                            .tabBlock(data-tab-context='#cabinet_switcher')
+                                #cabinet_tab_1
+                                    .tab_content.clearfix
+                                        .cabinet_form_col
+                                            form(action='#')
+                                                .form_cell
+                                                    input.f_input.input_v2(placeholder='Имя' value='Мирослав')
+                                                    
+                                                .form_cell
+                                                    input.f_input.input_v2(placeholder='Фамилия' value='Бошич')
+    
+                                                .form_cell
+                                                    input.f_input.input_v2(placeholder='Email' required)
+                                                    
+                                                .form_cell
+                                                    input.f_input.input_v2(placeholder='Телефон' data-inputmask="'mask': '[+38] (099)-999-99-99'")
+                                                    
+                                                .form_cell
+                                                    input.f_input.input_v2(placeholder='Адрес')
+                                                    
+                                                .form_cell
+                                                    input.f_input.input_v2(placeholder='Пароль' type='password' value='пароль')
+                                                    .form_cell_aside_tool
+                                                        a.gl_link.cool_text.fz_13.fw_500(href='#') Сменить пароль
+                                                        
+                                                .form_cell
+                                                    button.btn_v1.blue_btn.order_btn.mod_4 Сохранить
+                                            
+                                                //-.alter_auth
+                                                    .caption_v1.fz_18 Синхронизация
+                                                    ul.about_list
+                                                        li
+                                                            a.about_link(href='#')
+                                                                span.i-v
+                                                        li
+                                                            a.about_link(href='#')
+                                                                span.i-f
+                                                        li
+                                                            a.about_link(href='#')
+                                                                span.i-t
+                                                        li
+                                                            a.about_link(href='#')
+                                                                span.i-o
+                                                        li
+                                                            a.about_link(href='#')
+                                                                span.i-g
+                                                                
+                                #cabinet_tab_2
+                                    .tab_content
+                            
+                                        .orders_table
+                                            .order_row.caption_row
+                                                .order_cell.col_1
+                                                    span.cell_val Заказ №
+                                                .order_cell.col_2
+                                                    span.cell_val дата
+                                                .order_cell.col_3
+                                                    span.cell_val Статус
+                                                .order_cell.col_4
+                                                    span.cell_val &nbsp;
+                                                    
+                                            .order_row.orderRow
+                                                .order_expand_btn.orderExpandBtn
+                                                .order_cell.col_1
+                                                    span.cell_val 201371205
+                                                .order_cell.col_2
+                                                    span.cell_val 17.04.2016
+                                                .order_cell.col_3
+                                                    span.cell_val
+                                                        .prod_f_inf
+                                                            span.prod_f_icon.in_stock
+                                                            span Доставлен
+                                                .order_cell.col_4
+                                                    span.cell_val.fw_500: a.black_link(href='#') Повторить заказ
+                                        
+                                            +order_info(1)
+                                            
+                                            .order_row.orderRow
+                                                .order_expand_btn.orderExpandBtn
+                                                .order_cell.col_1
+                                                    span.cell_val 201371205
+                                                .order_cell.col_2
+                                                    span.cell_val 17.04.2016
+                                                .order_cell.col_3
+                                                    span.cell_val
+                                                        .prod_f_inf
+                                                            span.prod_f_icon.expected
+                                                            span В процессе
+                                                .order_cell.col_4
+                                                    span.cell_val.fw_500: a.black_link(href='#') Повторить заказ
+                                        
+                                            +order_info(2)
+                                            
+                                            .order_row.orderRow
+                                                .order_expand_btn.orderExpandBtn
+                                                .order_cell.col_1
+                                                    span.cell_val 201371205
+                                                .order_cell.col_2
+                                                    span.cell_val 17.04.2016
+                                                .order_cell.col_3
+                                                    span.cell_val
+                                                        .prod_f_inf
+                                                            span.prod_f_icon.canceled
+                                                            span Отменен
+                                                .order_cell.col_4
+                                                    span.cell_val.fw_500: a.black_link(href='#') Повторить заказ
+                                        
+                                            +order_info(3)
+     
+            +footer()
+            
+        +aside_left()
+        +aside_right()
+        +popups()
+        

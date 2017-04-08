@@ -1,0 +1,643 @@
+@import "variables";
+
+@font-face {
+  font-family: 'dreamsexpress';
+  src:
+    url('#{$icomoon-font-path}/dreamsexpress.ttf?8p1n8h') format('truetype'),
+    url('#{$icomoon-font-path}/dreamsexpress.woff?8p1n8h') format('woff'),
+    url('#{$icomoon-font-path}/dreamsexpress.svg?8p1n8h#dreamsexpress') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="i-"], [class*=" i-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'dreamsexpress' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.i-abc-squares {
+  &:before {
+    content: $i-abc-squares;
+  }
+}
+.i-baby-abacus-toy {
+  &:before {
+    content: $i-baby-abacus-toy;
+  }
+}
+.i-baby-abc-cubes {
+  &:before {
+    content: $i-baby-abc-cubes;
+  }
+}
+.i-baby-bag-with-flower-design {
+  &:before {
+    content: $i-baby-bag-with-flower-design;
+  }
+}
+.i-baby-ball-toy {
+  &:before {
+    content: $i-baby-ball-toy;
+  }
+}
+.i-baby-bath-with-toy-balls {
+  &:before {
+    content: $i-baby-bath-with-toy-balls;
+  }
+}
+.i-baby-bear-toy {
+  &:before {
+    content: $i-baby-bear-toy;
+  }
+}
+.i-baby-bed-with-a-mobile-toy-with-hanging-shapes-of-sun-moon-and-star2 {
+  &:before {
+    content: $i-baby-bed-with-a-mobile-toy-with-hanging-shapes-of-sun-moon-and-star2;
+  }
+}
+.i-baby-bed-with-a-mobile-toy-with-hanging-shapes-of-sun-moon-and-star {
+  &:before {
+    content: $i-baby-bed-with-a-mobile-toy-with-hanging-shapes-of-sun-moon-and-star;
+  }
+}
+.i-baby-bed {
+  &:before {
+    content: $i-baby-bed;
+  }
+}
+.i-baby-bib-cloth-outline {
+  &:before {
+    content: $i-baby-bib-cloth-outline;
+  }
+}
+.i-baby-bib-outline-with-a-flower {
+  &:before {
+    content: $i-baby-bib-outline-with-a-flower;
+  }
+}
+.i-baby-bib-outline-with-heart-shape {
+  &:before {
+    content: $i-baby-bib-outline-with-heart-shape;
+  }
+}
+.i-baby-bib-with-a-fish {
+  &:before {
+    content: $i-baby-bib-with-a-fish;
+  }
+}
+.i-baby-bib-with-a-soccer-ball-illustration {
+  &:before {
+    content: $i-baby-bib-with-a-soccer-ball-illustration;
+  }
+}
+.i-baby-bib-with-animal-head-outline {
+  &:before {
+    content: $i-baby-bib-with-animal-head-outline;
+  }
+}
+.i-baby-bib-with-heart-outline {
+  &:before {
+    content: $i-baby-bib-with-heart-outline;
+  }
+}
+.i-baby-bike-with-training-wheels {
+  &:before {
+    content: $i-baby-bike-with-training-wheels;
+  }
+}
+.i-baby-bottle-outline-1 {
+  &:before {
+    content: $i-baby-bottle-outline-1;
+  }
+}
+.i-baby-bottle-outline {
+  &:before {
+    content: $i-baby-bottle-outline;
+  }
+}
+.i-baby-bottle-with-a-heart {
+  &:before {
+    content: $i-baby-bottle-with-a-heart;
+  }
+}
+.i-baby-bottle-with-baby-face {
+  &:before {
+    content: $i-baby-bottle-with-baby-face;
+  }
+}
+.i-baby-chair {
+  &:before {
+    content: $i-baby-chair;
+  }
+}
+.i-baby-cloth-with-a-rabbit-head-outline {
+  &:before {
+    content: $i-baby-cloth-with-a-rabbit-head-outline;
+  }
+}
+.i-baby-cloth-with-a-rabbit-head-outline2 {
+  &:before {
+    content: $i-baby-cloth-with-a-rabbit-head-outline2;
+  }
+}
+.i-baby-cream-outline {
+  &:before {
+    content: $i-baby-cream-outline;
+  }
+}
+.i-baby-crib-mobile {
+  &:before {
+    content: $i-baby-crib-mobile;
+  }
+}
+.i-baby-diaper-outline-1 {
+  &:before {
+    content: $i-baby-diaper-outline-1;
+  }
+}
+.i-baby-diaper-outline-with-security-pin-in-the-front {
+  &:before {
+    content: $i-baby-diaper-outline-with-security-pin-in-the-front;
+  }
+}
+.i-baby-diaper-outline {
+  &:before {
+    content: $i-baby-diaper-outline;
+  }
+}
+.i-baby-drinking-bottle-outline-with-side-handles {
+  &:before {
+    content: $i-baby-drinking-bottle-outline-with-side-handles;
+  }
+}
+.i-baby-duck-toy-outline {
+  &:before {
+    content: $i-baby-duck-toy-outline;
+  }
+}
+.i-baby-dummy-with-bear-head-silhouette {
+  &:before {
+    content: $i-baby-dummy-with-bear-head-silhouette;
+  }
+}
+.i-baby-face-crying {
+  &:before {
+    content: $i-baby-face-crying;
+  }
+}
+.i-baby-flash-cards-with-book-image {
+  &:before {
+    content: $i-baby-flash-cards-with-book-image;
+  }
+}
+.i-baby-footprints {
+  &:before {
+    content: $i-baby-footprints;
+  }
+}
+.i-baby-girl-outline {
+  &:before {
+    content: $i-baby-girl-outline;
+  }
+}
+.i-baby-hat {
+  &:before {
+    content: $i-baby-hat;
+  }
+}
+.i-baby-head-outline-with-pacifier {
+  &:before {
+    content: $i-baby-head-outline-with-pacifier;
+  }
+}
+.i-baby-head-with-a-small-heart-outline {
+  &:before {
+    content: $i-baby-head-with-a-small-heart-outline;
+  }
+}
+.i-baby-male-face {
+  &:before {
+    content: $i-baby-male-face;
+  }
+}
+.i-baby-mobile-toy-with-hanging-space-shapes {
+  &:before {
+    content: $i-baby-mobile-toy-with-hanging-space-shapes;
+  }
+}
+.i-baby-onesie-outline-with-smiling-sun {
+  &:before {
+    content: $i-baby-onesie-outline-with-smiling-sun;
+  }
+}
+.i-baby-onesie-outline {
+  &:before {
+    content: $i-baby-onesie-outline;
+  }
+}
+.i-baby-onesie-with-front-pocket-outline {
+  &:before {
+    content: $i-baby-onesie-with-front-pocket-outline;
+  }
+}
+.i-baby-outline {
+  &:before {
+    content: $i-baby-outline;
+  }
+}
+.i-baby-pacifier-outline {
+  &:before {
+    content: $i-baby-pacifier-outline;
+  }
+}
+.i-baby-puree-pot-and-a-spoon {
+  &:before {
+    content: $i-baby-puree-pot-and-a-spoon;
+  }
+}
+.i-baby-rattle-1 {
+  &:before {
+    content: $i-baby-rattle-1;
+  }
+}
+.i-baby-rattle-of-flower-shape {
+  &:before {
+    content: $i-baby-rattle-of-flower-shape;
+  }
+}
+.i-baby-rattle {
+  &:before {
+    content: $i-baby-rattle;
+  }
+}
+.i-baby-ring-tower {
+  &:before {
+    content: $i-baby-ring-tower;
+  }
+}
+.i-baby-shape-box-toy {
+  &:before {
+    content: $i-baby-shape-box-toy;
+  }
+}
+.i-baby-shoes {
+  &:before {
+    content: $i-baby-shoes;
+  }
+}
+.i-baby-standing-outline-with-pants {
+  &:before {
+    content: $i-baby-standing-outline-with-pants;
+  }
+}
+.i-baby-stroller-of-rounded-design-side-view {
+  &:before {
+    content: $i-baby-stroller-of-rounded-design-side-view;
+  }
+}
+.i-baby-stroller-outline-of-side-view {
+  &:before {
+    content: $i-baby-stroller-outline-of-side-view;
+  }
+}
+.i-baby-stroller {
+  &:before {
+    content: $i-baby-stroller;
+  }
+}
+.i-baby-transport-side-view {
+  &:before {
+    content: $i-baby-transport-side-view;
+  }
+}
+.i-baby-walker {
+  &:before {
+    content: $i-baby-walker;
+  }
+}
+.i-baby-wearing-diaper-only-outline {
+  &:before {
+    content: $i-baby-wearing-diaper-only-outline;
+  }
+}
+.i-baby-with-pacifier-sign-and-lines {
+  &:before {
+    content: $i-baby-with-pacifier-sign-and-lines;
+  }
+}
+.i-baby-wrapped-in-swaddle {
+  &:before {
+    content: $i-baby-wrapped-in-swaddle;
+  }
+}
+.i-balloons-couple {
+  &:before {
+    content: $i-balloons-couple;
+  }
+}
+.i-bear-face {
+  &:before {
+    content: $i-bear-face;
+  }
+}
+.i-bear-face2 {
+  &:before {
+    content: $i-bear-face2;
+  }
+}
+.i-bear-rattle-outline {
+  &:before {
+    content: $i-bear-rattle-outline;
+  }
+}
+.i-bear-toy {
+  &:before {
+    content: $i-bear-toy;
+  }
+}
+.i-bucket-and-sand-shovel {
+  &:before {
+    content: $i-bucket-and-sand-shovel;
+  }
+}
+.i-car-baby-toy-outline {
+  &:before {
+    content: $i-car-baby-toy-outline;
+  }
+}
+.i-circular-button {
+  &:before {
+    content: $i-circular-button;
+  }
+}
+.i-crayon {
+  &:before {
+    content: $i-crayon;
+  }
+}
+.i-cup-with-a-spoon-inside {
+  &:before {
+    content: $i-cup-with-a-spoon-inside;
+  }
+}
+.i-diaper-with-a-heart-and-a-safety-pin {
+  &:before {
+    content: $i-diaper-with-a-heart-and-a-safety-pin;
+  }
+}
+.i-divider-outline {
+  &:before {
+    content: $i-divider-outline;
+  }
+}
+.i-duck-side-view-outline {
+  &:before {
+    content: $i-duck-side-view-outline;
+  }
+}
+.i-female-baby-face {
+  &:before {
+    content: $i-female-baby-face;
+  }
+}
+.i-female-baby-head {
+  &:before {
+    content: $i-female-baby-head;
+  }
+}
+.i-flower-smile {
+  &:before {
+    content: $i-flower-smile;
+  }
+}
+.i-fork-knife-and-plate-outline {
+  &:before {
+    content: $i-fork-knife-and-plate-outline;
+  }
+}
+.i-hot-air-balloon-baby-toy {
+  &:before {
+    content: $i-hot-air-balloon-baby-toy;
+  }
+}
+.i-moon-and-stars {
+  &:before {
+    content: $i-moon-and-stars;
+  }
+}
+.i-number-blocks-toys {
+  &:before {
+    content: $i-number-blocks-toys;
+  }
+}
+.i-pacifier-for-babies {
+  &:before {
+    content: $i-pacifier-for-babies;
+  }
+}
+.i-pregnant-woman-outlined-side-view {
+  &:before {
+    content: $i-pregnant-woman-outlined-side-view;
+  }
+}
+.i-rainbow-outline {
+  &:before {
+    content: $i-rainbow-outline;
+  }
+}
+.i-rattle-for-babies-1 {
+  &:before {
+    content: $i-rattle-for-babies-1;
+  }
+}
+.i-rattle-for-babies {
+  &:before {
+    content: $i-rattle-for-babies;
+  }
+}
+.i-rattle-with-a-star-shape {
+  &:before {
+    content: $i-rattle-with-a-star-shape;
+  }
+}
+.i-sad-baby-face {
+  &:before {
+    content: $i-sad-baby-face;
+  }
+}
+.i-security-pin-opened {
+  &:before {
+    content: $i-security-pin-opened;
+  }
+}
+.i-skate-with-handle-side-view {
+  &:before {
+    content: $i-skate-with-handle-side-view;
+  }
+}
+.i-sleeping-baby {
+  &:before {
+    content: $i-sleeping-baby;
+  }
+}
+.i-smiling-sun {
+  &:before {
+    content: $i-smiling-sun;
+  }
+}
+.i-sock-side-view-outline {
+  &:before {
+    content: $i-sock-side-view-outline;
+  }
+}
+.i-square-blocks-outline {
+  &:before {
+    content: $i-square-blocks-outline;
+  }
+}
+.i-stork-carrying-a-bag {
+  &:before {
+    content: $i-stork-carrying-a-bag;
+  }
+}
+.i-stork-carrying-a-bag2 {
+  &:before {
+    content: $i-stork-carrying-a-bag2;
+  }
+}
+.i-tool-to-listen-a-baby-from-far {
+  &:before {
+    content: $i-tool-to-listen-a-baby-from-far;
+  }
+}
+.i-toy-ball {
+  &:before {
+    content: $i-toy-ball;
+  }
+}
+.i-toy-car-outline {
+  &:before {
+    content: $i-toy-car-outline;
+  }
+}
+.i-toy-horse-rocking-chair-outline {
+  &:before {
+    content: $i-toy-horse-rocking-chair-outline;
+  }
+}
+.i-truck-side-view-outline {
+  &:before {
+    content: $i-truck-side-view-outline;
+  }
+}
+.i-two-pieces-of-a-puzzle {
+  &:before {
+    content: $i-two-pieces-of-a-puzzle;
+  }
+}
+.i-checkmark {
+  &:before {
+    content: $i-checkmark;
+  }
+}
+.i-chevron-down {
+  &:before {
+    content: $i-chevron-down;
+  }
+}
+.i-chevron-up {
+  &:before {
+    content: $i-chevron-up;
+  }
+}
+.i-chevron-right {
+  &:before {
+    content: $i-chevron-right;
+  }
+}
+.i-chevron-left {
+  &:before {
+    content: $i-chevron-left;
+  }
+}
+.i-location {
+  &:before {
+    content: $i-location;
+  }
+}
+.i-cross {
+  &:before {
+    content: $i-cross;
+  }
+}
+.i-f {
+  &:before {
+    content: $i-f;
+  }
+}
+.i-t {
+  &:before {
+    content: $i-t;
+  }
+}
+.i-v {
+  &:before {
+    content: $i-v;
+  }
+}
+.i-arr_right {
+  &:before {
+    content: $i-arr_right;
+  }
+}
+.i-arr_left {
+  &:before {
+    content: $i-arr_left;
+  }
+}
+.i-star-outlined {
+  &:before {
+    content: $i-star-outlined;
+  }
+}
+.i-star {
+  &:before {
+    content: $i-star;
+  }
+}
+.i-sort-desc {
+  &:before {
+    content: $i-sort-desc;
+  }
+}
+.i-sort-asc {
+  &:before {
+    content: $i-sort-asc;
+  }
+}
+.i-o {
+  &:before {
+    content: $i-o;
+  }
+}
+.i-clock {
+  &:before {
+    content: $i-clock;
+  }
+}
+.i-g {
+  &:before {
+    content: $i-g;
+  }
+}
+

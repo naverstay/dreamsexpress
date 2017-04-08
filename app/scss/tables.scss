@@ -1,0 +1,159 @@
+.orders_table {
+  //width: 890px;
+
+  .col_1 {
+    width: 21%;
+  }
+
+  .col_2 {
+    width: 24.5%;
+  }
+
+  .col_3 {
+    width: 23.2%;
+  }
+
+  .col_4 {
+    width: 31.3%;
+  }
+
+  .col_1_w {
+    width: 68.7%;
+  }
+
+  .col_2_w {
+    width: 15.5%;
+  }
+
+  .col_3_w {
+    width: 15.2%;
+    
+    @include respond-to-min($resp_s) {
+      font-size: 18px;
+    }
+  }
+}
+
+.order_expand_btn {
+  @extend %icon_pseudo;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 30px;
+  cursor: pointer;
+
+  &:before {
+    content: $i-chevron-down;
+    position: absolute;
+    top: 50%;
+    margin-top: -10px;
+    height: 20px;
+    right: 0;
+    left: 0;
+    text-align: center;
+    font-size: 10px;
+    line-height: 20px;
+    color: $gl_main_black;
+  }
+
+  @include respond-to-min($resp_s) {
+    width: 50px;
+    right: 12px;
+  }
+
+}
+
+.order_row {
+  @include transition_all(background .5s);
+  @extend %clearfix;
+  background: #f5f5f5;
+  border-bottom: 1px solid $gl_gray_lines;
+  line-height: 30px;
+  padding-right: 35px;
+  position: relative;
+
+  &.collapsed {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    line-height: 50px;
+  }
+
+  &.opened {
+    background: $gl_white;
+
+    .order_expand_btn:before {
+      content: $i-chevron-up;
+    }
+  }
+
+  &.caption_row {
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-size: 12px;
+    color: $gl_main_black;
+    background: $gl_white;
+  }
+
+  @include respond-to-max($resp_s) {
+    font-size: 10px;
+    
+    .prod_f_inf {
+      font-size: 10px;
+    }
+  }
+  
+  @include respond-to-min($resp_s) {
+    line-height: 50px;
+    padding-right: 55px;
+
+    &.collapsed {
+      padding-top: 15px;
+      padding-bottom: 15px;
+    }
+  }
+}
+
+.order_cell {
+  float: left;
+  padding-left: 10px;
+
+  .cell_val {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: normal;
+  }
+
+  @include respond-to-min($resp_s) {
+    padding-left: 20px;
+  }
+
+}
+
+.order_product {
+  @extend %clearfix;
+
+}
+
+.order_img {
+  float: left;
+
+  img {
+    display: block;
+  }
+
+  + .order_cell {
+    float: none;
+    margin-left: 60px;
+  }
+}
+
+.order_name {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: $gl_main_black;
+  letter-spacing: 1.2px;
+}
+
+

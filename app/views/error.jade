@@ -1,0 +1,30 @@
+include mixins
+doctype html
+html(lang='ru')
+    +dev_head("Daddy's kid Корзина", false, false, false, false, false, true)
+
+    body
+        .wrapper
+            .base
+                +header(1)
+                
+                div.main_content
+                    .section_inner
+                        +breadcrumbs(['Главная', 'Ошибка'])
+                        h1.page_title.fw_700
+                            span= 'Ошибка ' + (error || '')
+
+                            - if (url)
+                                h1= url
+                            - if (message)
+                                h1= message
+                            - if (error)
+                                h2= error.status
+                                pre #{error.stack}
+                        
+            +footer()
+            
+        +aside_left()
+        +aside_right()
+        +popups()
+        

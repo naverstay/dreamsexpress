@@ -1,0 +1,172 @@
+//************  buttons
+
+%btn_1 {
+
+}
+
+.btn_v1 {
+  height: 40px;
+
+  &.fav_btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    font: 500 13px/16px $Rubik;
+    text-align: center;
+    padding: 12px;
+  }
+
+  &.apply_btn {
+    display: block;
+    padding: 12px 30px;
+    font: 500 13px/16px $Rubik;
+    text-align: center;
+    border-radius: 2px;
+  }
+
+  &.cart_btn {
+    display: block;
+    cursor: pointer;
+    border-radius: 2px;
+    font: 500 13px/16px $Rubik;
+    text-align: center;
+    padding: 12px;
+  }
+
+  &.order_btn {
+    float: left;
+    //width: 100%;
+    //max-width: 200px;
+    cursor: pointer;
+    border-radius: 2px;
+    font: 500 13px/16px $Rubik;
+    text-align: center;
+    padding: 12px 44px;
+    margin-top: 10px;
+
+    &.mod_2 {
+      padding: 12px 24px;
+      margin-bottom: 35px;
+    }
+
+    &.mod_3 {
+      padding: 12px 36px;
+      margin-bottom: 35px;
+    }
+
+    &.mod_4 {
+      min-width: 200px;
+      margin-top: 20px;
+      margin-bottom: 23px;
+    }
+  }
+
+  &.load_more_btn {
+    text-align: center;
+    display: block;
+    border-radius: 2px;
+    padding: 11px;
+    font: 500 13px/16px $Rubik;
+    margin-bottom: 55px;
+  }
+
+}
+
+.btn_v2 {
+  height: 50px;
+
+  &.sort_btn {
+    @include transition_all(background .3s, color .3s);
+    display: block;
+    text-transform: uppercase;
+    padding: 15px 12px;
+    font-size: 10px;
+    line-height: 20px;
+    position: relative;
+    color: $gl_white;
+    letter-spacing: 1.2px;
+
+    &.active {
+      color: $gl_main_black;
+      background: $gl_turquoise;
+    }
+
+    .sort_icon {
+      margin-left: 5px;
+    }
+  }
+}
+
+.btn_v3 {
+  height: 60px;
+
+  &.order_confirm_btn {
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 17px;
+    font: 500 13px/16px $Rubik;
+  }
+}
+
+.blue_btn {
+  @include transition_all(background .3s);
+  background: $gl_violette;
+  color: $gl_white;
+
+  &:hover {
+    background: $gl_violette_hover;
+  }
+
+  &[disabled='disabled'] {
+    background: gray;
+    cursor: not-allowed;
+  }
+}
+
+.green_btn {
+  color: #fff;
+}
+
+.btn_red {
+  color: #fff;
+  background: #f46b65;
+}
+
+.violette_btn {
+  @include transition_all(background .3s, color .3s);
+  background: $gl_white;
+  color: $gl_main_black;
+  border: 1px solid $gl_violette_link_hover;
+
+  &:hover {
+    color: $gl_white;
+    background: $gl_violette_link_hover;
+  }
+}
+
+.violette_btn_transp {
+  @include transition_all(background .3s, color .3s);
+  background: none;
+  color: $gl_white;
+  border: 1px solid $gl_violette_link_hover;
+
+  &:hover {
+    background: $gl_violette_link_hover;
+  }
+}
+
+.light_blue_btn {
+  @include transition_all(background .3s, color .3s);
+  background: $gl_turquoise;
+  color: $gl_main_black;
+
+  &:hover {
+    color: $gl_white;
+    background: $gl_violette_link_hover;
+  }
+}
+

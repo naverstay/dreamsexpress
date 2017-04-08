@@ -1,0 +1,48 @@
+include mixins
+
+- var gender = ['Любой', 'Девочки','Мальчики']
+- var age = ['Любой', '5','10','15','20','25','30','35','40']
+- var sizes = ['Любой', '5','10','15','20','25','30','35','40']
+- var colors = ['Любой', 'Оранжевый','Красный','Черный','Белый','Синий']
+- var brands = ['Любой', 'Zara','H&M','Okaidi','Puma','Nike','Mothercare','Addidas','Reebok']
+
+doctype html
+html(lang='ru')
+    +dev_head("Daddy's kid Поиск", false, false)
+
+    body
+        .wrapper
+            .base
+                +header(1)
+                
+                div.main_content
+                    .section_inner
+                        +breadcrumbs(['Главная', 'Расширенный поиск'])
+                        h1.page_title.fw_700
+                            span Расширенный Поиск
+
+                        .search_container
+                            form(action='#')
+                                .q_search_block
+                                    input.f_input.input_v3(placeholder='Найти товар')
+                                    button.search_btn.aside_m_icon.i-baby-rattle
+                                    
+                        .search_result
+                            .subcaption.fz_18.fw_700 К сожалению, нами не найден "авпавпапввпа"»
+                                
+                            p.fz_18.cool_text Возможно, следующие советы помогут вам найти то, что вы ищете:
+                            
+                            ul.search_tips
+                                li Убедитесь в том, что в тексте для поиска нет ошибок или описок.
+                                li Попробуйте использовать другое описание.
+                                li Расширьте поиск, используя слова с более общим значением, например, "кукла".
+                                li Ограничьте поиск одним или двумя словами.
+                                li Просмотрите категории основного меню и используйте фильтры слева.
+                           
+                                    
+            +footer()
+            
+        +aside_left()
+        +aside_right()
+        +popups()
+        

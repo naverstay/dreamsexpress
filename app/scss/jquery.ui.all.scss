@@ -1,0 +1,206 @@
+//---------------------------------------------------------------------ui-dialog
+.ui-helper-hidden {
+  display: none;
+}
+
+.ui-helper-hidden-accessible {
+  z-index: 5000;
+  position: absolute;
+  opacity: 0;
+  left: 0;
+  color: transparent;
+  visibility: hidden;
+}
+
+//-------------------------------------------------------ui-dialog
+.ui-dialog {
+  z-index: 1000;
+  position: absolute;
+  display: none;
+  outline: 0;
+  max-width: 98%;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, .15);
+  
+  .no_animation & {
+    display: none !important;
+  }
+
+  &.dialog_fixed {
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    padding: 80px 30px 30px;
+    box-shadow: none;
+  }
+
+  &.mob_dialog_fixed {
+    @include respond-to-max($resp_s) {
+      position: fixed !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      height: 100% !important;
+      width: 100% !important;
+      padding: 0;
+      background: $gl_white;
+      box-shadow: none;
+      overflow-y: auto;
+    }
+  }
+  
+}
+
+.dialog_global {
+  box-shadow: 0 3px 13px rgba(59, 59, 59, .86);
+}
+
+.ui-dialog-content {
+  min-height: 0 !important;
+
+  .dialog_color_schem_1 & {
+    background: #e5e5e5;
+  }
+}
+
+.ui-dialog-content_border {
+}
+
+.ui-resizable-handle {
+  display: none !important;
+}
+
+.gl_overlay,
+.ui-widget-overlay {
+  z-index: 23 !important;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  //	background: #fff;
+  background: transparentize(#000, .75);
+  
+  .overlay_v2 & {
+    background: transparentize(#000, .85);
+  }
+}
+
+.gl_overlay {
+  display: none;
+
+  .fav_opened & {
+    display: block;
+  }
+}
+
+.ui-helper-clearfix {
+  display: block;
+  &:after {
+    display: block;
+    height: 0;
+    clear: both;
+    content: "";
+    visibility: hidden;
+  }
+}
+
+.ui-dialog-titlebar-close {
+  .dialog_close_butt_mod_1 & {
+    @extend %icon_pseudo;
+    cursor: pointer;
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    top: 10px;
+    right: 10px;
+    z-index: 1002;
+    font-size: 26px;
+    text-align: center;
+    background: none;
+
+    &:before {
+      @include transition_all(color .3s);
+      content: $i-cross;
+      color: $gl_white;
+      line-height: 30px;
+    }
+  }
+
+  .no_close_mod & {
+    display: none !important;
+  }
+
+  .no_close_on_dt & {
+
+    @include respond-to-min($resp_s) {
+      display: none !important;
+    }
+  }
+
+  .no_title_mod & {
+
+  }
+}
+
+.ui-dialog-titlebar {
+
+  .ui-draggable & {
+    cursor: move;
+  }
+
+  .dialog_g_size_1 & {
+    height: 20px;
+    border-radius: 2px 2px 0 0;
+    background: #fff;
+  }
+
+  .dialog_g_size_2 & {
+    height: 20px;
+    border-radius: 2px 2px 0 0;
+    margin-bottom: -20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .dialog_g_size_3 & {
+    height: 20px;
+    border-radius: 2px 2px 0 0;
+    margin-bottom: -20px;
+    position: relative;
+    z-index: 1;
+
+    @include respond-to-min($resp_s) {
+      &:before {
+        content: '';
+        position: absolute;
+        right: 0;
+        bottom: 100%;
+        border-top: 13px solid transparent;
+        border-right: 13px solid $gl_cool_black;
+      }
+    }
+  }
+
+  .title_center_mod & {
+    text-align: center;
+  }
+
+  .no_title & {
+    display: none;
+  }
+}
+
+.dialog_butt_wrap {
+
+  .dialog_butt_v1 & {
+    @extend %global_flex_block_row_nowrap_center;
+    padding: 25px 0;
+  }
+}
+
+//---------------------------------------------------------------------ui-dialog

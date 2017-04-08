@@ -1,0 +1,113 @@
+include mixins
+doctype html
+html(lang='ru')
+    +dev_head("Daddy's kid Новости", false, true)
+
+    body
+        .wrapper
+            .base
+                +header(1)
+                
+                div.main_content
+                    .section_inner
+                        +breadcrumbs(['Главная', 'Новости'])
+                        h1.page_title.fw_700 Новости
+
+                        ul#grid.news_list
+                            li.box.x2
+                                .news_block
+                                    a.news_img(href='news_1' + ( dev ? '.html' : ''))
+                                        img(src='images/news_1.jpg')
+                                    .news_inner
+                                        .news_caption: a(href='news_1' + ( dev ? '.html' : '')) 
+                                            span ПЛАТЬЕ СО СПУЩЕННЫМИ ПЛЕЧАМИ:
+                                            span.mob_hidden  <br>  
+                                            span ИНСТРУКЦИЯ ПО ПРИМЕНЕНИЮ
+                                        p Ты уже наверняка не первый раз слышишь о том, что платье со спущенными плечами - одна из главных вещей сезона.
+                                    
+                                    .news_date 5 дней назад
+                                        
+                            li.small.box
+                                .news_block
+                                    a.news_img(href='news_1' + ( dev ? '.html' : ''))
+                                        img(src='images/news_2.jpg')
+                                    .news_inner
+                                        .news_caption: a(href='news_1' + ( dev ? '.html' : '')) ВЕЩЬ СЕЗОНА: КОРСЕТ МАДОННЫ
+                                    .news_date
+                                        .product_hit Акция
+                                        span С 12 по 26 апреля
+                                        
+                            +loop_while(4)
+                                li.small.box
+                                    .news_block
+                                        a.news_img(href='news_1' + ( dev ? '.html' : ''))
+                                            img(src='images/news_2.jpg')
+                                        .news_inner
+                                            .news_caption: a(href='news_1' + ( dev ? '.html' : '')) ВЕЩЬ СЕЗОНА: КОРСЕТ МАДОННЫ
+                                        .news_date С 12 по 26 апреля
+
+                            li.small.box
+                                .news_block
+                                    a.news_img(href='news_1' + ( dev ? '.html' : ''))
+                                        img(src='images/news_2.jpg')
+                                    .news_inner
+                                        .news_caption: a(href='news_1' + ( dev ? '.html' : '')) ВЕЩЬ СЕЗОНА: КОРСЕТ МАДОННЫ
+                                    .news_date
+                                        .product_hit Акция
+                                        span С 12 по 26 апреля
+                                        
+                            +loop_while(4)
+                                li.small.box
+                                    .news_block
+                                        a.news_img(href='news_1' + ( dev ? '.html' : ''))
+                                            img(src='images/news_2.jpg')
+                                        .news_inner
+                                            .news_caption: a(href='news_1' + ( dev ? '.html' : '')) ВЕЩЬ СЕЗОНА: КОРСЕТ МАДОННЫ
+                                        .news_date С 12 по 26 апреля
+                                        
+                            li.small.box
+                                .news_block
+                                    .news_inner
+                                        .news_caption: a(href='news_1' + ( dev ? '.html' : '')) ПЛАТЬЕ СО СПУЩЕННЫМИ ПЛЕЧАМИ: ИНСТРУКЦИЯ ПО ПРИМЕНЕНИЮ
+                                        p Ты уже наверняка не первый раз слышишь о том, что платье со спущенными плечами - одна из главных вещей сезона.
+                                        
+                                    .news_date 23 февраля 2016
+                                        
+                            +loop_while(2)
+                                li.small.box
+                                    .news_block
+                                        a.news_img(href='news_1' + ( dev ? '.html' : ''))
+                                            img(src='images/news_2.jpg')
+                                        .news_inner
+                                            .news_caption: a(href='news_1' + ( dev ? '.html' : '')) ВЕЩЬ СЕЗОНА: КОРСЕТ МАДОННЫ
+                                        .news_date Год назад
+
+                            li.small.box
+                                .news_block.to_bottom
+                                    .news_inner
+                                        .news_caption: a(href='news_1' + ( dev ? '.html' : '')) ПЛАТЬЕ СО СПУЩЕННЫМИ ПЛЕЧАМИ: ИНСТРУКЦИЯ ПО ПРИМЕНЕНИЮ
+                                        p Ты уже наверняка не первый раз слышишь о том, что платье со спущенными плечами - одна из главных вещей сезона.
+                                        
+                                    .news_date 23 февраля 2016
+                                        
+                            +loop_while(2)
+                                li.small.box
+                                    .news_block
+                                        a.news_img(href='news_1' + ( dev ? '.html' : ''))
+                                            img(src='images/news_2.jpg')
+                                        .news_inner
+                                            .news_caption: a(href='news_1' + ( dev ? '.html' : '')) ВЕЩЬ СЕЗОНА: КОРСЕТ МАДОННЫ
+                                        .news_date Год назад
+                                            
+                        a.btn_v1.load_more_btn.violette_btn(href='#') Смотреть еще 20
+                                            
+
+
+
+
+            +footer()
+            
+        +aside_left()
+        +aside_right()
+        +popups()
+        

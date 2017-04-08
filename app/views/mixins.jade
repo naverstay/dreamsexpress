@@ -1,0 +1,887 @@
+- var dev = false;
+- var no_min = true;
+- var year = new Date();
+
+- function formatPrice(s) {return s.replace(/(?!^)(?=(\d{3})+(?=\.|$))/gm, ' ')}
+
+//- var head_menu = ['Новинки','Акции','Оплата','Доставка','О компании']
+- var head_menu = ['Каталог','Новинки','Акции','Доставка и оплата','О компании']
+- var head_menu_link = ['catalog','news','lk','delivery','cart']
+- var aside_menu = ['Детская одежда','Детская обувь','Игрушки','Коляски','Детские товары','Мамам','Автокресла']
+- var aside_menu_icon = ['baby-onesie-with-front-pocket-outline','baby-shoes','bear-toy','baby-transport-side-view','baby-diaper-outline','baby-onesie-outline','baby-chair']
+    
+- var sub_menu = ['Все категории','Платья ','Комплекты одежды','Верхняя одежда','Нижнее белье','Одежда для сна','Распродажа']
+    
+mixin dev_head(page_title, index, news, search, product, lk, cart, add)
+    head
+        title= (title || '') + ' ' + page_title
+        | 
+        | <!-- saved from url=(0014)about:internet -->
+        meta(charset='utf-8')
+        meta(name='viewport', content="width=device-width, initial-scale=1.0")
+        meta(name="SKYPE_TOOLBAR", content="SKYPE_TOOLBAR_PARSER_COMPATIBLE")
+        meta(name="apple-mobile-web-app-capable", content="yes")
+        meta(name="format-detection", content="telephone=no")
+
+        - if (no_min)
+            | 
+            | <!--build:css css/styles.min.css-->
+            link(rel='stylesheet', href='css/main_global.css', media='all')
+            | 
+            | <!--endbuild-->
+        - else
+            link(rel='stylesheet', href='css/styles.min.css', media='all')
+            
+        link(href='//fonts.googleapis.com/css?family=Rubik:300,400,500,700', rel='stylesheet', type='text/css')
+        
+        - if (no_min)
+            | 
+            | <!--build:js js/main.min.js -->
+            script(src='js/lib/jquery-1.12.1.min.js')
+            script(src='js/lib/jquery-ui-1.11.4.js')
+            script(src='js/lib/slick.js')
+            script(src='js/lib/select2.js')
+            script(src='js/main.js')
+            | 
+            | <!--endbuild-->
+        - else
+            script(src='js/main.min.js')
+        
+        - if (index)
+            - if (no_min)
+                | 
+                | <!--build:js js/index.min.js -->
+                script(src='js/index.js')
+                | 
+                | <!--endbuild-->
+            - else
+                script(src='js/index.min.js')
+        - if (news)
+            - if (no_min)
+                | 
+                | <!--build:js js/news.min.js -->
+                script(src='js/lib/imagesloaded.pkgd.min.js')
+                script(src='js/lib/isotope.pkgd.min.js')
+                script(src='js/lib/packery-mode.pkgd.js')
+                script(src='js/news.js')
+                | 
+                | <!--endbuild-->
+            - else
+                script(src='js/news.min.js')
+
+        - if (search)
+            link(href='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css' rel="stylesheet")
+            script(src='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js')
+            - if (no_min)
+                | 
+                | <!--build:js js/search.min.js -->
+                script(src='js/lib/nouislider.min.js')
+                script(src='js/lib/jquery.inputmask.bundle.js')
+                script(src='js/search.js')
+                | 
+                | <!--endbuild-->
+            - else
+                script(src='js/search.min.js')
+
+        - if (lk)
+             - if (no_min)
+                | 
+                | <!--build:js js/lk.min.js -->
+                script(src='js/lk.js')
+                | 
+                | <!--endbuild-->
+             - else
+                script(src='js/search.min.js')
+
+        - if (cart)
+            - if (no_min)
+                | 
+                | <!--build:js js/cart.min.js -->
+                script(src='js/lib/jquery.inputmask.bundle.js')
+                script(src='js/cart.js')
+                | 
+                | <!--endbuild-->
+            - else
+                script(src='js/cart.min.js')
+            
+        - if (add)
+            - if (no_min)
+                | 
+                | <!--build:js js/add.min.js -->
+                script(src='js/add.js')
+                | 
+                | <!--endbuild-->
+            - else
+                script(src='js/add.js')
+
+mixin loop_while(counter)
+    -i=0;
+    while i < counter
+        -i++;
+        block
+
+mixin product_item(old_price)
+    .product_item
+        a.product_img(href='product' + (dev ? '.html' : ''))
+            img(src='images/dress_1.jpg')
+            .hover_img.prod_hover
+                img(src='images/hover_1.jpg')
+            .product_hit Хит продаж
+            .product_share_holder
+                span.prod_hover.prod_fav.favBtn
+                .product_share - 30%
+            .product_q_review.violette_btn.prod_hover.openReview.mob_hidden Быстрый просмотр
+        h3.product_caption Трикотажное платье  <br> с рисунком
+        .product_price
+            - if (old_price)
+                span.old_price 8449
+                    span._cur  грн.
+            span.new_price 4069
+                span._cur  грн.
+        
+        .product_item_overview.prod_hover
+            p Цвета и размеры в наличии
+            ul.prod_colors
+                li
+                    .prod_color
+                        img(src='images/color_1.png')
+                li
+                    .prod_color
+                        img(src='images/color_2.png')
+                li
+                    .prod_color
+                        img(src='images/color_3.png')
+                li
+                    .prod_color
+                        img(src='images/color_4.png')
+            .prod_sizes xs, s, m, xxl, xxxl
+        
+mixin header(active)
+    div.header
+        a.mob_menu_btn.openMobMenu(href='#')
+        a.mob_search_btn(href='#')
+            span.i-baby-rattle.aside_m_icon
+        .section_inner
+            .callback_block
+                .callback_inner
+                    .callback_time пн-пт: 9:00-22:00
+                    a.callback_btn.callbackBtn(href='#') (812) 505-10-41
+                    //-.callback_phone.select_box_v1
+                        select.select2
+                            option (812) 505-10-41
+                            option (812) 505-10-42
+                            option (812) 505-10-43
+
+mixin footer()
+    .footer
+        .section_inner
+            ul.main_menu.mob_hidden
+                for item, i in head_menu
+                    li
+                        - if (i == active)
+                            span.menu_link.menu_active: span=item
+                        - else
+                            a.menu_link(href=head_menu_link[i] + (dev ? '.html' : '')): span=item
+                    
+            ul.footer_info
+                li
+                    .footer_info_unit
+                        dl.contacts_list
+                            dt Контактная информация
+                            dd (812) 505-10-41  <br> 
+                                span d
+                                span r
+                                span e
+                                span a
+                                span m
+                                span s
+                                span e
+                                span x
+                                span p
+                                span r
+                                span e
+                                span s
+                                span s
+                                span .
+                                span b
+                                span i
+                                span z
+                                span @
+                                span g
+                                span m
+                                span a
+                                span i
+                                span l
+                                span .
+                                span c
+                                span o
+                                span m
+                                
+                        .footer_info_control
+                            a.gl_link(href='#') Заказать звонок
+                            
+                li
+                    .footer_info_unit
+                        dl.contacts_list
+                            dt Режим работы
+                            dd Будни с 9:00 до 22:00 <br> 
+                                | Выходные с 10:00 до 18:00 <br> 
+                                | Доставка с 12:00 до 20:00
+                            
+                            //-p.fz_13.fw_500
+                                a.gl_link(href='#') Посмотреть на карте
+                                
+                //-li
+                    .footer_info_unit
+                        dl.contacts_list
+                            dt адрес
+                            dd г. Санкт-Петербург, <br> 
+                                | ул. Правды, 1, ТЦ «Галерея»
+                                
+                        .footer_info_control
+                            a.gl_link(href='#') Посмотреть на карте
+                            
+                //-li
+                    .footer_info_unit
+                        dl.contacts_list
+                            dt Мы в соцсетях
+                            dd
+                                ul.about_list
+                                    li
+                                        a.about_link(href='#')
+                                            span.i-v
+                                    li
+                                        a.about_link(href='#')
+                                            span.i-f
+                                    li
+                                        a.about_link(href='#')
+                                            span.i-t
+                                    //-li
+                                        a.about_link(href='#')
+                                            span.i-o
+                                    //-li
+                                        a.about_link(href='#')
+                                            span.i-g
+                                
+                    
+            .copyright_block
+                .copyright
+                    | &copy;  
+                    span= year.getFullYear()
+                    |  dreamsexpress.biz, Все права защищены.
+                .payments
+                    img(src='images/pay_icons.png')
+                    
+mixin aside_right()
+    .aside_right
+        ul.user_menu
+            li.mob_hidden
+                a.user_m_link.openFailPopup(href='#')
+                    span.user_m_icon.i-baby-abacus-toy
+            li
+                a.user_m_link.openFav(href='#')
+                    span.user_m_icon.i-toy-ball
+                    span.user_m_counter 23
+            li
+                a.user_m_link.openSuccessPopup.cartLink(href='#')
+                    span.user_m_icon.i-truck-side-view-outline
+                    span.user_m_counter 6
+                    
+    .gl_overlay
+    .fav_container
+        .fav_caption
+            span Вам понравилось (999)
+        .fav_close_btn.openFav
+
+        ul.fav_list
+            +loop_while(4)
+                li.favUnit
+                    .product_item
+                        a.product_img(href='product' + (dev ? '.html' : ''))
+                            img(src='images/fav_1.jpg')
+                        .prod_rm_btn.rmFavBtn
+                        h3.product_caption Трикотажное платье с рисунком
+                        .product_price
+                            span.new_price 4069
+                                span._cur  грн.
+                li.favUnit
+                    .product_item
+                        a.product_img(href='product' + (dev ? '.html' : ''))
+                            img(src='images/fav_1.jpg')
+                        .prod_rm_btn.rmFavBtn
+                        h3.product_caption длинное название Трикотажного  <br>  платья с рисунком
+                        .product_price
+                            span.new_price 2000
+                                span._cur  грн.
+                            
+        a.btn_v1.fav_btn.light_blue_btn.clearFavBtn(href='#') Очистить список
+        
+mixin aside_left()
+    .aside_left
+        .aside_menu_holder
+            //-ul.aside_menu.search_menu
+                li.bdr_mod
+                    form.search_block.search_aside.aside_m_link(action='#')
+                        .aside_m_text: span
+                            input.f_input.input_v1(placeholder='Найти товар')
+                        button.search_btn.aside_m_icon.i-baby-rattle
+                
+            .aside_menu_scroller
+                ul.aside_menu.nav
+                    li.menuItem.bdr_mod.mob_hidden
+                        a.search_block.search_aside.aside_m_link.quickSearchBtn(href='#')
+                            span.aside_m_text
+                                span Найти товар
+                            span.aside_m_icon.i-baby-rattle
+                    for item, i in aside_menu
+                        li.menuItem(class= i == 0 ? "bdr_mod" : "")
+                            a.aside_m_link(href='#')
+                                span.aside_m_text: span=item
+                                span.submenu_icon
+                                span.aside_m_icon(class='i-' + aside_menu_icon[i])
+                            +aside_submenu(i, item)
+                        
+                ul.aside_menu.contacts
+                    li.bdr_mod.menuItem
+                        a.aside_m_link(href='#')
+                            span.aside_m_text: span Контакты
+                            span.submenu_icon
+                            span.aside_m_icon(class='i-location')
+                        +aside_submenu(7, 'Контакты')
+                
+        ul.main_menu
+            for item, i in head_menu
+                li
+                    - if (i == active)
+                        span.menu_link.menu_active: span=item
+                    - else
+                        a.menu_link(href=head_menu_link[i]): span=item
+
+        ul.auth_menu
+            li
+                a.menu_link.authBtn(href='#'): span Войти
+                
+    .logo_block.header_logo: a.logo(href= (dev ? 'index.html' : '/'))
+        img(src='images/logo.svg')
+
+mixin aside_submenu(ind, title)
+    
+    .submenu_holder
+        case ind
+            when 7
+                .submenu_inner
+                    .submenu_block
+                        .subcaption.fz_18.fw_700.text_upper.mob_hidden=title
+                        .phone.fz_16.fw_500 (812) 505-10-41
+                        p.fz_13.fw_500
+                            a.gl_link(href='#') Заказать звонок
+                        
+                        p email@gmail.com
+                        
+                        dl.contacts_list
+                            dt Режим работы
+                            dd Будни с 9:00 до 22:00 <br> 
+                                | Выходные с 10:00 до 18:00 <br> 
+                                | Доставка с 12:00 до 20:00
+                            
+                            dt адрес
+                            dd г. Санкт-Петербург, <br> 
+                                | ул. Правды, 1, ТЦ «Галерея»
+        
+                            p.fz_13.fw_500
+                                a.gl_link(href='#') Посмотреть на карте
+        
+            default
+                .submenu_w
+                    .submenu_inner.mob_hidden
+                        .subcaption.fz_18.fw_700.text_upper=title
+                        p Мы отобрали лучшую детскую одежду для ваших детей
+                    ul.submenu_list
+                        for item, i in sub_menu
+                            li(class= i == 0 ? "dt_hidden" : "")
+                                a.aside_m_link.submenu_link(href='#')
+                                    span.aside_m_text: span=item + ' ' + ind
+                                    span.aside_m_icon(class='i-' + aside_menu_icon[i])
+                        li.mob_hidden
+                            a.aside_m_link.submenu_link(href='#')
+                                span.aside_m_text.show_more Показать все категории (3)
+                    .submenu_tag_block.mob_hidden
+                        p По брендам:
+                        ul.submenu_tags
+                            li: a.gl_link(href='#') Zara
+                            li: a.gl_link(href='#') H&M
+                            li: a.gl_link(href='#') Okaidi
+                            li: a.gl_link(href='#') Puma
+                            li: a.gl_link(href='#') Nike
+                            li: a.gl_link(href='#') Mothercare
+                            li: a.gl_link(href='#') Addidas
+                            li: a.gl_link(href='#') Reebok
+                        
+                    //-for item, i in sub_menu
+                        li
+                            a.submenu_link(href='#')
+                                span=item
+                    
+mixin main_slider()
+    .main_slider.mainSlider
+        +loop_while(4)
+            .slide
+                img(src='images/slide_1.jpg')
+                .slide_description
+                    p В нашем магазине действует акция -30% 
+                        span.mob_hidden <br> 
+                        | на новую коллекцию. Только до конца апреля.
+                        span.mob_hidden <br>
+                        |  Ждем ваших заказов
+            
+        .slide_prev.mob_hidden
+        .slide_next.mob_hidden
+                            
+mixin hit_slider(items)
+    .hitSlider.hit_slider_holder
+        .hit_slider
+            - if (items.length)
+                for item, i in items
+                    .slide
+                        a.product_img(href='products/' + item.product_code)
+                            img(src=item.main_img)
+                            .product_hit Хит продаж
+                            .product_share_holder
+                                - if (item.share)
+                                    .product_share= item.share
+                        h3.product_caption= item.name
+                        .product_price
+                            - if (item.old_price)
+                                span.old_price= formatPrice(item.old_price)
+                                    span._cur  грн.
+                            span.new_price= formatPrice(item.price)
+                                span._cur  грн.
+                                
+            - else
+                +loop_while(6)
+                    .slide
+                        a.product_img(href='product' + (dev ? '.html' : ''))
+                            img(src='images/hit_1.jpg')
+                            .product_hit Хит продаж
+                            .product_share_holder: .product_share - 30%
+                        h3.product_caption Трикотажное платье с рисунком
+                        .product_price
+                            span.old_price 8449
+                                span._cur  грн.
+                            span.new_price 4069
+                                span._cur  грн.
+                    .slide
+                        a.product_img(href='product' + (dev ? '.html' : ''))
+                            img(src='images/hit_1.jpg')
+                            .product_hit Хит продаж
+                            .product_share_holder: .product_share - 30%
+                        h3.product_caption Трикотажное платье с рисунком
+                        .product_price
+                            span.new_price 4069
+                                span._cur  грн.
+                                
+        .slide_prev
+        .slide_next
+
+mixin pop_slider()
+    .popSlider.hit_slider_holder
+        .hit_slider.slide_middle
+            +loop_while(3)
+                .slide
+                    a.product_img(href='product' + (dev ? '.html' : ''))
+                        img(src='images/brand_1.png')
+                .slide
+                    a.product_img(href='product' + (dev ? '.html' : ''))
+                        img(src='images/brand_2.png')
+                .slide
+                    a.product_img(href='product' + (dev ? '.html' : ''))
+                        img(src='images/brand_3.png')
+                .slide
+                    a.product_img(href='product' + (dev ? '.html' : ''))
+                        img(src='images/brand_4.png')
+                .slide
+                    a.product_img(href='product' + (dev ? '.html' : ''))
+                        img(src='images/brand_5.png')
+                .slide
+                    a.product_img(href='product' + (dev ? '.html' : ''))
+                        img(src='images/brand_6.png')
+    
+        .slide_prev
+        .slide_next
+        
+mixin breadcrumbs(list)
+    ul.breadcrumbs
+        for item, i in list
+            li.breadcrumb_item
+                - if (i == list.length - 1)
+                    span=item
+                - else
+                    a.gl_link(href= item == 'Главная' ? (dev ? 'index.html' : '/') : (item == 'Каталог' ? 'catalog' + (dev ? '.html' : '') : 'products' + (dev ? '.html' : '')))=item
+            
+mixin dropdown_w(caption)
+    .dropdown_w
+        .dropdown_caption=caption
+        block
+        
+        ul.dropdown_controls.form_cell
+            li
+                a.btn_v1.blue_btn.apply_btn.catApply(href='#') Ok
+            li 
+                a.gl_link.catReset.blue_link(href='#') Сбросить
+            
+mixin cart_unit_controls()
+    ul.cart_unit_controls
+        li
+            span.cart_control Сумма:
+        li.cart_unit_quantity
+            .cart_quantity_control.val_cell
+                input.val.f_input.input_v1(value=1 data-inputmask="'alias': 'numeric'")
+                .val_btn.minus.disabled -
+                .val_btn.plus +
+        li
+            .cart_unit_price 
+                span 1200 
+                span._cur  грн.
+                
+        li.cart_unit_rm
+            a.gl_link(href='#') Удалить
+
+mixin prod_review_info(product_page)
+    .prod_review_info
+        .product_share_holder: .product_share - 30%
+        .prod_review_cart
+            .product_price
+                span.new_price 4069
+                    span._cur  грн.
+                span.old_price 8449
+                    span._cur  грн.
+
+            .prod_review_controls_w
+                ul.prod_review_controls
+                    li
+                        a.btn_v1.blue_btn.cart_btn.addToCart(href='#') В корзину
+                    li
+                        a.btn_v1.violette_btn_transp.cart_btn.toggleOneClick(href='#') Купить в 1 клик
+                    li
+                        a.prod_fav.favBtn(href='#')
+
+                .prod_review_1_click.oneClickForm
+                    form(action='#')
+                        .form_cell
+                            input.f_input.input_v5(placeholder='Имя')
+                        .form_cell
+                            input.f_input.input_v5(placeholder='телефон' data-inputmask="'mask': '[+38] (099)-999-99-99'")
+
+                        ul.dropdown_controls
+                            li
+                                a.btn_v1.blue_btn.apply_btn(href='#') Купить
+                            li
+                                a.gl_link.white_link.toggleOneClick(href='#') Отменить
+            
+        .prod_review_options
+            - if (product_page)
+                ul.prod_rating_list
+                    +loop_while(3)
+                        li
+                            span.prod_rating.active
+                    +loop_while(2)
+                        li
+                            span.prod_rating
+                    li (5)
+                
+            dl.prod_options
+                dt Цвет: 
+                dd Белый в синюю полоску
+
+            ul.prod_options_switch
+                li
+                    label.option_switch.round
+                        input.inp_hidden(type='radio' name='prod_color')
+                        span.check_text
+                            img(src='images/color_1_big.png')
+
+                li
+                    label.option_switch.round
+                        input.inp_hidden(type='radio' name='prod_color')
+                        span.check_text
+                            img(src='images/color_2_big.png')
+
+            dl.prod_options
+                dt Размер: 
+                dd &nbsp;
+
+            ul.prod_options_switch
+                li
+                    label.option_switch
+                        input.inp_hidden(type='radio' name='prod_size')
+                        span.check_text: span xs
+                li
+                    label.option_switch
+                        input.inp_hidden(type='radio' name='prod_size')
+                        span.check_text: span s
+                li
+                    label.option_switch
+                        input.inp_hidden(type='radio' name='prod_size' disabled)
+                        span.check_text: span m
+                li
+                    label.option_switch
+                        input.inp_hidden(type='radio' name='prod_size')
+                        span.check_text: span l
+                li
+                    label.option_switch
+                        input.inp_hidden(type='radio' name='prod_size')
+                        span.check_text: span xl
+                li
+                    label.option_switch
+                        input.inp_hidden(type='radio' name='prod_size' disabled)
+                        span.check_text: span xxl
+                        
+            - if (product_page)
+                dl.prod_options
+                    dt Артикул: 
+                    dd 0350205001
+                
+                .prod_footer_info
+                    .prod_f_inf
+                        span.prod_f_icon.in_stock
+                        span Товар в наличии
+                    .prod_f_inf.felivery
+                        span.prod_f_icon.i-truck-side-view-outline
+                        span Срок доставки 1-2 дня
+                
+            - if (!product_page)
+                p Мужские джинсы PlanB, выполненные из плотного денима на основе хлопка. Традиционный силуэт, прямой крой и средняя посадка. 
+                
+                .footer_info_control
+                    a.gl_link(href='product' + (dev ? '.html' : '')) На страницу товара
+                
+mixin order_info(count)
+    .orderExpandRow(style='display:none;')
+        +loop_while(count)
+            .order_row.collapsed
+                .order_cell.col_1_w
+                    .order_product
+                        a.order_img(href='product' + (dev ? '.html' : ''))
+                            img(src='images/cart_1.jpg')
+                        .order_cell
+                            .cell_val
+                                a.order_name(href='product' + (dev ? '.html' : '')) Трикотажное платье с рисунком
+                            
+                .order_cell.col_2_w
+                    .cell_val.fw_500 10 шт
+                .order_cell.col_3_w
+                    .cell_val
+                        span 40 069 
+                        span._cur  грн.
+                    
+        .order_row.collapsed
+            .order_cell.col_1_w &nbsp;
+            .order_cell.col_2_w
+                .cell_val.fw_500 ИТОГО
+            .order_cell.col_3_w 
+                .cell_val
+                    span 120 069 
+                    span._cur  грн.
+
+mixin popups()
+    .popup_close_btn.popupClose
+        
+    #quick_search_popup.popup.popup_v4
+        .q_search_block
+            form.qSearchForm(action='/q_search' method='POST')
+                input.f_input.input_v3.qSearchInput(placeholder='Найти товар' name='search_for')
+                button.search_btn.aside_m_icon.i-baby-rattle
+                .adv_search_box
+                    a.gl_link(href='search' + (dev ? '.html' : '')) Перейти к расширенному поиску
+        
+        .q_search_results_holder: ul.searchResults.q_search_results
+            +loop_while(7)
+                li
+                    .product_item
+                        a.product_img(href='product' + (dev ? '.html' : ''))
+                            img(src='images/search_rslt_1.jpg')
+                            .product_hit Хит продаж
+                            .product_share_holder: .product_share - 30%
+                        h3.product_caption Трикотажное платье  <br> с рисунком
+                        .product_price
+                            span.old_price 8449
+                                span._cur  грн.
+                            span.new_price 4069
+                                span._cur  грн.
+                    
+    #review_popup.popup.popup_v5
+        .popup_inner
+            .prod_review 
+                .prod_review_photos
+                    h3 Топ и брючки тонкой вязки
+                    .fotorama(data-thumbwidth=60, data-thumbheight=60, data-height=340, data-nav="thumbs", data-thumbmargin=3)
+                        .prod_review_img.product_img(data-thumb='images/preview_small_1.jpg')
+                            img(src='images/preview_main_1.jpg')
+                            .product_hit Хит продаж
+                        .prod_review_img.product_img(data-thumb='images/preview_small_2.jpg')
+                            img(src='images/preview_main_1.jpg')
+                            .product_hit Хит продаж
+                        .prod_review_img.product_img(data-thumb='images/preview_small_3.jpg')
+                            img(src='images/preview_main_1.jpg')
+                            .product_hit Хит продаж
+
+            +prod_review_info()
+
+    #callback_popup.popup.popup_v2
+        .popup_inner
+            ul#callback_switcher.tab_holder.tab_v1
+                li: a.tab_link(href='#callback_tab_1'): span Перезвоните мне
+                li: a.tab_link(href='#callback_tab_2'): span Задать вопрос
+                
+            .tabBlock(data-tab-context='#callback_switcher')
+                #callback_tab_1
+                    .tab_content
+                        form(action='#')
+                            .form_cell
+                                input.f_input.input_v2(placeholder='Имя')
+                                
+                            .form_cell
+                                input.f_input.input_v2(placeholder='Телефон' data-inputmask="'mask': '[+38] (099)-999-99-99'")
+                                
+                            .form_cell
+                                button.btn_v1.blue_btn.order_btn Отправить заявку
+                                
+                #callback_tab_2
+                    .tab_content
+                        form(action='#')
+                            .form_cell
+                                input.f_input.input_v2(placeholder='Имя')
+                                
+                            .form_cell
+                                input.f_input.input_v2(placeholder='Телефон' data-inputmask="'mask': '[+38] (099)-999-99-99'")
+                                
+                            .form_cell
+                                textarea.f_input.input_v2(placeholder='Вопрос')
+                                
+                            .form_cell
+                                button.btn_v1.blue_btn.order_btn Отправить вопрос
+                                
+    #fail_popup.popup.popup_v3.popup_fail
+        .popup_inner.form_cell_v1
+            .popup_caption Ошибка
+            .popup_msg Вы указали почту, которой нет.  <br>  Попробуйте еще раз
+            
+            .form_cell
+                a.btn_v1.blue_btn.order_btn.mod_2(href='#') Попробовать еще раз
+                a.gl_link.popupClose(href='#') Закрыть
+                    
+    #success_popup.popup.popup_v3.popup_success
+        .popup_inner.form_cell_v1
+            .popup_caption Успех!
+            .popup_msg.successText Новый пароль отправлен на вашу почту. Откройте письмо и пройдите по ссылке 
+            
+            .form_cell
+                button.btn_v1.blue_btn.order_btn.mod_3.popupClose Закрыть
+
+    #recovery_popup.popup.popup_v3
+        .popup_inner.form_cell_v1
+            .popup_caption Восстановление пароля
+            form(action='#')
+                .form_cell
+                    input.f_input.input_v2(placeholder='Email')
+                    
+                .form_cell
+                    button.btn_v1.blue_btn.order_btn.mod_2 Выслать новый пароль
+
+    #auth_popup.popup.popup_v3
+        .popup_inner
+            ul#auth_switcher.tab_holder.tab_v2
+                li.ui-state-active: a.tab_link(href='#auth_tab_1'): span Вход
+                li: a.tab_link(href='#auth_tab_2'): span Регистрация
+
+            .tabBlock(data-tab-context='#auth_switcher')
+                #auth_tab_1
+                    .tab_content
+                        form(action='#')
+                            .form_cell
+                                input.f_input.input_v2(placeholder='Email')
+                                
+                            .form_cell
+                                input.f_input.input_v2(placeholder='пароль')
+                                
+                            .form_cell
+                                button.btn_v1.blue_btn.order_btn Войти
+                                
+                            .form_cell
+                                label.check_emul.check_v1
+                                    input.inp_hidden(type='checkbox')
+                                    span.check_text Запомнить на этом устройтсве
+                                
+                            .form_cell
+                                a.gl_link.cool_text.fz_13.fw_500.passRecoveryBtn(href='#') Забыли пароль?
+                        
+                #auth_tab_2
+                    .tab_content
+                        form(action='#')
+                            .form_cell
+                                input.f_input.input_v2(placeholder='Email')
+                                
+                            .form_cell
+                                input.f_input.input_v2(placeholder='пароль')
+                                
+                            .form_cell
+                                button.btn_v1.blue_btn.order_btn Зарегистрироваться
+                        
+                    //-.alter_auth
+                        p Войти через:
+                        ul.about_list
+                            li
+                                a.about_link(href='#')
+                                    span.i-v
+                            li
+                                a.about_link(href='#')
+                                    span.i-f
+                            li
+                                a.about_link(href='#')
+                                    span.i-t
+                            li
+                                a.about_link(href='#')
+                                    span.i-o
+                            li
+                                a.about_link(href='#')
+                                    span.i-g
+                        
+    #add2cart_popup.popup.popup_v5
+        .popup_cart_title
+            .popup_cart_caption.fz_18 Товар добавлен в корзину
+            p 
+                span Всего: 4 товар (ов) на сумму 1 401 069
+                span._cur  грн.
+        
+        .popup_cart_body
+            p С этим товаром покупают:
+            
+            ul.cart_items
+                    li
+                        .product_item
+                            a.product_img(href='product' + (dev ? '.html' : ''))
+                                img(src='images/fav_1.jpg')
+                            h3.product_caption Трикотажное платье с рисунком
+                            .product_price
+                                span.new_price 200
+                                    span._cur  грн.
+                                    
+                    li
+                        .product_item
+                            a.product_img(href='product' + (dev ? '.html' : ''))
+                                img(src='images/fav_1.jpg')
+                            h3.product_caption длинное название длинное название длинное название
+                            .product_price
+                                span.new_price 200
+                                    span._cur  грн.
+                                    
+                    li
+                        .product_item
+                            a.product_img(href='product' + (dev ? '.html' : ''))
+                                img(src='images/fav_1.jpg')
+                            h3.product_caption ФУтболка
+                            .product_price
+                                span.new_price 200
+                                    span._cur  грн.
+    .preloader
+        

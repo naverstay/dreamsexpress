@@ -1,0 +1,378 @@
+.search_container {
+
+  @include respond-to-min($resp_s) {
+    margin-top: -20px;
+  }
+}
+
+.search_result_info {
+  margin: 30px 0 35px;
+  line-height: 1.5;
+}
+
+.search_filters {
+  @extend %clearfix;
+  margin-left: -10px;
+
+  > li {
+    padding-left: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+
+  @include respond-to-min($resp_s) {
+    margin-left: -20px;
+
+    > li {
+      float: left;
+      padding-left: 20px;
+      margin-bottom: 20px;
+      width: 50%;
+    }
+  }
+
+  @include respond-to-min($resp_xl) {
+    margin-left: -30px;
+
+    > li {
+      width: 25%;
+      padding-left: 30px;
+      margin-bottom: 40px;
+    }
+  }
+}
+
+.search_categories {
+  @extend %clearfix;
+  margin-left: -10px;
+  margin-bottom: 10px;
+
+  > li {
+    float: left;
+    width: 100%;
+    margin-bottom: 10px;
+    padding-left: 10px;
+  }
+
+  @include respond-to-min($resp_s_1) {
+
+    > li {
+      width: 50%;
+    }
+  }
+
+  @include respond-to-min($resp_s) {
+    margin-left: -20px;
+    margin-right: -1%;
+
+    > li {
+      width: 33%;
+      margin-bottom: 20px;
+      padding-left: 20px;
+    }
+  }
+
+  @include respond-to-min($resp_xl) {
+    margin-right: -4%;
+    margin-left: -30px;
+
+    > li {
+      width: 16%;
+      margin-bottom: 30px;
+      padding-left: 30px;
+    }
+  }
+}
+
+.dropdown_controls {
+  @extend %clearfix;
+  margin-left: -30px;
+  line-height: 40px;
+
+  > li {
+    float: left;
+    padding-left: 30px;
+  }
+
+}
+
+.dropdown_holder {
+  position: relative;
+}
+
+.dropdown_btn {
+  @include transition_all(background .3s, border-color .3s);
+  padding: 9px 17px;
+  border: 1px solid $gl_gray_lines;
+
+  .active & {
+    background: $gl_inp_gray;
+    border-color: $gl_inp_gray;
+  }
+}
+
+.dropdown_w {
+  @include transition_all(transform .3s .1s, opacity .3s .1s);
+  @include transform_translate(0, -20px);
+  opacity: 0;
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  min-width: 250px;
+  left: 0;
+  background: $gl_white;
+  padding: 18px 24px;
+  border-radius: 2px;
+  pointer-events: none;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, .15);
+
+  .opened & {
+    @include transform_translate(0, 0);
+    opacity: 1;
+    z-index: 3;
+    pointer-events: all;
+  }
+
+  .dropdown_w_right & {
+    left: auto;
+    right: 0;
+  }
+
+}
+
+.dropdown_caption {
+  @extend %icon_pseudo;
+  @extend .caption_v1;
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  font-size: 10px;
+  line-height: 30px;
+
+  .dropdown_btn > & {
+    padding-right: 20px;
+    z-index: 2;
+
+    &:before {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      font-size: 12px;
+      line-height: 12px;
+      margin-top: -8px;
+      content: $i-chevron-down;
+    }
+  }
+}
+
+.dropdown_val {
+  position: relative;
+  z-index: 2;
+  font-size: 12px;
+  line-height: 30px;
+  color: #666;
+  min-height: 30px;
+}
+
+.dropdown_reset {
+  @extend %icon_pseudo;
+  z-index: 4;
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  border-radius: 100%;
+  width: 20px;
+  height: 20px;
+  background: $gl_turquoise;
+  text-align: center;
+  cursor: pointer;
+  display: none;
+
+  &:before {
+    content: $i-cross;
+    font-size: 10px;
+    line-height: 20px;
+    color: $gl_main_black;
+  }
+
+  .active & {
+    display: block;
+  }
+
+}
+
+.search_tips {
+  margin-top: 27px;
+  margin-bottom: 45px;
+
+  > li {
+    position: relative;
+    line-height: 2;
+    margin-bottom: 2px;
+
+    &:before {
+      content: '•';
+      display: inline-block;
+      margin-right: 8px;
+      color: $gl_main_black;
+    }
+  }
+}
+
+.search_result {
+  padding-top: 45px;
+
+  .subcaption {
+    text-transform: uppercase;
+    margin-bottom: 35px;
+    letter-spacing: .8px;
+  }
+
+  p.cool_text {
+    letter-spacing: -.3px;
+  }
+}
+
+.cat_list {
+  margin: 13px 0 20px;
+
+  > li {
+    margin-bottom: 8px;
+  }
+}
+
+.price_toddler_holder {
+
+}
+
+.price_toddler_vals {
+  @extend %clearfix;
+  padding-top: 4px;
+  margin-left: -20px;
+
+  > li {
+    float: left;
+    width: 50%;
+    padding-left: 20px;
+    margin-bottom: 20px;
+  }
+
+}
+
+.price_toddler_holder {
+  padding: 8px 0;
+  position: relative;
+}
+
+.search_sort {
+  @extend %clearfix;
+  line-height: 50px;
+  margin-bottom: 25px;
+  padding: 0 5px;
+  background: $gl_cool_black;
+
+  > li {
+    float: left;
+    padding-left: 15px;
+
+    &:first-child {
+      min-width: 180px;
+
+      @include respond-to-max($resp_s) {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.adv_search_results {
+  @extend %clearfix;
+  margin-left: -30px;
+
+  .product_item {
+    background: $gl_white;
+  }
+
+  .product_share_holder {
+    right: -10px;
+  }
+
+  .product_share_holder,
+  .product_hit {
+    top: 12px;
+  }
+
+  .product_caption {
+    font-size: 10px;
+    line-height: 18px;
+    margin-top: 15px;
+  }
+
+  .old_price {
+    text-align: right;
+    padding-right: 5px;
+  }
+
+  .new_price {
+    text-align: left;
+    padding-left: 5px;
+  }
+
+  .product_price {
+    padding-bottom: 20px;
+  }
+
+  > li {
+    padding-left: 30px;
+    margin-bottom: 30px;
+    float: left;
+    width: 100%;
+
+    @include respond-to-min($resp_s_1) {
+      width: 50%;
+    }
+
+    @include respond-to-min($resp_s) {
+      width: 33%;
+    }
+
+    @include respond-to-min($resp_l) {
+      width: 25%;
+    }
+
+    @include respond-to-min($resp_xl) {
+      width: 20%;
+    }
+
+    @include respond-to-min($resp_xxl) {
+      width: 16%;
+    }
+  }
+
+  @include respond-to-min($resp_s) {
+    margin-right: -1%;
+  }
+
+  @include respond-to-min($resp_l) {
+    margin-right: 0;
+  }
+
+  @include respond-to-min($resp_xxl) {
+    margin-right: -4%;
+  }
+
+}
+
+.catalog_description {
+  border-top: 1px solid #eaeaea;
+  padding-top: 38px;
+  
+  p {
+    margin-bottom: 20px;
+    line-height: 1.8;
+    color: #666;
+  }
+}
+
+
+

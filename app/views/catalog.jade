@@ -1,0 +1,99 @@
+include mixins
+
+doctype html
+html(lang='ru')
+    +dev_head("Daddy's kid Каталог")
+
+    body
+        .wrapper
+            .base
+                +header(1)
+                
+                div.main_content
+                    .section_inner
+                        +breadcrumbs(['Главная', 'Каталог'])
+                        h1.page_title.fw_700
+                            span Каталог
+
+                    .cat_holder
+                        .section_inner
+                            .cat_caption Детская одежда
+                            p Мы отобрали лучшую детскую одежду для ваших детей
+                            
+                            .cat_row
+                                +loop_while(6)
+                                    .cat_cell: a.cat_unit(href='products' + (dev ? '.html' : ''))
+                                        .cat_img
+                                            img(src='images/cat_1.png')
+                                        .cat_item_name Комплекты  <br> одежды
+                                
+                            .cat_caption Детская обувь
+                            p Мы отобрали лучшую детскую одежду для ваших детей
+                            
+                            .cat_row
+                                +loop_while(5)
+                                    .cat_cell: a.cat_unit(href='products' + (dev ? '.html' : ''))
+                                        .cat_img
+                                            img(src='images/cat_2.png')
+                                        .cat_item_name Сандалии  <br> и балетки
+                                    
+                            .cat_caption Игрушки
+                            p Мы отобрали лучшую детскую одежду для ваших детей
+                            
+                            .cat_row
+                                +loop_while(7)
+                                    .cat_cell: a.cat_unit(href='products' + (dev ? '.html' : ''))
+                                        .cat_img
+                                            img(src='images/cat_3.png')
+                                        .cat_item_name Радиоуправляемые  <br> игрушки
+
+                            .cat_caption Мамам
+                            p Мы отобрали лучшую детскую одежду для ваших детей
+                            
+                            .cat_row
+                                +loop_while(5)
+                                    .cat_cell: a.cat_unit(href='products' + (dev ? '.html' : ''))
+                                        .cat_img
+                                            img(src='images/cat_4.png')
+                                        .cat_item_name Верх  <br>  для беременных
+                                            
+                            .cat_caption Детские коляски
+                            p Мы отобрали лучшую детскую одежду для ваших детей
+                            
+                            .cat_row
+                                +loop_while(5)
+                                    .cat_cell: a.cat_unit(href='products' + (dev ? '.html' : ''))
+                                        .cat_img
+                                            img(src='images/cat_5.png')
+                                        .cat_item_name Верх  <br>  для беременных
+                                            
+                            .cat_caption автокресла
+                            p Мы отобрали лучшую детскую одежду для ваших детей
+                            
+                            .cat_row
+                                +loop_while(4)
+                                    .cat_cell: a.cat_unit(href='products' + (dev ? '.html' : ''))
+                                        .cat_img
+                                            img(src='images/cat_6.png')
+                                        .cat_item_name Прогулочные  <br>  коляски
+
+                            .cat_caption детские товары
+                            p Мы отобрали лучшую детскую одежду для ваших детей
+
+                            .cat_row
+                                +loop_while(3)
+                                    .cat_cell: a.cat_unit(href='products' + (dev ? '.html' : ''))
+                                        .cat_img
+                                            img(src='images/cat_7.png')
+                                        .cat_item_name Прогулочные  <br>  коляски
+                                            
+                                            
+
+
+
+            +footer()
+            
+        +aside_left()
+        +aside_right()
+        +popups()
+        

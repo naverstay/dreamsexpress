@@ -1,0 +1,81 @@
+.blue_link {
+  @include transition_all(color .3s);
+  color: $gl_violette;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: $gl_violette_link_hover;
+  }
+}
+
+.white_link {
+  @include transition_all(color .3s);
+  color: $gl_white;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: $gl_gray_lines;
+  }
+}
+
+.black_link {
+  @include transition_all(color .3s);
+  color: $gl_main_black;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: $gl_cool_black;
+  }
+}
+
+.caption_v1 {
+  color: $gl_main_black;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+.title {
+  color: $gl_main_black;
+  letter-spacing: 1px;
+}
+
+.page_title {
+  font-size: 20px;
+  line-height: 30px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  color: $gl_main_black;
+  letter-spacing: 1.5px;
+  
+  @include respond-to-min($resp_s) {
+    font-size: 30px;
+    line-height: 40px;
+    margin-bottom: 32px;
+  }
+}
+
+.subcaption {
+  color: $gl_main_black;
+  letter-spacing: 1px;
+}
+
+.cool_text {
+  color: $gl_cool_black;
+}
+
+@for $i from 0 through 4 {
+  .fw_#{($i + 3) * 100} {
+    font-weight: 300 + 100 * $i;
+  }
+}
+
+@for $i from 10 through 36 {
+  .fz_#{$i} {
+    font-size: 0px + $i;
+  }
+}
+

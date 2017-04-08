@@ -1,0 +1,92 @@
+include mixins
+
+- var gender = ['Любой', 'Девочки','Мальчики']
+- var age = ['Любой', '5','10','15','20','25','30','35','40']
+- var sizes = ['Любой', '5','10','15','20','25','30','35','40']
+- var colors = ['Любой', 'Оранжевый','Красный','Черный','Белый','Синий']
+- var brands = ['Любой', 'Zara','H&M','Okaidi','Puma','Nike','Mothercare','Addidas','Reebok']
+
+doctype html
+html(lang='ru')
+    +dev_head("Daddy's kid Товар " + id || '', false, false, true)
+
+    body
+        .wrapper
+            .base
+                +header(1)
+                
+                div.main_content
+                    .section_inner
+                        +breadcrumbs(['Главная', 'Каталог', 'Детская одежда', 'Верхняя одежда', 'Нейлоновая куртка-бомбер'])
+
+                        .product_block
+                            .product_photos
+                                h1.page_title.fw_700
+                                    span Нейлоновая куртка-бомбер
+                                    
+                            .product_cart
+                                .product_soc
+                                    
+                        .product_block
+                            .product_photos
+                                .fotorama(data-thumbwidth=68, data-thumbheight=68, data-width='100%', data-height='100%', data-maxwidth=660, data-maxheight=660, data-nav="thumbs")
+                                    .prod_review_img.product_img(data-thumb='images/product_1_thumb.jpg')
+                                        img(src='images/product_1.jpg')
+                                    .prod_review_img.product_img(data-thumb='images/product_1_thumb.jpg')
+                                        img(src='images/product_1.jpg')
+                                    .prod_review_img.product_img(data-thumb='images/product_1_thumb.jpg')
+                                        img(src='images/product_1.jpg')
+                                    
+                            .product_cart
+                                .product_soc
+                                    +prod_review_info(true)
+                                
+                    .section_inner
+                        ul#features_switcher.tab_holder.tab_v4
+                            li: a.tab_link(href='#features_tab_1'): span ОПИСАНИЕ
+                            li: a.tab_link(href='#features_tab_2'): span ДОСТАВКА
+                            li: a.tab_link(href='#features_tab_3'): span отзывы (25)
+
+                    .product_feature_tabs: .tabBlock(data-tab-context='#features_switcher')
+                        #features_tab_1
+                            .section_inner
+                                .prod_feature
+                                    p Куртка-бомбер из нейлона. На куртке воротник стойка, молния спереди, а также боковые карманы на молнии. Карман на молнии на одном рукаве. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны.
+
+                        #features_tab_2
+                            .section_inner
+                                .prod_feature
+                                    p Куртка-бомбер из нейлона. На куртке воротник стойка, молния спереди, а также боковые карманы на молнии. Карман на молнии на одном рукаве. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны.Карман на молнии на одном рукаве. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны.
+
+                        #features_tab_3
+                            .section_inner
+                                .prod_feature
+                                    p Куртка-бомбер из нейлона. На куртке воротник стойка, молния спереди, а также боковые карманы на молнии. Карман на молнии на одном рукаве. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны.
+                                    p Куртка-бомбер из нейлона. На куртке воротник стойка, молния спереди, а также боковые карманы на молнии. Карман на молнии на одном рукаве. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны.
+                    
+                    .prod_additional
+                        .section_inner
+                            h2.page_title.fw_700
+                                span Сочетается с
+                                        
+                            ul.q_search_results
+                                +loop_while(2)
+                                    li
+                                        +product_item(true)
+                                        
+                    .prod_additional
+                        .section_inner
+                            h2.page_title.fw_700
+                                span Другие также купили
+                                        
+                            ul.q_search_results
+                                +loop_while(1)
+                                    li
+                                        +product_item(true)
+                            
+            +footer()
+            
+        +aside_left()
+        +aside_right()
+        +popups()
+        

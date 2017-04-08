@@ -1,0 +1,246 @@
+
+.footer {
+  background: $gl_gray_light;
+  padding: 45px 30px 30px;
+
+  @include respond-to-min($resp_s) {
+    padding: 33px 30px;
+  }
+
+  @include respond-to-max($resp_s) {
+    .contacts_list {
+      dt {
+        font-size: 9px;
+        letter-spacing: 1.3px;
+      }
+
+      dd {
+        margin-bottom: 5px;
+      }
+    }
+  }
+  
+}
+
+.copyright_block {
+  @extend %clearfix;
+  line-height: 22px;
+  text-align: center;
+
+  @include respond-to-min($resp_s) {
+    max-width: 87.5%;
+  }
+
+  @include respond-to-min($resp_l) {
+    max-width: 74.5%;
+  }
+
+  @include respond-to-min($resp_xxl) {
+    max-width: 93.5%;
+  }
+
+}
+
+.copyright {
+  font-size: 12px;
+  margin-bottom: 15px;
+  
+  @include respond-to-min($resp_s) {
+    margin-bottom: 0;
+    float: left;
+  }
+  
+}
+
+.payments {
+
+  @include respond-to-min($resp_s) {
+    float: right;
+  }
+
+  img {
+    display: inline-block;
+    vertical-align: top;
+    max-width: 100%;
+  }
+}
+
+.footer_info {
+  @extend %clearfix;
+
+  > li {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  @include respond-to-min($resp_s) {
+    margin-left: -20px;
+    margin-bottom: 27px;
+
+    > li {
+      text-align: left;
+      float: left;
+      width: 50%;
+      margin-bottom: 25px;
+      padding-left: 20px;
+    }
+  }
+
+  @include respond-to-min($resp_l) {
+    margin-bottom: 0;
+
+    > li {
+      width: 25%;
+      margin-bottom: 30px;
+    }
+  }
+
+  @include respond-to-min($resp_xxl) {
+
+  }
+
+}
+
+.contacts_list {
+  line-height: 1.8;
+
+  dd {
+    margin-bottom: 25px;
+  }
+
+  dt {
+    text-transform: uppercase;
+    font-size: 10px;
+    color: $gl_gray_additional;
+    letter-spacing: 1px;
+  }
+
+  dd,
+  dt {
+    display: block;
+  }
+}
+
+.footer_info_list {
+
+  dd {
+    p {
+      margin-bottom: 10px;
+    }
+  }
+
+  dt {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 10px;
+    color: $gl_gray_additional;
+    margin-bottom: 10px;
+  }
+
+}
+
+.about_list {
+  li {
+    display: inline-block;
+    vertical-align: top;
+    margin: 15px 7px 0;
+
+    @include respond-to-min($resp_s) {
+      margin: 15px 13px 0 0;
+    }
+  }
+}
+
+.about_link {
+  display: block;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  text-decoration: none;
+
+  span {
+    @include transition_all(color .3s);
+    color: $gl_soc;
+    font-size: 30px;
+  }
+
+  &:hover {
+    .i-v {
+      color: $gl_vk;
+    }
+
+    .i-f {
+      color: $gl_fb;
+    }
+
+    .i-t {
+      color: $gl_tw;
+    }
+
+    .i-o {
+      color: $gl_od;
+    }
+
+    .i-g {
+      color: $gl_gp;
+    }
+  }
+}
+
+.footer_info_unit {
+  position: relative;
+  padding-bottom: 20px;
+
+  @include respond-to-min($resp_s) {
+    min-height: 115px;
+  }
+}
+
+.footer_info_control {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 500;
+
+  .gl_link {
+    text-decoration: none;
+    color: $gl_main_black;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+}
+
+.rur {
+  font-family: $PTRoubleSans;
+}
+
+
+.mob_hidden {
+  @include respond-to-max($resp_s) {
+    display: none !important;
+  }
+}
+
+.tablet_hidden {
+  @include respond-to-max($resp_l) {
+    display: none !important;
+  }
+}
+
+.dt_hidden {
+  @include respond-to-min($resp_s) {
+    display: none !important;
+  }
+}
+
+// todo remove
+#chromeperfectpixel-supported-by {
+  display: none !important;
+}
