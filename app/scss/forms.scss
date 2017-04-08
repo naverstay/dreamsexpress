@@ -5,7 +5,7 @@
 .f_input {
   display: block;
   width: 100%;
-  
+
   &.input_v1 {
     background: none;
     border: none;
@@ -28,7 +28,7 @@
     &.empty {
       background: $gl_inp_red;
     }
-    
+
     @at-root textarea#{&} {
       height: 60px;
     }
@@ -325,6 +325,9 @@
     }
 
     .noUi-connect {
+      position: absolute;
+      height: 100%;
+
       &:before {
         content: '';
         position: absolute;

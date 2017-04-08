@@ -2,7 +2,8 @@
 - var no_min = true;
 - var year = new Date();
 
-- function formatPrice(s) {return s.replace(/(?!^)(?=(\d{3})+(?=\.|$))/gm, ' ')}
+- function formatPrice(s) {return ('' + s).replace(/(?!^)(?=(\d{3})+(?=\.|$))/gm, ' ')}
+- function plural(n, str1, str2, str5, num) {return (num ? n + ' ': '') + ((((n % 10) == 1) && ((n % 100) != 11)) ? (str1) : (((((n % 10) >= 2) && ((n % 10) <= 4)) && (((n % 100) < 10) || ((n % 100) >= 20))) ? (str2) : (str5)));}
 
 //- var head_menu = ['Новинки','Акции','Оплата','Доставка','О компании']
 - var head_menu = ['Каталог','Новинки','Акции','Доставка и оплата','О компании']
@@ -683,13 +684,387 @@ mixin order_info(count)
                     span 120 069 
                     span._cur  грн.
 
+mixin filter_form(search)
+    ul#cabinet_switcher.tab_holder.tab_v3
+        li.tab_cell: a.tab_link(href='#filter_tab_1'): span Взрослые
+        li.tab_cell: a.tab_link(href='#filter_tab_2'): span Детские
+
+    .tabBlock(data-tab-context='#cabinet_switcher')
+        #filter_tab_1
+            form.filterForm(action='/filter' method='POST')
+                input.inp_hidden.tabActive(type='radio' name='adult' value='true' checked)
+                - if (search)
+                    .q_search_block
+                        input.f_input.input_v3.filterInput(placeholder='Название товара' name='name')
+                        button.search_btn.aside_m_icon.i-baby-rattle
+            
+                .search_result_info
+                    span.filterCounterTxt &nbsp;
+                    span.fw_500.filterCounter &nbsp;
+                    //-span , уточните категорию
+                    
+                ul.search_filters
+                    li
+                        label.filter_check
+                            input.inp_hidden(type='checkbox')
+                            span.check_btn
+                                span.check_icon.i-baby-wrapped-in-swaddle
+                                span.check_text Верхняя одежда (23)
+                    li
+                        label.filter_check
+                            input.inp_hidden(type='checkbox')
+                            span.check_btn
+                                span.check_icon.i-baby-wrapped-in-swaddle
+                                span.check_text Верхняя одежда (23)
+                    li
+                        label.filter_check
+                            input.inp_hidden(type='checkbox')
+                            span.check_btn
+                                span.check_text платья (121)
+                    li
+                        label.filter_check
+                            input.inp_hidden(type='checkbox')
+                            span.check_btn
+                                span.check_icon.i-baby-wrapped-in-swaddle
+                                span.check_text Верхняя одежда (23)
+                            
+                ul.search_categories
+                    li
+                        .dropdown_holder.catParameter
+                            .dropdown_btn.dropdownBtn
+                                .dropdown_reset.catReset
+                                .dropdown_caption Пол
+                                .dropdown_val: span.catVal=gender[0]
+                            +dropdown_w('Пол')
+                                ul.cat_list.catList(data-default=gender[0])
+                                    for item, i in gender
+                                        - if (i > 0)
+                                            li
+                                                label.check_emul.check_v1
+                                                    input.inp_hidden(type='checkbox' name=('gender') value= ['', 'f', 'm'][i])
+                                                    span.check_text= ['', 'Женщины', 'Мужчины'][i]
+        
+                    li
+                        .dropdown_holder.catParameter
+                            .dropdown_btn.dropdownBtn
+                                .dropdown_reset.catReset
+                                .dropdown_caption Возраст
+                                .dropdown_val: span.catVal=age[0]
+                            +dropdown_w('Возраст')
+                                ul.cat_list.catList(data-default=age[0])
+                                    for item, i in age
+                                        - if (i > 0)
+                                            li
+                                                label.check_emul.check_v1
+                                                    input.inp_hidden(type='checkbox' name=('age') value= item)
+                                                    span.check_text= plural(item, 'год', 'года', 'лет', true)
+        
+                    //-li
+                        .dropdown_holder.catParameter.active
+                            .dropdown_btn.dropdownBtn
+                                .dropdown_reset.catReset
+                                .dropdown_caption Бренд
+                                .dropdown_val: span.catVal=brands[0]
+                            +dropdown_w('Бренд')
+                                ul.cat_list.catList(data-default=brands[0])
+                                    for item, i in brands
+                                        - if (i > 0)
+                                            li
+                                                label.check_emul.check_v1
+                                                    input.inp_hidden(type='checkbox')
+                                                    span.check_text=item
+        
+                    li
+                        .dropdown_holder.catParameter
+                            .dropdown_btn.dropdownBtn
+                                .dropdown_reset.catReset
+                                .dropdown_caption Размер
+                                .dropdown_val: span.catVal=sizes[0]
+                            +dropdown_w('Размер')
+                                ul.cat_list.catList(data-default=sizes[0])
+                                    for item, i in sizes
+                                        - if (i > 0)
+                                            li
+                                                label.check_emul.check_v1
+                                                    input.inp_hidden(type='checkbox' name=('size') value= item)
+                                                    span.check_text=item
+        
+                    li
+                        .dropdown_holder.catParameter
+                            .dropdown_btn.dropdownBtn
+                                .dropdown_reset.catReset
+                                .dropdown_caption Сезон
+                                .dropdown_val: span.catVal=seasons[0]
+                            +dropdown_w('Сезон')
+                                ul.cat_list.catList(data-default=seasons[0])
+                                    for item, i in seasons
+                                        - if (i > 0)
+                                            li
+                                                label.check_emul.check_v1
+                                                    input.inp_hidden(type='checkbox' name=('season') value= ['', 's', 'w', 'd'][i])
+                                                    span.check_text=item
+
+                    li
+                        .dropdown_holder.catParameter
+                            .dropdown_btn.dropdownBtn
+                                .dropdown_reset.catReset
+                                .dropdown_caption Цена
+                                .dropdown_val: span.catVal Любая
+                            .dropdown_w
+                                .dropdown_caption 
+                                    span Цена 
+                                    span._cur  грн.
+                                .cat_list.catList(data-default='Любая')
+                                    ul.price_toddler_vals
+                                        li
+                                            .input_w: input.filterMin.f_input.input_v4(data-name='price_min' data-inputmask="'alias': 'decimal', 'groupSeparator': ' ', 'digitsOptional': true, 'autoGroup': true, 'prefix' : 'от ', 'suffix': ' ₴' ")
+                                        li
+                                            .input_w: input.filterMax.f_input.input_v4(data-name='price_max' data-inputmask="'alias': 'decimal', 'groupSeparator': ' ', 'digitsOptional': true, 'autoGroup': true, 'prefix' : 'до ', 'suffix': ' ₴' ")
+                                    
+                                    .toddler_v1.price_toddler_holder
+                                        .priceToddler.price_toddler(data-toddler-min='0' data-toddler-max='50000')
+        
+                                ul.dropdown_controls.form_cell
+                                    li
+                                        a.btn_v1.blue_btn.apply_btn.catApply(href='#') Ok
+                                    li
+                                        a.gl_link.catReset.blue_link(href='#') Сбросить
+        
+                    //-li
+                        .dropdown_holder.catParameter.dropdown_w_right
+                            .dropdown_btn.dropdownBtn
+                                .dropdown_reset.catReset
+                                .dropdown_caption Цвет
+                                .dropdown_val: span.catVal=colors[0]
+                            +dropdown_w('Цвет')
+                                ul.cat_list.catList(data-default=colors[0])
+                                    for item, i in colors
+                                        - if (i > 0)
+                                            li
+                                                label.check_emul.check_v1
+                                                    input.inp_hidden(type='checkbox')
+                                                    span.check_text=item
+        
+                ul.search_sort
+                    li
+                        label.check_v2.check_emul
+                            input.inp_hidden(type='checkbox')
+                            span.check_text в наличии
+                    li
+                        span.fz_12 Сортировать по:
+                        
+                    li
+                        a.btn_v2.sort_btn.active(href='#')
+                            span цене
+                            span.i-sort-desc.sort_icon
+        
+                    li
+                        a.btn_v2.sort_btn(href='#') скидке
+                        
+                    li
+                        a.btn_v2.sort_btn(href='#') популярности
+            
+                .search_result_info
+                    //-p.cool_text Показано 3 товара
+
+                ul.q_search_results.filterResults
+                    //-+loop_while(2)
+                        li
+                            +product_item(true)
+                        li
+                            +product_item(false)
+                        
+        #filter_tab_2
+            form.filterForm(action='/filter' method='POST')
+                input.inp_hidden.tabActive(type='radio' name='adult' value='false')
+                - if (search)
+                    .q_search_block
+                        input.f_input.input_v3.filterInput(placeholder='Название товара' name='name')
+                        button.search_btn.aside_m_icon.i-baby-rattle
+            
+                .search_result_info
+                    span.filterCounterTxt &nbsp;
+                    span.fw_500.filterCounter &nbsp;
+                    //-span , уточните категорию
+                    
+                ul.search_filters
+                    li
+                        label.filter_check
+                            input.inp_hidden(type='checkbox')
+                            span.check_btn
+                                span.check_icon.i-baby-wrapped-in-swaddle
+                                span.check_text Верхняя одежда (23)
+                    li
+                        label.filter_check
+                            input.inp_hidden(type='checkbox')
+                            span.check_btn
+                                span.check_icon.i-baby-wrapped-in-swaddle
+                                span.check_text Верхняя одежда (23)
+                    li
+                        label.filter_check
+                            input.inp_hidden(type='checkbox')
+                            span.check_btn
+                                span.check_text платья (121)
+                    li
+                        label.filter_check
+                            input.inp_hidden(type='checkbox')
+                            span.check_btn
+                                span.check_icon.i-baby-wrapped-in-swaddle
+                                span.check_text Верхняя одежда (23)
+                            
+                ul.search_categories
+                    li
+                        .dropdown_holder.catParameter
+                            .dropdown_btn.dropdownBtn
+                                .dropdown_reset.catReset
+                                .dropdown_caption Пол
+                                .dropdown_val: span.catVal=gender[0]
+                            +dropdown_w('Пол')
+                                ul.cat_list.catList(data-default=gender[0])
+                                    for item, i in gender
+                                        - if (i > 0)
+                                            li
+                                                label.check_emul.check_v1
+                                                    input.inp_hidden(type='checkbox' name=('gender') value= ['', 'f', 'm'][i])
+                                                    span.check_text=item
+        
+                    li
+                        .dropdown_holder.catParameter
+                            .dropdown_btn.dropdownBtn
+                                .dropdown_reset.catReset
+                                .dropdown_caption Возраст
+                                .dropdown_val: span.catVal=age[0]
+                            +dropdown_w('Возраст')
+                                ul.cat_list.catList(data-default=age[0])
+                                    for item, i in age
+                                        - if (i > 0)
+                                            li
+                                                label.check_emul.check_v1
+                                                    input.inp_hidden(type='checkbox' name=('age') value= item)
+                                                    span.check_text= plural(item, 'год', 'года', 'лет', true)
+        
+                    //-li
+                        .dropdown_holder.catParameter.active
+                            .dropdown_btn.dropdownBtn
+                                .dropdown_reset.catReset
+                                .dropdown_caption Бренд
+                                .dropdown_val: span.catVal=brands[0]
+                            +dropdown_w('Бренд')
+                                ul.cat_list.catList(data-default=brands[0])
+                                    for item, i in brands
+                                        - if (i > 0)
+                                            li
+                                                label.check_emul.check_v1
+                                                    input.inp_hidden(type='checkbox')
+                                                    span.check_text=item
+        
+                    li
+                        .dropdown_holder.catParameter
+                            .dropdown_btn.dropdownBtn
+                                .dropdown_reset.catReset
+                                .dropdown_caption Размер
+                                .dropdown_val: span.catVal=sizes[0]
+                            +dropdown_w('Размер')
+                                ul.cat_list.catList(data-default=sizes[0])
+                                    for item, i in sizes
+                                        - if (i > 0)
+                                            li
+                                                label.check_emul.check_v1
+                                                    input.inp_hidden(type='checkbox' name=('size') value= item)
+                                                    span.check_text=item
+        
+                    li
+                        .dropdown_holder.catParameter
+                            .dropdown_btn.dropdownBtn
+                                .dropdown_reset.catReset
+                                .dropdown_caption Сезон
+                                .dropdown_val: span.catVal=seasons[0]
+                            +dropdown_w('Сезон')
+                                ul.cat_list.catList(data-default=seasons[0])
+                                    for item, i in seasons
+                                        - if (i > 0)
+                                            li
+                                                label.check_emul.check_v1
+                                                    input.inp_hidden(type='checkbox' name=('season') value= ['', 's', 'w', 'd'][i])
+                                                    span.check_text=item
+        
+                    li
+                        .dropdown_holder.catParameter
+                            .dropdown_btn.dropdownBtn
+                                .dropdown_reset.catReset
+                                .dropdown_caption Цена
+                                .dropdown_val: span.catVal Любая
+                            .dropdown_w
+                                .dropdown_caption 
+                                    span Цена 
+                                    span._cur  грн.
+                                .cat_list.catList(data-default='Любая')
+                                    ul.price_toddler_vals
+                                        li
+                                            .input_w: input.filterMin.f_input.input_v4(data-name='price_min' data-inputmask="'alias': 'decimal', 'groupSeparator': ' ', 'digitsOptional': true, 'autoGroup': true, 'prefix' : 'от ', 'suffix': ' ₴' ")
+                                        li
+                                            .input_w: input.filterMax.f_input.input_v4(data-name='price_max' data-inputmask="'alias': 'decimal', 'groupSeparator': ' ', 'digitsOptional': true, 'autoGroup': true, 'prefix' : 'до ', 'suffix': ' ₴' ")
+                                    
+                                    .toddler_v1.price_toddler_holder
+                                        .priceToddler.price_toddler(data-toddler-min='0' data-toddler-max='50000')
+        
+                                ul.dropdown_controls.form_cell
+                                    li
+                                        a.btn_v1.blue_btn.apply_btn.catApply(href='#') Ok
+                                    li
+                                        a.gl_link.catReset.blue_link(href='#') Сбросить
+        
+                    //-li
+                        .dropdown_holder.catParameter.dropdown_w_right
+                            .dropdown_btn.dropdownBtn
+                                .dropdown_reset.catReset
+                                .dropdown_caption Цвет
+                                .dropdown_val: span.catVal=colors[0]
+                            +dropdown_w('Цвет')
+                                ul.cat_list.catList(data-default=colors[0])
+                                    for item, i in colors
+                                        - if (i > 0)
+                                            li
+                                                label.check_emul.check_v1
+                                                    input.inp_hidden(type='checkbox')
+                                                    span.check_text=item
+        
+                ul.search_sort
+                    li
+                        label.check_v2.check_emul
+                            input.inp_hidden(type='checkbox')
+                            span.check_text в наличии
+                    li
+                        span.fz_12 Сортировать по:
+                        
+                    li
+                        a.btn_v2.sort_btn.active(href='#')
+                            span цене
+                            span.i-sort-desc.sort_icon
+        
+                    li
+                        a.btn_v2.sort_btn(href='#') скидке
+                        
+                    li
+                        a.btn_v2.sort_btn(href='#') популярности
+                
+                .search_result_info
+                    //-p.cool_text Показано 3 товара
+            
+                ul.q_search_results.filterResults
+                    //-+loop_while(2)
+                        li
+                            +product_item(true)
+                        li
+                            +product_item(false)
+            
 mixin popups()
     .popup_close_btn.popupClose
         
     #quick_search_popup.popup.popup_v4
         .q_search_block
             form.qSearchForm(action='/q_search' method='POST')
-                input.f_input.input_v3.qSearchInput(placeholder='Найти товар' name='search_for')
+                input.f_input.input_v3.qSearchInput(placeholder='Найти товар' name='name')
                 button.search_btn.aside_m_icon.i-baby-rattle
                 .adv_search_box
                     a.gl_link(href='search' + (dev ? '.html' : '')) Перейти к расширенному поиску

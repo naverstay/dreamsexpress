@@ -3272,15 +3272,18 @@ a.menu_link {
     height: 4px;
     margin-top: -2px;
     background: #e6e6e6; }
-  .toddler_v1 .price_toddler .noUi-connect:before {
-    content: '';
+  .toddler_v1 .price_toddler .noUi-connect {
     position: absolute;
-    height: 4px;
-    margin-top: -2px;
-    top: 50%;
-    right: 0;
-    left: 0;
-    background: #697bff; }
+    height: 100%; }
+    .toddler_v1 .price_toddler .noUi-connect:before {
+      content: '';
+      position: absolute;
+      height: 4px;
+      margin-top: -2px;
+      top: 50%;
+      right: 0;
+      left: 0;
+      background: #697bff; }
   .toddler_v1 .price_toddler .noUi-origin.noUi-background:before {
     content: '';
     position: absolute;

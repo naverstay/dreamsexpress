@@ -11,10 +11,26 @@ var productsController = require('./controllers/products');
 
 var app = express();
 
-
 var Products = require('./models/products');
 
 var all_products;
+
+var fieldTypes = {
+    name: 'rx',
+    info: 'rx',
+    main_img: 'str',
+    hover_img: 'str',
+    img_list: 'str',
+    price: 'range',
+    sizes: 'rx',
+    colors: 'rx',
+    adult: 'str',
+    gender: 'str',
+    season: 'str',
+    category: 'str',
+    product_code: 'exact',
+    in_stock: 'bool'
+};
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -135,55 +151,76 @@ app.get('/add_product', function (req, res) {
     res.render('add_product', {all_products: all_products, title: 'add_product'});
 });
 
-app.post('/add_', function (req, res) {
-    // console.log(req);
+// app.post('/q_search', productsController.filter);
 
-    var product = {
-        name: req.body.product_name,
-        info: req.body.product_info,
-        main_img: req.body.product_main_img,
-        hover_img: req.body.product_hover_img,
-        img_list: req.body.product_img_list,
-        price: req.body.product_price,
-        sizes: req.body.product_sizes,
-        colors: req.body.product_colors,
-        adult: req.body.product_adult,
-        gender: req.body.product_gender,
-        season: req.body.product_season,
-        category: req.body.product_category,
-        product_code: req.body.product_code,
-        in_stock: req.body.in_stock
-    };
+app.post('/q_search', function (req, res) {
+    console.log(req.body.name);
 
-    // console.log(product);
+    var products_collection = db.get().collection('products'), rx = new RegExp(escapeRegExp(req.body.name), "ig");
 
-    Products.create(product, function (err, result) {
-        if (err) {
-            // console.log(err);
-            return res.sendStatus(500);
-        }
-        res.send({error: err || false, item: product});
+    products_collection.find({name: rx}).toArray(function (err, results) {
+        res.send(results);
     });
 });
 
-app.post('/q_search', function (req, res) {
-    // console.log(req.body.search_for);
 
-    var products_collection = db.get().collection('products'), rx = new RegExp(escapeRegExp(req.body.search_for), "ig");
-    
-    products_collection.find({"name": rx}).toArray(function (err, results) {
+app.post('/filter', function (req, res) {
+    var ret = [], params = removeEmpty(req.body), filter = {};
+
+    for (var field in params) {
+        var param = params[field];
+
+        console.log(field, params[field]);
+
+        if ((/name/ig).test(field)) {
+            filter['name'] = RXify(param.trim());
+        } else if ((/info/ig).test(field)) {
+            filter['info'] = RXify(param.trim());
+        } else if ((/adult/ig).test(field)) {
+            filter['adult'] = (param == 'true');
+        } else if ((/gender/ig).test(field)) {
+            filter['gender'] = RXify(param);
+        } else if ((/season/ig).test(field)) {
+            filter['season'] = RXify(param);
+        } else if ((/price_min/ig).test(field)) {
+            filter['price'] = {
+                $gte: parseInt(('' + param).replace(/\D/g, ''))
+            };
+            
+            console.log(params['price_max']);
+
+            if (params['price_max']) {
+                filter['price']['$lte'] = parseInt(('' + params['price_max']).replace(/\D/g, ''));
+            }
+        } else if ((/price_max/ig).test(field)) {
+            filter['price'] = {
+                $lte: parseInt(('' + param).replace(/\D/g, ''))
+            };
+
+            console.log(params['price_min'], filter['price']);
+            
+            if (params['price_min']) {
+                filter['price']['$gte'] = parseInt(('' + params['price_min']).replace(/\D/g, ''));
+            }
+        }
+    }
+
+    console.log('start', req.body, filter);
+
+    var products_collection = db.get().collection('products');
+
+    products_collection.find(filter).toArray(function (err, results) {
         res.send(results);
-        // console.dir(all_products);
     });
-    
-    
-    // Products.find({"name": req.search_for}, function (err, doc) {
-    //     if (err) {
-    //         console.log(err);
-    //         return res.sendStatus(500);
-    //     }
-    //     res.send(doc);
-    // });
+
+    // for (var i = 0; i < all_products.length; i++) {
+    //     var item = all_products[i];
+    //
+    //
+    // }
+
+    // res.send(all_products);
+
 });
 
 app.get('/artists', productsController.all);
@@ -205,15 +242,77 @@ db.connect('mongodb://localhost:27017/rags', function (err) {
 
         var products_collection = db.get().collection('products');
 
+        // all_products = productsController.all();
+
+        // console.log('all_products', all_products, products_collection.find());
+
         products_collection.find().toArray(function (err, results) {
             all_products = results;
-            // console.dir(all_products);
         });
     });
 });
 
 function escapeRegExp(str) {
-    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    return ('' + str).replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+
+function RXify(str) {
+    if (typeof str == 'string') {
+        return new RegExp(escapeRegExp(str), "ig");
+    }
+    
+    if (typeof str == 'object') {
+        var ret = '';
+        for (var i = 0; i < str.length; i++) {
+            var item = str[i];
+            ret += '|' + item;
+        }
+        
+        return new RegExp(ret.slice(1), "ig");
+    }
+}
+
+function removeEmpty(obj) {
+    Object.keys(obj).forEach(function (key) {
+        if (obj[key] && typeof obj[key] === 'object') {
+            removeEmpty(obj[key])
+        } else if (obj[key] === null) {
+            delete obj[key]
+        }
+    });
+    return obj;
+}
+
+function paramTypeFix(field, val) {
+    var ret;
+
+    console.log(val);
+
+    if ((/name|info/ig).test(field)) {
+        ret = RXify(val);
+    } else if ((/price_min/ig).test(field)) {
+        ret = {$gte: 20};
+    } else if ((/price_max/ig).test(field)) {
+        ret = {$lte: 20};
+    } else {
+        ret = val;
+    }
+
+    // switch (type) {
+    //     case "rx":
+    //         ret = RXify(val);
+    //         break;
+    //     case "str":
+    //         break;
+    //     case "range":
+    //         break;
+    //     case "bool":
+    //         break;
+    //     case "exact":
+    //         break;
+    // }
+
+    return ret;
 }
 
 function logErrors(err, req, res, next) {

@@ -3,6 +3,7 @@ var db = require('../db');
 
 exports.all = function (cb) {
     db.get().collection('products').find().toArray(function (err, docs) {
+        console.log(docs);
         cb(err, docs);
     });
 };
@@ -15,6 +16,14 @@ exports.findById = function (id, cb) {
 
 exports.findByName = function (name, cb) {
     db.get().collection('products').find({name: name}, function (err, doc) {
+        cb(err, doc);
+    });
+};
+
+exports.filter = function (params, cb) {
+    console.log(params, {name: params.name});
+
+    db.get().collection('products').find({name: params.name}, function (err, doc) {
         cb(err, doc);
     });
 };

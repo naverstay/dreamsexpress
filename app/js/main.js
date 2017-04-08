@@ -201,7 +201,7 @@ function isHex(h) {
 }
 
 function formatPrice(s) {
-    return s.replace(/(?!^)(?=(\d{3})+(?=\.|$))/gm, ' ');
+    return ('' + s).replace(/(?!^)(?=(\d{3})+(?=\.|$))/gm, ' ');
 }
 
 function addNoscrollStyle() {
@@ -491,7 +491,8 @@ function initTabs() {
             active: 0,
             tabContext: tab.attr('data-tab-context'),
             activate: function (e, u) {
-
+                $('.tabActive').prop('checked', null);
+                $(u.newPanel).find('.tabActive').click();
             }
         });
     });

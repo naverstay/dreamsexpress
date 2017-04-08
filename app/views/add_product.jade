@@ -52,14 +52,14 @@ html(lang='ru')
                                             .form_row
                                                 .form_cell
                                                     label.check_v3.check_emul
-                                                        input.inp_hidden(type='radio' name='product_adult')
+                                                        input.inp_hidden(type='radio' name='product_adult' value='a')
                                                         span.check_text
                                                             span.check_icon.i-car-baby-toy-outline
                                                             span Взрослый
 
                                                 .form_cell
                                                     label.check_v3.check_emul
-                                                        input.inp_hidden(type='radio' name='product_adult' checked)
+                                                        input.inp_hidden(type='radio' name='product_adult' value='c' checked)
                                                         span.check_text
                                                             span.check_icon.i-skate-with-handle-side-view
                                                             span Десткий
@@ -67,8 +67,8 @@ html(lang='ru')
                                             .form_cell
                                                 .select_box_v2
                                                     select.select2(name='product_gender')
-                                                        option М
-                                                        option Ж
+                                                        option(value='m') М
+                                                        option(value='f') Ж
                                                 
                                             .form_row
                                                 .form_cell
