@@ -413,6 +413,20 @@
   .form_cell {
     float: left;
     padding-left: 40px;
-  }
 
+    &.remember_check {
+      float: right;
+      line-height: 40px;
+      margin-top: 10px;
+    }
+  }
+}
+
+.auth_block {
+  @extend %clearfix;
+
+  .popup_inner {
+    max-width: 320px;
+    float: left;
+  }
 }

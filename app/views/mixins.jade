@@ -1,5 +1,5 @@
 - var dev = false;
-- var no_min = true;
+- var no_min = false;
 - var year = new Date();
 
 - function formatPrice(s) {return ('' + s).replace(/(?!^)(?=(\d{3})+(?=\.|$))/gm, ' ')}
@@ -31,7 +31,9 @@ mixin dev_head(page_title, index, news, search, product, lk, cart, add)
             | 
             | <!--endbuild-->
         - else
-            link(rel='stylesheet', href='css/styles.min.css', media='all')
+            //-link(rel='stylesheet', href='css/styles.min.css', media='all')
+            
+            link(rel='stylesheet', href='css/main_global.css', media='all')
             
         link(href='//fonts.googleapis.com/css?family=Rubik:300,400,500,700', rel='stylesheet', type='text/css')
         
@@ -41,7 +43,10 @@ mixin dev_head(page_title, index, news, search, product, lk, cart, add)
             script(src='js/lib/jquery-1.12.1.min.js')
             script(src='js/lib/jquery-ui-1.11.4.js')
             script(src='js/lib/slick.js')
+            script(src='js/lib/jquery.validationEngine.js')
+            script(src='js/lib/jquery.validationEngine-ru.js')
             script(src='js/lib/select2.js')
+            script(src='js/lib/jquery.inputmask.bundle.js')
             script(src='js/main.js')
             | 
             | <!--endbuild-->
@@ -77,7 +82,6 @@ mixin dev_head(page_title, index, news, search, product, lk, cart, add)
                 | 
                 | <!--build:js js/search.min.js -->
                 script(src='js/lib/nouislider.min.js')
-                script(src='js/lib/jquery.inputmask.bundle.js')
                 script(src='js/search.js')
                 | 
                 | <!--endbuild-->
@@ -158,6 +162,9 @@ mixin product_item(old_price)
             .prod_sizes xs, s, m, xxl, xxxl
         
 mixin header(active)
+    div.dev_log
+        p= user
+        p= title
     div.header
         a.mob_menu_btn.openMobMenu(href='#')
         a.mob_search_btn(href='#')
@@ -274,48 +281,49 @@ mixin footer()
                     img(src='images/pay_icons.png')
                     
 mixin aside_right()
-    .aside_right
-        ul.user_menu
-            li.mob_hidden
-                a.user_m_link.openFailPopup(href='#')
-                    span.user_m_icon.i-baby-abacus-toy
-            li
-                a.user_m_link.openFav(href='#')
-                    span.user_m_icon.i-toy-ball
-                    span.user_m_counter 23
-            li
-                a.user_m_link.openSuccessPopup.cartLink(href='#')
-                    span.user_m_icon.i-truck-side-view-outline
-                    span.user_m_counter 6
-                    
-    .gl_overlay
-    .fav_container
-        .fav_caption
-            span Вам понравилось (999)
-        .fav_close_btn.openFav
-
-        ul.fav_list
-            +loop_while(4)
-                li.favUnit
-                    .product_item
-                        a.product_img(href='product' + (dev ? '.html' : ''))
-                            img(src='images/fav_1.jpg')
-                        .prod_rm_btn.rmFavBtn
-                        h3.product_caption Трикотажное платье с рисунком
-                        .product_price
-                            span.new_price 4069
-                                span._cur  грн.
-                li.favUnit
-                    .product_item
-                        a.product_img(href='product' + (dev ? '.html' : ''))
-                            img(src='images/fav_1.jpg')
-                        .prod_rm_btn.rmFavBtn
-                        h3.product_caption длинное название Трикотажного  <br>  платья с рисунком
-                        .product_price
-                            span.new_price 2000
-                                span._cur  грн.
-                            
-        a.btn_v1.fav_btn.light_blue_btn.clearFavBtn(href='#') Очистить список
+    - if (user)
+        .aside_right
+            ul.user_menu
+                li.mob_hidden
+                    a.user_m_link.openFailPopup(href='#')
+                        span.user_m_icon.i-baby-abacus-toy
+                li
+                    a.user_m_link.openFav(href='#')
+                        span.user_m_icon.i-toy-ball
+                        span.user_m_counter 23
+                li
+                    a.user_m_link.openSuccessPopup.cartLink(href='#')
+                        span.user_m_icon.i-truck-side-view-outline
+                        span.user_m_counter 6
+                        
+        .gl_overlay
+        .fav_container
+            .fav_caption
+                span Вам понравилось (999)
+            .fav_close_btn.openFav
+    
+            ul.fav_list
+                +loop_while(4)
+                    li.favUnit
+                        .product_item
+                            a.product_img(href='product' + (dev ? '.html' : ''))
+                                img(src='images/fav_1.jpg')
+                            .prod_rm_btn.rmFavBtn
+                            h3.product_caption Трикотажное платье с рисунком
+                            .product_price
+                                span.new_price 4069
+                                    span._cur  грн.
+                    li.favUnit
+                        .product_item
+                            a.product_img(href='product' + (dev ? '.html' : ''))
+                                img(src='images/fav_1.jpg')
+                            .prod_rm_btn.rmFavBtn
+                            h3.product_caption длинное название Трикотажного  <br>  платья с рисунком
+                            .product_price
+                                span.new_price 2000
+                                    span._cur  грн.
+                                
+            a.btn_v1.fav_btn.light_blue_btn.clearFavBtn(href='#') Очистить список
         
 mixin aside_left()
     .aside_left
@@ -359,8 +367,15 @@ mixin aside_left()
                         a.menu_link(href=head_menu_link[i]): span=item
 
         ul.auth_menu
+            - if (user)
+                li#user_lk
+                    a.menu_link(href='/lk')
+                        span= user.local.email
+            
             li
-                a.menu_link.authBtn(href='#'): span Войти
+                a.menu_link.authBtn.text_upper(href='#' class= (user ? 'user' : ''))
+                    span.un_authenticated Войти
+                    span.authenticated Выйти
                 
     .logo_block.header_logo: a.logo(href= (dev ? 'index.html' : '/'))
         img(src='images/logo.svg')
@@ -441,7 +456,7 @@ mixin main_slider()
 mixin hit_slider(items)
     .hitSlider.hit_slider_holder
         .hit_slider
-            - if (items.length)
+            - if (items && items.length)
                 for item, i in items
                     .slide
                         a.product_img(href='products/' + item.product_code)
@@ -1058,7 +1073,69 @@ mixin filter_form(search)
                         li
                             +product_item(false)
             
+mixin auth_forms(suffix)
+    .popup_inner
+        ul#auth_switcher.tab_holder.tab_v2
+            li.ui-state-active: a.tab_link(href='#auth_tab_1'): span Вход
+            li: a.tab_link(href='#auth_tab_2'): span Регистрация
+
+        .tabBlock(data-tab-context='#auth_switcher')
+            #auth_tab_1
+                .tab_content
+                    form.authForm.validateMe(action='/login' method='POST')
+                        .form_cell
+                            input#auth_email.f_input.input_v2(placeholder='Email' name='email' class='validate[required, custom[email]]')
+
+                        .form_cell
+                            input#auth_pass.f_input.input_v2(placeholder='пароль' name='password' class='validate[required, minSize[6]]')
+
+                        .form_cell
+                            label.check_emul.check_v1
+                                input.inp_hidden(type='checkbox' name='remember')
+                                span.check_text Запомнить на этом устройтсве
+
+                        .form_row
+                            .form_cell
+                                button.btn_v1.blue_btn.order_btn Войти
+
+                            .remember_check.form_cell
+                                a.gl_link.cool_text.fz_13.fw_500.passRecoveryBtn(href='#') Забыли пароль?
+
+                        .alter_auth
+                            p Войти через:
+                            ul.about_list
+                                li
+                                    a.about_link(href='#')
+                                        span.i-v
+                                li
+                                    a.about_link(href='#')
+                                        span.i-f
+                                li
+                                    a.about_link(href='#')
+                                        span.i-t
+                                li
+                                    a.about_link(href='#')
+                                        span.i-o
+                                li
+                                    a.about_link(href='#')
+                                        span.i-g
+
+            #auth_tab_2
+                .tab_content
+                    form.regForm.validateMe(action='/signup' method='POST')
+                        .form_cell
+                            input.f_input.input_v2(placeholder='Email' name='email' class='validate[required, custom[email]]')
+
+                        .form_cell
+                            input.f_input.input_v2(placeholder='пароль' name='password' class='validate[required, minSize[6]]')
+
+                        .form_cell
+                            button.btn_v1.blue_btn.order_btn Зарегистрироваться
+
+
 mixin popups()
+    form.logoutForm.hide(action='/logout' method='POST')
+
     .popup_close_btn.popupClose
         
     #quick_search_popup.popup.popup_v4
@@ -1073,7 +1150,7 @@ mixin popups()
             +loop_while(7)
                 li
                     .product_item
-                        a.product_img(href='product' + (dev ? '.html' : ''))
+                        a.product_img(href='product_58e95666d4a12e2c21c3d587' + (dev ? '.html' : ''))
                             img(src='images/search_rslt_1.jpg')
                             .product_hit Хит продаж
                             .product_share_holder: .product_share - 30%
@@ -1154,73 +1231,21 @@ mixin popups()
                 button.btn_v1.blue_btn.order_btn.mod_3.popupClose Закрыть
 
     #recovery_popup.popup.popup_v3
-        .popup_inner.form_cell_v1
+        .popup_inner
             .popup_caption Восстановление пароля
-            form(action='#')
+            form.recoveryForm.validateMe(action='/recovery' method='POST')
                 .form_cell
-                    input.f_input.input_v2(placeholder='Email')
-                    
-                .form_cell
-                    button.btn_v1.blue_btn.order_btn.mod_2 Выслать новый пароль
+                    input.f_input.input_v2(placeholder='Email' name='email' class='validate[required, custom[email]]')
+                .form_row
+                    .form_cell
+                        button.btn_v1.blue_btn.order_btn.mod_2 Выслать новый пароль
+                        
+                    .remember_check.form_cell
+                        a.gl_link.cool_text.fz_13.fw_500.popupClose(href='#') Отмена
 
     #auth_popup.popup.popup_v3
-        .popup_inner
-            ul#auth_switcher.tab_holder.tab_v2
-                li.ui-state-active: a.tab_link(href='#auth_tab_1'): span Вход
-                li: a.tab_link(href='#auth_tab_2'): span Регистрация
-
-            .tabBlock(data-tab-context='#auth_switcher')
-                #auth_tab_1
-                    .tab_content
-                        form(action='#')
-                            .form_cell
-                                input.f_input.input_v2(placeholder='Email')
-                                
-                            .form_cell
-                                input.f_input.input_v2(placeholder='пароль')
-                                
-                            .form_cell
-                                button.btn_v1.blue_btn.order_btn Войти
-                                
-                            .form_cell
-                                label.check_emul.check_v1
-                                    input.inp_hidden(type='checkbox')
-                                    span.check_text Запомнить на этом устройтсве
-                                
-                            .form_cell
-                                a.gl_link.cool_text.fz_13.fw_500.passRecoveryBtn(href='#') Забыли пароль?
-                        
-                #auth_tab_2
-                    .tab_content
-                        form(action='#')
-                            .form_cell
-                                input.f_input.input_v2(placeholder='Email')
-                                
-                            .form_cell
-                                input.f_input.input_v2(placeholder='пароль')
-                                
-                            .form_cell
-                                button.btn_v1.blue_btn.order_btn Зарегистрироваться
-                        
-                    //-.alter_auth
-                        p Войти через:
-                        ul.about_list
-                            li
-                                a.about_link(href='#')
-                                    span.i-v
-                            li
-                                a.about_link(href='#')
-                                    span.i-f
-                            li
-                                a.about_link(href='#')
-                                    span.i-t
-                            li
-                                a.about_link(href='#')
-                                    span.i-o
-                            li
-                                a.about_link(href='#')
-                                    span.i-g
-                        
+        +auth_forms()
+        
     #add2cart_popup.popup.popup_v5
         .popup_cart_title
             .popup_cart_caption.fz_18 Товар добавлен в корзину

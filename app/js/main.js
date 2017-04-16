@@ -10,7 +10,22 @@ var body, html, doc, wnd, search_delay,
     success_popup,
     quick_search_popup,
     add2cart_popup,
-    recovery_popup;
+    recovery_popup,
+    inputMaskEvents = {
+        "oncomplete": function (ev) {
+            // console.log(ev, this);
+            $(this).addClass('_complete').removeClass('_incomplete');
+
+        },
+        "onincomplete": function (ev) {
+            // console.log(ev, this);
+            $(this).addClass('_incomplete').removeClass('_complete');
+        },
+        "oncleared": function (ev) {
+            // console.log(ev, this);
+            $(this).removeClass('_complete');
+        }
+    };
 
 $(function ($) {
 
@@ -54,6 +69,10 @@ $(function ($) {
         $(this).toggleClass('favorite');
         return false;
     });
+
+    initMask();
+
+    initValidation();
 
     addNoscrollStyle();
 
@@ -155,7 +174,7 @@ function renderQSearchResult(data) {
         items +=
             '<li>' +
             '<div class="product_item">' +
-            '<a href="products/' + item._id + '" class="product_img">' +
+            '<a href="product_' + item._id + '" class="product_img">' +
             '<img src="' + item.main_img + '">' +
             '<div class="product_hit">Хит продаж</div>' +
             '<div class="product_share_holder">' +
@@ -192,7 +211,7 @@ function colorRender(colors) {
 }
 
 function plural(n, str1, str2, str5, num) {
-    return (num ? n + ' ': '') + ((((n % 10) == 1) && ((n % 100) != 11)) ? (str1) : (((((n % 10) >= 2) && ((n % 10) <= 4)) && (((n % 100) < 10) || ((n % 100) >= 20))) ? (str2) : (str5)));
+    return (num ? n + ' ' : '') + ((((n % 10) == 1) && ((n % 100) != 11)) ? (str1) : (((((n % 10) >= 2) && ((n % 10) <= 4)) && (((n % 100) < 10) || ((n % 100) >= 20))) ? (str2) : (str5)));
 }
 
 function isHex(h) {
@@ -214,10 +233,67 @@ function addNoscrollStyle() {
     $('<style type="text/css">').html('.no_scroll body, .no_scroll .auth_menu, .no_scroll .aside_right { margin-right: ' + (testWidth - html.width()) + 'px; }').appendTo('head');
 }
 
+function initValidation() {
+    $('.validateMe').each(function (ind) {
+        var f = $(this);
+
+        f.validationEngine({
+            //binded                   : false,
+            scroll: false,
+            showPrompts: true,
+            showArrow: false,
+            addSuccessCssClassToField: 'success',
+            addFailureCssClassToField: 'error',
+            // parentFieldClass: '.form_cell',
+            // parentFormClass: '.order_block',
+            promptPosition: "centerRight",
+            //doNotShowAllErrosOnSubmit: true,
+            //focusFirstField          : false,
+            autoHidePrompt: true,
+            autoHideDelay: 2000,
+            autoPositionUpdate: false,
+            prettySelect: true,
+            //useSuffix                : "_VE_field",
+            addPromptClass: 'relative_mode one_msg',
+            showOneMessage: false
+        });
+    });
+}
+
 function initMask() {
-    $("input").filter(function (i, el) {
-        return $(el).attr('data-inputmask') != void 0;
-    }).inputmask();
+
+    $("input").each(function (i, el) {
+        var inp = $(el), param = inputMaskEvents;
+
+        if (inp.attr('data-inputmask-custom') != void 0) {
+            inp.inputmask(JSON.parse('{' + inp.attr('data-inputmask-custom').replace(/'/g, '"') + '}'));
+        }
+
+        // if (inp.attr('data-inputmask-phone') != void 0) {
+        //     inp.mask(inp.attr('data-inputmask-phone'), {placeholder: inp.attr('data-mask-placeholder')});
+        // }
+
+        // if (inp.attr('data-inputmask-regex') != void 0) {
+        //     param.regex = inp.attr('data-inputmask-regex');
+        //
+        //     inp.inputmask('Regex', param);
+        // }
+
+        if (inp.attr('data-inputmask') != void 0) {
+            inp.inputmask();
+        }
+
+        if (inp.attr('data-inputmask-email') != void 0) {
+            param.regex = inp.attr('data-inputmask-email');
+            param.placeholder = '_';
+
+            inp.inputmask('Regex', param);
+        }
+
+        if (inp.attr('data-inputmask-regex') != void 0) {
+            inp.inputmask('Regex', inputMaskEvents);
+        }
+    });
 }
 
 function initInputFillChecker() {
@@ -358,12 +434,89 @@ function initAuthPopup() {
     });
 
     $('.authBtn').on('click', function () {
-
-        auth_popup.dialog('open');
+        if ($(this).hasClass('user')) {
+            $('.logoutForm').trigger('submit');
+        } else {
+            auth_popup.dialog('open');
+        }
 
         return false;
     });
 
+    $('.authForm, .regForm, .logoutForm, .userUpdate').on('submit', function () {
+        var form = $(this);
+
+        if (form.validationEngine('validate')) {
+            sendForm($(this), function () {
+
+            });
+        }
+
+        return false;
+    });
+
+}
+
+function sendForm(form, cb) {
+    var data = form.serialize(); // пoдгoтaвливaeм дaнныe
+
+    console.log(data);
+
+    $.ajax({ // инициaлизируeм ajax зaпрoс
+        type: form.attr('method'), // oтпрaвляeм в POST фoрмaтe, мoжнo GET
+        url: form.attr('action'), // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
+        dataType: 'json', // oтвeт ждeм в json фoрмaтe
+        data: data, // дaнныe для oтпрaвки
+        beforeSend: function (data) { // сoбытиe дo oтпрaвки
+
+        },
+        success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
+            console.log(data);
+            
+            $('.auth_msg').remove();
+
+            if (data.redirectTo) {
+                setTimeout(function () {
+                    window.location = data.redirectTo;
+                }, 1);
+            } else if (data.user_created) {
+                $('#auth_tab_1 .tab_content').prepend('<p class="auth_msg">Email ' + data.email + ' зарегистрирован</p>');
+                $('#auth_email').val(data.email);
+                $('a[href="#auth_tab_1"]').click();
+
+            } else if (data.logout_done) {
+                $('#user_lk').remove();
+                $('.authBtn').removeClass('user');
+            } else if (data.user_updated) {
+                console.log('user_updated');
+            } else if (data.user_authenticated) {
+                $('.auth_menu').prepend(data.user);
+                $('.authBtn').addClass('user');
+                auth_popup.dialog('close');
+            } else if (data.login_failed) {
+                $('#auth_tab_1 .tab_content').prepend('<p class="auth_msg">' + data.message[0] + '</p>');
+                $('#auth_pass').val('');
+            } else {
+                $('#auth_tab_2 .tab_content').prepend('<p class="auth_msg">' + data.message[0] + '</p>');
+            }
+
+            setTimeout(function () {
+                $('.auth_msg').remove();
+            }, 3000);
+        },
+        error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
+
+            console.log(xhr, ajaxOptions, thrownError);
+
+            // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
+            // alert(thrownError); // и тeкст oшибки
+        },
+        complete: function (data) { // сoбытиe пoслe любoгo исхoдa
+            if (typeof cb === 'function') {
+                cb(data);
+            }
+        }
+    });
 }
 
 function initFailPopup() {

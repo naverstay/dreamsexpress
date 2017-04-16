@@ -1,0 +1,26 @@
+include mixins
+doctype html
+html(lang='ru')
+    +dev_head("DREAMSEXPRESS login", false, false, false, false, false, true)
+
+    body
+        .wrapper
+            .base
+                +header(1)
+                
+                div.main_content
+                    .section_inner
+                        +breadcrumbs(['Главная', 'login'])
+                        h1.page_title.fw_700
+                            span Требуется авторизация
+                            
+                        .auth_block
+                            +auth_forms('_lk')
+
+
+            +footer()
+            
+        +aside_left()
+        +aside_right()
+        +popups()
+        

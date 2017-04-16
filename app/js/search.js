@@ -15,7 +15,7 @@ $(function ($) {
 
     initToddler();
 
-    initMask();
+    // initMask();
 
     initReviewPopup();
 
@@ -24,27 +24,27 @@ $(function ($) {
 });
 
 function initFilter() {
-    /*    filterInput.on('keyup keydown change paste cut', function () {
-            var filter = $(this);
-    
-            clearTimeout(filter_delay);
-    
-            // if (!filter.length) {
-            //     searchResults.html('');
-            //     return;
-            // }
-    
-            filter_delay = setTimeout(function () {
-                filter.closest('form').trigger('submit');
-            }, 1000);
-        });*/
+    filterInput.on('keyup keydown change paste cut', function () {
+        var filter = $(this);
+
+        clearTimeout(filter_delay);
+
+        // if (!filter.length) {
+        //     searchResults.html('');
+        //     return;
+        // }
+
+        filter_delay = setTimeout(function () {
+            filter.closest('form').trigger('submit');
+        }, 1000);
+    });
 
     filterForm.on('submit', function () {
         var form = $(this), filter = form.find('.filterInput').val();
 
         if (!filtering) {
             clearTimeout(filter_delay);
-            
+
             filter_delay = setTimeout(function () {
                 searching = true;
                 last_filter = filter;
@@ -55,18 +55,13 @@ function initFilter() {
         return false;
 
     }).each(function (ind) {
-        var form = $(this), filter = form.find('.filterInput');
+        /*var form = $(this), filter = form.find('.filterInput');
 
         form.find('input, select').on('keyup keydown change paste cut', function () {
             var el = $(this);
 
-            // if (!filter.length) {
-            //     searchResults.html('');
-            //     return;
-            // }
-
             el.closest('form').trigger('submit');
-        });
+        });*/
     });
 }
 

@@ -174,12 +174,24 @@
   }
 }
 
+.tab_content {
+  position: relative;
+}
+
+.auth_msg {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  margin-bottom: 5px;
+}
+
 .article_content {
 
   &.tab_content {
     margin-bottom: 50px;
   }
-  
+
   > h3 {
     font-weight: 700;
     font-size: 18px;
@@ -237,7 +249,7 @@
       }
     }
   }
-  
+
 }
 
 .share_period {
