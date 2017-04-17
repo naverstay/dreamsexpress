@@ -126,7 +126,31 @@ module.exports = function (app, passport) {
         var products_collection = db.get().collection('products'), rx = new RegExp(escapeRegExp(req.body.name), "ig");
 
         products_collection.find({name: rx}).toArray(function (err, results) {
-            res.send(results);
+            var items = '';
+
+            for (var i = 0; i < results.length; i++) {
+                var item = results[i];
+
+                items +=
+                    '<li>' +
+                    '<div class="product_item">' +
+                    '<a href="product_' + item._id + '" class="product_img">' +
+                    '<img src="' + item.main_img + '">' +
+                    '<div class="product_hit">Хит продаж</div>' +
+                    '<div class="product_share_holder">' +
+                    '<div class="product_share">- 30%</div>' +
+                    '</div>' +
+                    '</a>' +
+                    '<h3 class="product_caption">' + item.name + '</h3>' +
+                    '<div class="product_price">' +
+                    (item.old_price ? '<span class="old_price">' + formatPrice(item.old_price) + '<span> грн.</span></span>' : '') +
+                    '<span class="new_price">' + formatPrice(item.price) + '<span> грн.</span></span>' +
+                    '</div>' +
+                    '</div>' +
+                    '</li>';
+            }
+
+            res.send({items: items});
         });
     });
 
@@ -388,4 +412,8 @@ function removeEmpty(obj) {
         }
     });
     return obj;
+}
+
+function formatPrice(s) {
+    return ('' + s).replace(/(?!^)(?=(\d{3})+(?=\.|$))/gm, ' ');
 }

@@ -163,6 +163,11 @@
 
   @include respond-to-min($resp_s) {
     float: left;
+    width: 40%;
+    padding-right: 15px;
+  }
+
+  @include respond-to-min($resp_l) {
     width: 60%;
     padding-right: 30px;
   }
@@ -175,6 +180,10 @@
 
   @include respond-to-min($resp_s) {
     float: right;
+    width: 60%;
+  }
+
+  @include respond-to-min($resp_l) {
     width: 40%;
   }
 }

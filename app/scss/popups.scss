@@ -211,18 +211,21 @@
   overflow-x: hidden;
   overflow-y: auto;
   height: 100%;
-  margin-right: -50px;
-  padding-right: 36px;
+  //margin-right: -50px;
+  //padding-right: 36px;
 
   @include respond-to-min($resp_l) {
     //padding-right: 50px;
   }
 
+  
+  
 }
 
 .q_search_results {
   @extend %clearfix;
   margin-left: -30px;
+  margin-top: -30px;
 
   .product_item {
     background: $gl_white;
@@ -260,7 +263,7 @@
 
   > li {
     padding-left: 30px;
-    margin-bottom: 30px;
+    margin-top: 30px;
     float: left;
     width: 100%;
 
@@ -291,7 +294,7 @@
 
   @include respond-to-min($resp_l) {
     margin-right: 0;
-    margin-bottom: 20px;
+    //margin-bottom: 20px;
   }
 
   @include respond-to-min($resp_xxl) {

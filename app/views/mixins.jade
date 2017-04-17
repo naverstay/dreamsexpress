@@ -1,5 +1,5 @@
 - var dev = false;
-- var no_min = false;
+- var no_min = true;
 - var year = new Date();
 
 - function formatPrice(s) {return ('' + s).replace(/(?!^)(?=(\d{3})+(?=\.|$))/gm, ' ')}
@@ -46,6 +46,7 @@ mixin dev_head(page_title, index, news, search, product, lk, cart, add)
             script(src='js/lib/jquery.validationEngine.js')
             script(src='js/lib/jquery.validationEngine-ru.js')
             script(src='js/lib/select2.js')
+            script(src='js/lib/jquery.mCustomScrollbar.min.js')
             script(src='js/lib/jquery.inputmask.bundle.js')
             script(src='js/main.js')
             | 
@@ -1146,7 +1147,7 @@ mixin popups()
                 .adv_search_box
                     a.gl_link(href='search' + (dev ? '.html' : '')) Перейти к расширенному поиску
         
-        .q_search_results_holder: ul.searchResults.q_search_results
+        .q_search_results_holder.mCSB: ul.searchResults.q_search_results
             +loop_while(7)
                 li
                     .product_item

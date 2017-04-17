@@ -70,6 +70,12 @@ $(function ($) {
         return false;
     });
 
+    qSearchForm.on('submit', function () {
+        qSearchFunc();
+
+        return false;
+    });
+
     initMask();
 
     initValidation();
@@ -120,7 +126,7 @@ function initQSearch() {
             if (!searching && search != last_search) {
                 searching = true;
                 last_search = search;
-                qSearchFunc();
+                qSearchForm.trigger('submit');
             }
         }, 1000);
     });
@@ -141,9 +147,7 @@ function qSearchFunc() {
         },
         success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
 
-            console.log(data['error']);
-
-            renderQSearchResult(data);
+            searchResults.html(data.items);
 
             /*if (data['error']) { // eсли oбрaбoтчик вeрнул oшибку
                 alert(data['error']); // пoкaжeм eё тeкст
@@ -224,13 +228,25 @@ function formatPrice(s) {
 }
 
 function addNoscrollStyle() {
+
+    $('.mCSB').each(function (ind) {
+        $(this).mCustomScrollbar({
+            theme: "dark",
+            scrollEasing: "linear"
+        });
+    });
+
+    return;
+
     html.css('overflow-y', 'hidden');
 
     var testWidth = html.width();
 
     html.attr('style', null);
 
-    $('<style type="text/css">').html('.no_scroll body, .no_scroll .auth_menu, .no_scroll .aside_right { margin-right: ' + (testWidth - html.width()) + 'px; }').appendTo('head');
+    var scrollW = testWidth - html.width();
+
+    $('<style type="text/css">').html('.no_scroll body, .no_scroll .auth_menu, .no_scroll .aside_right { margin-right: ' + (scrollW) + 'px; }.no_scroll .q_search_results_holder { margin-right: ' + (-scrollW) + 'px; }').appendTo('head');
 }
 
 function initValidation() {
@@ -472,7 +488,7 @@ function sendForm(form, cb) {
         },
         success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
             console.log(data);
-            
+
             $('.auth_msg').remove();
 
             if (data.redirectTo) {
