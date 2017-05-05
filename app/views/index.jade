@@ -15,16 +15,16 @@ html(lang='ru')
                             li
                                 .share_item
                                     .share_img
-                                        img.mob_hidden(src='images/sales_2.png')
-                                        img.dt_hidden(src='images/sales_2_mob.png')
+                                        img.mob_hidden(src='/images/sales_2.png')
+                                        img.dt_hidden(src='/images/sales_2_mob.png')
                                         a.share_text(href='#')
                                             h3.share_caption Бесплатная доставка
                                             p для заказов от 3 000 Р
                             li
                                 .share_item
                                     .share_img
-                                        img.mob_hidden(src='images/sales_1.jpg')
-                                        img.dt_hidden(src='images/sales_1_mob.jpg')
+                                        img.mob_hidden(src='/images/sales_1.jpg')
+                                        img.dt_hidden(src='/images/sales_1_mob.jpg')
                                         a.share_text(href='#')
                                             h3.share_caption весенняя распродажа
                                             p пальто и куртки
@@ -33,25 +33,25 @@ html(lang='ru')
                             li
                                 .product_item
                                     a.product_img(href='#')
-                                        img(src='images/prod_1.jpg')
+                                        img(src='/images/prod_1.jpg')
                                     h3.product_caption Детская одежда
                                     p.tablet_hidden Платья, Верхняя одежда, Пижамы, Аксессуары
                             li
                                 .product_item
                                     a.product_img(href='#')
-                                        img(src='images/prod_1.jpg')
+                                        img(src='/images/prod_1.jpg')
                                     h3.product_caption Детская обувь
                                     p.tablet_hidden Кеды, сапоги, сандали, ботинки
                             li
                                 .product_item
                                     a.product_img(href='#')
-                                        img(src='images/prod_1.jpg')
+                                        img(src='/images/prod_1.jpg')
                                     h3.product_caption Игрушки
                                     p.tablet_hidden Мягкие игрушки, куклы, пупсы, конструкторы, мякиши
                             li
                                 .product_item
                                     a.product_img(href='#')
-                                        img(src='images/prod_1.jpg')
+                                        img(src='/images/prod_1.jpg')
                                     h3.product_caption мамам
                                     p.tablet_hidden Личная гигиена, одежда, белье, купальники, книги
                                     
@@ -60,7 +60,7 @@ html(lang='ru')
                             .prod_info.slider_controls
                                 .hit_caption.subcaption
                                     span Хиты продаж
-                                    span.hit_counter 12
+                                    span.hit_counter= all_products ? all_products.length || '' : ''
                                 p В нашем интернет-магазине представлены только тщательно отобранные модели, исключительные диваны хиты продаж в Москве и по России. Каждая модель дивана из нашего интернет каталога – это воплощение отличного дизайна, легенда мебельной отрасли.
                             
                             +hit_slider(all_products)
@@ -89,4 +89,5 @@ html(lang='ru')
         +aside_left()
         +aside_right()
         +popups()
+        +scripts("DREAMSEXPRESS Главная", true)
         

@@ -15,6 +15,10 @@
     font: 500 13px/16px $Rubik;
     text-align: center;
     padding: 12px;
+
+    .fav_container._empty & {
+      display: none;
+    }
   }
 
   &.apply_btn {
@@ -70,7 +74,6 @@
     font: 500 13px/16px $Rubik;
     margin-bottom: 55px;
   }
-
 }
 
 .btn_v2 {
@@ -79,6 +82,7 @@
   &.sort_btn {
     @include transition_all(background .3s, color .3s);
     display: block;
+    cursor: pointer;
     text-transform: uppercase;
     padding: 15px 12px;
     font-size: 10px;

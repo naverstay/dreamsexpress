@@ -15,6 +15,8 @@
     "cookie-parser": "^1.4.3",
     "debug": "~2.6.0",
     "express": "^4.15.2",
+    "express-mailer": "^0.3.1",
+    "express-redirect": "^1.2.2",
     "express-session": "^1.15.2",
     "jade": "~1.11.0",
     "mongodb": "^2.2.25",
@@ -22,8 +24,11 @@
     "morgan": "~1.7.0",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.1",
+    "passport-google": "^0.3.0",
     "passport-google-oauth": "^1.0.0",
+    "passport-google-oauth2": "^0.1.6",
     "passport-local": "^1.0.0",
-    "passport-twitter": "^1.0.4"
+    "passport-twitter": "^1.0.4",
+    "slug": "^0.9.1"
   }
 }

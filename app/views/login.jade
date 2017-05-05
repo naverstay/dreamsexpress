@@ -12,10 +12,13 @@ html(lang='ru')
                     .section_inner
                         +breadcrumbs(['Главная', 'login'])
                         h1.page_title.fw_700
-                            span Требуется авторизация
+                            - if (email)
+                                span E-mail подтвержден
+                            - else
+                                span Требуется авторизация
                             
                         .auth_block
-                            +auth_forms('_lk')
+                            +auth_forms('_lk', email || false)
 
 
             +footer()
@@ -23,4 +26,5 @@ html(lang='ru')
         +aside_left()
         +aside_right()
         +popups()
+        +scripts("DREAMSEXPRESS login", false, false, false, false, false, true)
         

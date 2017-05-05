@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'dreamsexpress';
   src:
-    url('fonts/dreamsexpress.ttf?8p1n8h') format('truetype'),
-    url('fonts/dreamsexpress.woff?8p1n8h') format('woff'),
-    url('fonts/dreamsexpress.svg?8p1n8h#dreamsexpress') format('svg');
+    url('fonts/dreamsexpress.ttf?7fuhkk') format('truetype'),
+    url('fonts/dreamsexpress.woff?7fuhkk') format('woff'),
+    url('fonts/dreamsexpress.svg?7fuhkk#dreamsexpress') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -23,6 +23,18 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.i-star-rounded:before {
+  content: "\e97d";
+}
+.i-star2:before {
+  content: "\e97e";
+}
+.i-cart:before {
+  content: "\e97b";
+}
+.i-cart2:before {
+  content: "\e97c";
+}
 .i-abc-squares:before {
   content: "\e900";
 }

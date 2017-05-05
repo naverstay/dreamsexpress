@@ -19,7 +19,7 @@ html(lang='ru')
                         .news_container
                             .article_holder
                                 a.news_img(href='news_1' + ( dev ? '.html' : ''))
-                                    img(src='images/news_big.jpg')
+                                    img(src='/images/news_big.jpg')
                                     .product_hit Акция
                                         
                                 p.cool_text Действует с 12 по 15 апреля
@@ -43,7 +43,7 @@ html(lang='ru')
                                         li
                                             .news_block
                                                 a.news_img(href='news_1' + ( dev ? '.html' : ''))
-                                                    img(src='images/news_1.jpg')
+                                                    img(src='/images/news_1.jpg')
                                                     .product_hit Акция
                                                 .news_inner
                                                     .news_caption: a(href='news_1' + ( dev ? '.html' : '')) ВЕЩЬ СЕЗОНА: КОРСЕТ МАДОННЫ
@@ -56,4 +56,5 @@ html(lang='ru')
         +aside_left()
         +aside_right()
         +popups()
+        +scripts("DREAMSEXPRESS Новость")
         

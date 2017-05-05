@@ -68,7 +68,7 @@ function initFilter() {
 function filterFunc(form) {
     var data = form.serialize(); // пoдгoтaвливaeм дaнныe
 
-    console.log(data);
+    // console.log(data);
 
     $.ajax({ // инициaлизируeм ajax зaпрoс
         type: form.attr('method'), // oтпрaвляeм в POST фoрмaтe, мoжнo GET
@@ -102,46 +102,12 @@ function filterFunc(form) {
 }
 
 function renderFilterResult(data, form) {
-    var items = '', counter = 0;
-
-    $.each(data, function (index, item) {
-        console.log(item);
-
-        items +=
-            '<li>' +
-            '<div class="product_item">' +
-            '<a href="products/' + item._id + '" class="product_img">' +
-            '<img src="' + item.main_img + '">' +
-            (item.hover_img ? '<div class="hover_img prod_hover"><img src="' + item.hover_img + '"></div>' : '') +
-            '<div class="product_hit">Хит продаж</div>' +
-            '<div class="product_share_holder">' +
-            '<span class="prod_hover prod_fav favBtn"></span>' +
-            '<div class="product_share">- 30%</div>' +
-            '</div>' +
-            '<div class="product_q_review violette_btn prod_hover openReview mob_hidden">Быстрый просмотр</div>' +
-            '</a>' +
-            '<h3 class="product_caption">' + item.name + '</h3>' +
-            '<div class="product_price">' +
-            (item.old_price ? '<span class="old_price">' + formatPrice(item.old_price) + '<span> грн.</span></span>' : '') +
-            '<span class="new_price">' + formatPrice(item.price) + '<span> грн.</span></span>' +
-            '</div>' +
-            '<div class="product_item_overview prod_hover">' +
-            '<p>Цвета и размеры в наличии</p>' +
-            '<ul class="prod_colors">' +
-            colorRender(item.colors) +
-            '</ul>' +
-            '<div class="prod_sizes">' + item.sizes + '</div>' +
-            '</div>' +
-            '</div>' +
-            '</li>';
-
-        counter++;
-    });
+    var counter = data.count;
 
     form.find('.filterCounterTxt').text(plural(counter, 'Найден ', 'Найдено ', 'Найдено '));
     form.find('.filterCounter').text(plural(counter, 'товар', 'товара', 'товаров', true));
 
-    form.find('.filterResults').html(items);
+    form.find('.filterResults').html(data.items);
 }
 
 function initReviewPopup() {
@@ -166,7 +132,70 @@ function initReviewPopup() {
     });
 
     body.delegate('.openReview', 'click', function () {
-        review_popup.dialog('open');
+        var btn = $(this), id = btn.closest('a').attr('href');
+
+        console.log(id);
+
+        $.ajax({ // инициaлизируeм ajax зaпрoс
+            type: "POST", // oтпрaвляeм в POST фoрмaтe, мoжнo GET
+            url: btn.closest('a').attr('href'), // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
+            dataType: 'json', // oтвeт ждeм в json фoрмaтe
+            data: {id: id}, // дaнныe для oтпрaвки
+            beforeSend: function (data) { // сoбытиe дo oтпрaвки
+
+            },
+            success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
+
+                if (data.redirectTo) {
+                    setTimeout(function () {
+                        window.location = data.redirectTo;
+                    }, 1);
+                }
+
+                review_popup.find('.prod_review').html(data.prod_review);
+                review_popup.find('.prod_review_options').html(data.prod_review_options);
+                review_popup.find('.product_share_holder').html(data.product_share_holder);
+                review_popup.find('.product_price').html(data.product_price);
+
+                setTimeout(function () {
+                    $('.fotorama', review_popup).fotorama();
+
+                    review_popup.dialog('open');
+                }, 10);
+
+                // review_popup.find('.prod_name').text(data.name);
+                //
+                // review_popup.find('.prod_link').attr('href', id);
+                //
+                // review_popup.find('.prod_review_img img').attr('src', data.main_img);
+                //
+                // review_popup.find('.new_price').text(data.price);
+                //
+                // review_popup.find('.fotorama').html(buildFotorama(data.is_hit, data.main_img, data.hover_img, data.img_list));
+                //
+                // if (data.old_price) {
+                //     review_popup.find('.old_price').text(data.old_price).show();
+                // } else {
+                //     review_popup.find('.old_price').hide();
+                // }
+                //
+                // review_popup.find('.product_hit').toggle(data.is_hit);
+
+
+            },
+            error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
+
+                console.log(xhr, ajaxOptions, thrownError);
+
+                setTimeout(function () {
+                    $('.failText').text('Что-то пошло не так');
+                    fail_popup.dialog('open');
+                }, 50);
+            },
+            complete: function (data) { // сoбытиe пoслe любoгo исхoдa
+                favoriting = false;
+            }
+        });
 
         return false;
     });
@@ -282,7 +311,7 @@ function initCatDropDown() {
 
         param.find('.catList input').each(function (ind) {
             var inp = $(this);
-            if ((this.type == 'checkbox' || this.type == 'checkbox') && this.checked) {
+            if ((this.type == 'checkbox' || this.type == 'radio') && this.checked) {
                 val += ', ' + inp.next('.check_text').text();
             }
             if ((this.type == 'text')) {
@@ -290,19 +319,21 @@ function initCatDropDown() {
             }
         });
 
-        if (val.length) {
-            param.addClass('active').find('.catVal').text(val.length ? val.slice(2) : param.find('.catList').attr('data-default'));
+        val = val.slice(2);
 
-            var min = param.find('.filterMin');
+        console.log(val, val.length);
 
-            min.attr('name', min.attr('data-name'));
+        param.toggleClass('active', val.length > 0).find('.catVal').text(val.length ? val : param.find('.catList').attr('data-default'));
 
-            var max = param.find('.filterMax');
+        var min = param.find('.filterMin');
 
-            max.attr('name', max.attr('data-name'));
+        min.attr('name', min.attr('data-name'));
 
-            firedEl.closest('form').trigger('submit');
-        }
+        var max = param.find('.filterMax');
+
+        max.attr('name', max.attr('data-name'));
+
+        firedEl.closest('form').trigger('submit');
 
         return false;
     });

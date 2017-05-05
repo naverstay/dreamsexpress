@@ -20,7 +20,7 @@ html(lang='ru')
                                     .cart_unit_info
                                         .cart_unit_img
                                             a.product_img(href='product.html')
-                                                img(src='images/cart_2.jpg')
+                                                img(src='/images/cart_2.jpg')
                                                 .product_hit Хит продаж
 
                                         .prod_info
@@ -74,7 +74,7 @@ html(lang='ru')
                                     .cart_unit_info
                                         .cart_unit_img
                                             a.product_img(href='product.html')
-                                                img(src='images/cart_3.jpg')
+                                                img(src='/images/cart_3.jpg')
 
                                         .prod_info
                                             .prod_info_caption Подгузники Goo’n
@@ -138,7 +138,7 @@ html(lang='ru')
                                                 input.f_input.input_v6(placeholder='Email' required)
                                                 
                                             .form_cell
-                                                input.f_input.input_v2(placeholder='Телефон' data-inputmask="'mask': '[+38] (099)-999-99-99'")
+                                                input.f_input.input_v2(placeholder='Телефон' data-inputmask="'mask': '[+38] (099)-999-99-99', 'clearIncomplete' : true")
                                                 
                                             .form_cell
                                                 input.f_input.input_v2(placeholder='Адрес' required)
@@ -201,4 +201,5 @@ html(lang='ru')
         +aside_left()
         +aside_right()
         +popups()
+        +scripts("DREAMSEXPRESS Корзина", false, false, false, false, false, true)
         

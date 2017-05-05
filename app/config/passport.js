@@ -3,10 +3,20 @@
 // load all the things we need
 var LocalStrategy = require('passport-local').Strategy;
 
+var FacebookStrategy = require('passport-facebook').Strategy;
+var TwitterStrategy = require('passport-twitter').Strategy;
+
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+// var GoogleStrategy = require('passport-google-oauth2').Strategy;
 
 // load up the user model
 var User = require('../models/user');
+
+// load the auth variables
+var configAuth = require('./auth');
+
+var ObjectID = require('mongodb').ObjectID;
+var client = require('../models/clients');
 
 // expose this function to our app using module.exports
 module.exports = function (passport) {
@@ -29,18 +39,95 @@ module.exports = function (passport) {
         });
     });
 
-    passport.use('google-signup', new GoogleStrategy({
-            clientID: 'GOOGLE_CLIENT_ID',
-            clientSecret: 'GOOGLE_CLIENT_SECRET',
-            callbackURL: "http://www.example.com/auth/google/callback"
-        },
-        function (accessToken, refreshToken, profile, done) {
-            User.findOrCreate({googleId: profile.id}, function (err, user) {
-                return done(err, user);
+    /*
+        passport.use(new FacebookStrategy({
+                clientID: settings.server.facebook.clientId,
+                clientSecret: settings.server.facebook.clientSecret,
+                callbackURL: settings.server.facebook.oAuthRedirect1,
+                profileFields: ['displayName', 'email'],
+                passReqToCallback: true
+            },
+            //done method is the passport.authenticate callback
+            async((req, accessToken, refreshToken, profile, done), function () {
+                try {
+                    var r = await
+                    myapi.authenticate(accessToken, profile);
+                    if (!r.authorized) {
+                        done('unauthorized'); //error (calls the passport.authenticate callback)
+                    } else {
+                        done(null, { //no error (calls the passport.authenticate callback)
+                            token: r.token,
+                            fbid: profile.id,
+                            fb_access_token: accessToken,
+                            profile: profile
+                        });
+                    }
+                }
+                catch (e) {
+                    logger.error(e);
+                }
+            })));
+        */
+
+
+    // =========================================================================
+    // GOOGLE ==================================================================
+    // =========================================================================
+
+    passport.use(new GoogleStrategy({
+        clientID: configAuth.googleAuth.clientID,
+        clientSecret: configAuth.googleAuth.clientSecret,
+        callbackURL: configAuth.googleAuth.callbackURL
+    }, function (token, refreshToken, profile, done) {
+
+        // make the code asynchronous
+        // User.findOne won't fire until we have all our data back from Google
+        process.nextTick(function () {
+
+            // try to find the user based on their google id
+            User.findOne({'google.id': profile.id}, function (err, user) {
+                if (err)
+                    return done(err);
+
+                if (user) {
+
+                    // if a user is found, log them in
+                    return done(null, user);
+                } else {
+                    // if the user isnt in our database, create a new user
+                    var newUser = new User();
+
+                    // set all of the relevant information
+                    newUser.google.id = profile.id;
+                    newUser.google.token = token;
+                    newUser.google.name = profile.displayName;
+                    newUser.google.email = profile.emails[0].value; // pull the first email
+
+                    // save the user
+                    newUser.save(function (err) {
+                        if (err)
+                            throw err;
+                        return done(null, newUser);
+                    });
+                }
             });
-        }
-    ));
-    
+        });
+    }));
+
+    /*    passport.use(new GoogleStrategy({
+                clientID: configAuth.googleAuth.clientID,
+                clientSecret: configAuth.googleAuth.clientSecret,
+                callbackURL: configAuth.googleAuth.callbackURL,
+                passReqToCallback: true
+            },
+            function (request, accessToken, refreshToken, profile, done) {
+                User.findOrCreate({googleId: profile.id}, function (err, user) {
+                    return done(err, user);
+                });
+            }
+        ));*/
+
+
     // =========================================================================
     // LOCAL SIGNUP ============================================================
     // =========================================================================
@@ -114,10 +201,17 @@ module.exports = function (passport) {
             if (!user.validPassword(password))
                 return done(null, false, req.flash('loginMessage', 'Пароль не подходит.')); // create the loginMessage and save it to session as flashdata
 
-            // all is well, return successful user
-            return done(null, user);
-        });
+            client.filter({_id: ObjectID(user._id)}, function (err, results) {
+                var customer = results[0];
 
+                if (!results.length || !customer.role || customer.role == '') {
+                    return done(null, false, req.flash('loginMessage', 'Требуется подтверждение e-mail'));
+                }
+
+                // all is well, return successful user
+                return done(null, user);
+            });
+        });
     }));
 
 };

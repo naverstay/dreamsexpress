@@ -3,9 +3,9 @@
 @font-face {
   font-family: 'dreamsexpress';
   src:
-    url('#{$icomoon-font-path}/dreamsexpress.ttf?8p1n8h') format('truetype'),
-    url('#{$icomoon-font-path}/dreamsexpress.woff?8p1n8h') format('woff'),
-    url('#{$icomoon-font-path}/dreamsexpress.svg?8p1n8h#dreamsexpress') format('svg');
+    url('#{$icomoon-font-path}/dreamsexpress.ttf?7fuhkk') format('truetype'),
+    url('#{$icomoon-font-path}/dreamsexpress.woff?7fuhkk') format('woff'),
+    url('#{$icomoon-font-path}/dreamsexpress.svg?7fuhkk#dreamsexpress') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -25,6 +25,26 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.i-star-rounded {
+  &:before {
+    content: $i-star-rounded;
+  }
+}
+.i-star2 {
+  &:before {
+    content: $i-star2;
+  }
+}
+.i-cart {
+  &:before {
+    content: $i-cart;
+  }
+}
+.i-cart2 {
+  &:before {
+    content: $i-cart2;
+  }
+}
 .i-abc-squares {
   &:before {
     content: $i-abc-squares;

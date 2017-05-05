@@ -25,27 +25,27 @@ html(lang='ru')
                                         .cabinet_form_col
                                             form.userUpdate.validateMe(action='/user' method='PUT')
                                                 .form_cell
-                                                    input.f_input.input_v2(placeholder='Имя' name='first_name' value= user.local.firstName)
+                                                    input.f_input.input_v2(placeholder='Имя' name='client_first_name' value= (user && user.data ? user.data.first_name || '' : '') )
                                                     
                                                 .form_cell
-                                                    input.f_input.input_v2(placeholder='Фамилия' name='last_name' value= user.local.lastName)
+                                                    input.f_input.input_v2(placeholder='Фамилия' name='client_last_name' value= (user && user.data ? user.data.last_name || '' : '') )
     
                                                 .form_cell
-                                                    input.f_input.input_v2(placeholder='Email' name='email' value= user.local.email class='validate[required, custom[email]]')
+                                                    input.f_input.input_v2(placeholder='Email' name='client_email' readonly value= (user ? user.email || '' : '') class='validate[required, custom[email]]')
                                                     
                                                 .form_cell
-                                                    input.f_input.input_v2(placeholder='Телефон' name='phone' value= user.local.phone data-inputmask="'mask': '[+38] (099)-999-99-99'")
+                                                    input.f_input.input_v2(placeholder='Телефон' name='client_phone' value= (user && user.data ? user.data.phone || '' : '') data-inputmask="'mask': '[+38] (099)-999-99-99', 'clearIncomplete' : true")
                                                     
                                                 .form_cell
-                                                    input.f_input.input_v2(placeholder='Адрес' name='address' value= user.local.address)
+                                                    input.f_input.input_v2(placeholder='Адрес' name='client_address' value= (user && user.data ? user.data.address || '' : '') )
                                                     
-                                                .form_cell
-                                                    input.f_input.input_v2(placeholder='Старый пароль' name='password' type='password' class='validate[minSize[6]]')
+                                                //-.form_cell
+                                                    input.f_input.input_v2(placeholder='Старый пароль' name='client_password' type='password' class='validate[minSize[6]]')
                                                     //-.form_cell_aside_tool
                                                         a.gl_link.cool_text.fz_13.fw_500(href='#') Сменить пароль
                                                         
-                                                .form_cell
-                                                    input.f_input.input_v2(placeholder='Новый пароль' name='new_password' type='password' class='validate[minSize[6]]')
+                                                //-.form_cell
+                                                    input.f_input.input_v2(placeholder='Новый пароль' name='client_new_password' type='password' class='validate[minSize[6]]')
                                                         
                                                 .form_cell
                                                     button.btn_v1.blue_btn.order_btn.mod_4 Сохранить
@@ -69,9 +69,8 @@ html(lang='ru')
                                                             a.about_link(href='#')
                                                                 span.i-g
                                                                 
-                                #cabinet_tab_2
+                                #cabinet_tab_2(style='display:none')
                                     .tab_content
-                            
                                         .orders_table
                                             .order_row.caption_row
                                                 .order_cell.col_1
@@ -136,4 +135,5 @@ html(lang='ru')
         +aside_left()
         +aside_right()
         +popups()
+        +scripts("DREAMSEXPRESS Кабинет", false, false, false, false, true)
         

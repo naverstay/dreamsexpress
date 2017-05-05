@@ -2,8 +2,115 @@
 module.exports = function (app, passport) {
 
     var productsController = require('../controllers/products');
+    var clientsController = require('../controllers/clients');
+    var ObjectID = require('mongodb').ObjectID;
+
     var user = require('../models/user');
+    var client = require('../models/clients');
+
+    // var products = require('../models/products');
     var db = require('../config/db');
+
+    var slug = require('slug');
+
+    function restrict(req, res, next) {
+        req.session.prevPage = req.body.pathname || '/';
+        next();
+    }
+
+    function isObjectID(str) {
+        var rxObjectID = new RegExp("^[0-9a-fA-F]{24}$");
+        return rxObjectID.test(str);
+    }
+
+    function favUpdate(list, req, cb) {
+        client.update(req.session.passport.user, {
+            first_name: req.client_info.first_name,
+            last_name: req.client_info.last_name,
+            phone: req.client_info.phone,
+            address: req.client_info.address,
+            role: req.client_info.role,
+            fav: list
+        }, function (err, numberAffected, rawResponse) {
+            console.log(err, numberAffected, rawResponse);
+
+            if (err)
+                return done(err, numberAffected, rawResponse);
+
+            client.findById(req.user._id, function (err, results) {
+                req.client_info = results;
+                req.client_info.email = req.user.local.email;
+
+                getFavList(req.client_info.fav, function (html) {
+                    cb(html);
+                });
+            });
+        });
+    }
+
+    function getFavList(list, cb) {
+        var ret = '';
+
+        if (list && list.length) {
+            var obj_ids = list.map(function (item) {
+                return ObjectID(item);
+            });
+
+            productsController.filter({_id: {$in: obj_ids}}, function (err, result) {
+                ret = favItemsHtml(result);
+
+                if (typeof cb == 'function') {
+                    cb(ret);
+                }
+            });
+
+        } else {
+            if (typeof cb == 'function') {
+                cb('<div class="favUnitMarker"></div>');
+            }
+        }
+    }
+
+    app.use(function (req, res, next) {
+        var clients_collection = db.get().collection('clients');
+
+        req.client_info = {};
+
+        productsController.filter({}, function (err, results) {
+            req.all_products = results;
+
+            if (req.user) {
+                client.filter({_id: ObjectID(req.user._id)}, function (err, results) {
+                    if (results && results.length) {
+                        req.client_info = JSON.parse(JSON.stringify(results[0]));
+                    }
+
+                    req.client_info.email = req.user.local.email;
+
+                    if (req.client_info && req.client_info.fav) {
+
+                        var obj_ids = req.client_info.fav.map(function (item) {
+                            return ObjectID(item);
+                        });
+
+                        req.fav_html = [];
+
+                        productsController.filter({_id: {$in: obj_ids}}, function (err, result) {
+                            req.fav_html = result.slice(0);
+
+                            next();
+                        });
+                    } else {
+                        next();
+                    }
+                });
+
+            } else {
+                next();
+            }
+        });
+
+    });
 
     // =====================================
     // HOME PAGE (with login links) ========
@@ -11,30 +118,65 @@ module.exports = function (app, passport) {
 
     app.get('/', function (req, res) {
         // console.log('req.user', req.user);
-        res.render('index', {user: req.user, all_products: global.all_products, title: 'express index'});
+
+        res.render('index', {
+            user: req.client_info,
+            all_products: req.all_products,
+            fav_html: req.fav_html,
+            title: 'express index'
+        });
     });
 
     app.get('/login', function (req, res) {
         if (req.user) {
-            res.render('lk', {user: req.user, all_products: global.all_products, title: 'lk'});
+            res.redirect('/lk');
         } else {
-            res.render('login', {user: req.user, all_products: global.all_products, title: 'login'});
+            res.render('login', {
+                user: req.client_info,
+                all_products: req.all_products,
+                fav_html: req.fav_html,
+                title: 'login'
+            });
+        }
+    });
+
+    app.get('/login&email=*', function (req, res) {
+        if (req.user) {
+            res.redirect('/lk');
+        } else {
+            res.render('login', {
+                user: req.client_info,
+                all_products: req.all_products,
+                fav_html: req.fav_html,
+                email: req.params[0],
+                title: 'email confirmed'
+            });
         }
     });
 
     app.get('/product', function (req, res) {
-        res.render('product', {user: req.user, all_products: global.all_products, title: 'product'});
+        res.render('product', {
+            user: req.client_info,
+            all_products: req.all_products,
+            fav_html: req.fav_html,
+            title: 'product'
+        });
     });
 
     app.get('/products', function (req, res) {
-        res.render('products', {user: req.user, all_products: global.all_products, title: 'products'});
+        res.render('products', {
+            user: req.client_info,
+            all_products: req.all_products,
+            fav_html: req.fav_html,
+            title: 'products'
+        });
     });
 
 // app.get('/products/:id', function (req, res) {
 //     if (req.params.id) {
-//         res.render('product', {user: req.user, all_products: global.all_products, title: 'Express', id: req.params.id});
+//         res.render('product', {user: req.client_info, all_products: req.all_products, fav_html: req.fav_html, title: 'Express', id: req.params.id});
 //     } else {
-//         res.render('products', {user: req.user, all_products: global.all_products, title: 'Express'});
+//         res.render('products', {user: req.client_info, all_products: req.all_products, fav_html: req.fav_html, title: 'Express'});
 //     }
 // });
 
@@ -65,67 +207,369 @@ module.exports = function (app, passport) {
             path: req.param(0)
         });
 
-        res.render('products', {user: req.user, all_products: global.all_products, title: 'regular page'});
+        res.render('products', {
+            user: req.client_info,
+            all_products: req.all_products,
+            fav_html: req.fav_html,
+            title: 'regular page'
+        });
+    });
+
+    app.get('/activate_*', function (req, res, next) {
+        var activation_id = req.params[0];
+
+        console.log('activate', activation_id);
+
+        db.get().collection('users').findOne({_id: ObjectID(activation_id)}, function (err, doc) {
+
+            console.log(doc);
+
+            db.get().collection('clients').save({
+                _id: ObjectID(activation_id),
+                first_name: '',
+                last_name: '',
+                phone: '',
+                address: '',
+                role: 'customer',
+                fav: []
+            }, function (err, numberAffected, rawResponse) {
+                console.log(err, numberAffected, rawResponse);
+
+                if (err)
+                    return done(err, numberAffected, rawResponse);
+
+                res.redirect('/login&email=' + doc.local.email);
+            });
+        });
     });
 
 // handler for the /user/:id path, which renders a special page
-    app.get('/product_*', function (req, res, next) {
-        console.log('2=========' + JSON.stringify(req.params));
+
+    app.get('/product/:id', function (req, res, next) {
+        var filter = [{url: req.params.id}];
+
+        // console.log('2=========', req.params.id, checkForHexRegExp.test(req.params.id));
+
+        if (isObjectID(req.params.id)) {
+            filter.push({_id: ObjectID('' + req.params.id)});
+        }
+
+        productsController.filter({$or: filter}, function (err, results) {
+
+            if (results.length) {
+                res.render('product', {
+                    user: req.client_info,
+                    // all_products: req.all_products,
+                    product: results[0],
+                    fav_html: req.fav_html,
+                    title: 'product page',
+                    id: results[0]._id
+                });
+            } else {
+                res.status(404);
+
+                // respond with html page
+                if (req.accepts('html')) {
+                    res.render('error', {
+                        url: req.url,
+                        error: 404,
+                        user: req.client_info,
+                        title: 'ERROR 404',
+                        message: 'Товар не найден'
+                    });
+                    return;
+                }
+
+                // respond with json
+                if (req.accepts('json')) {
+                    res.send({error: 'Not found'});
+                    return;
+                }
+
+                // default to plain-text. send()
+                res.type('txt').send('Not found');
+            }
+        });
+    });
+
+// handler for the /user/:id path, which renders a special page
+
+    app.post('/product/:id', function (req, res, next) {
+        // console.log('2=========' + JSON.stringify(req.params));
 
         // res.json({
         //     id: req.param('id'),
         //     path: req.param(0)
         // });
 
-        res.render('product', {
-            user: req.user,
-            all_products: global.all_products,
-            title: 'product page',
-            id: req.params.id
+        var filter = [{url: req.params.id}], checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
+
+        if (checkForHexRegExp.test(req.params.id)) {
+            filter.push({_id: ObjectID('' + req.params.id)});
+        }
+
+        productsController.filter({$or: filter}, function (err, results) {
+
+            if (results.length) {
+                var item = results[0];
+
+                var prod_review = '<div class="prod_review_photos"> ' +
+                    '<h3>Топ и брючки тонкой вязки</h3> ' +
+                    buildFotorama(item.is_hit, item.main_img, item.hover_img, item.img_list) +
+                    '</div>';
+
+                var prod_review_options = '<div class="prod_review_options">' +
+                    '<dl class="prod_options">' +
+                    '<dt>Цвет: </dt>' +
+                    '<dd></dd>' +
+                    '</dl>' +
+                    '<ul class="prod_options_switch">' +
+                    colorList(item.colors) +
+                    '</ul>' +
+                    '<dl class="prod_options"><dt>Размер: </dt><dd>&nbsp;</dd></dl>' +
+                    '<ul class="prod_options_switch">' +
+                    sizesList(item.sizes) +
+                    '</ul>' +
+                    '<p>' +
+                    (item.description ? item.description : '') +
+                    '</p>' +
+                    '<div class="footer_info_control"><a class="gl_link" href="product/' + item.url + '">На страницу товара</a></div>' +
+                    '</div>';
+
+                var product_share_holder = (item.old_price ? '<div class="product_share">- ' + Math.ceil(100 * ((item.price - item.old_price) / item.price )).toFixed() + '%</div>' : '');
+
+                var product_price = '<span class="new_price">' + formatPrice(item.price) +
+                    '<span class="_cur"> грн.</span></span>' +
+                    (item.old_price ? '<span class="old_price">' + formatPrice(item.old_price) +
+                    '<span class="_cur"> грн.</span></span>' : '');
+
+                res.send({
+                    prod_review: prod_review,
+                    product_share_holder: product_share_holder,
+                    product_price: product_price,
+                    prod_review_options: prod_review_options
+                });
+            } else {
+
+            }
         });
     });
 
-
     app.get('/catalog', function (req, res) {
-        res.render('catalog', {user: req.user, all_products: global.all_products, title: 'catalog'});
+        res.render('catalog', {
+            user: req.client_info,
+            all_products: req.all_products,
+            fav_html: req.fav_html,
+            title: 'catalog'
+        });
     });
 
-    app.get('/cart', function (req, res) {
-        res.render('cart', {user: req.user, all_products: global.all_products, title: 'cart'});
+    app.get('/cart', isLoggedIn, function (req, res) {
+        res.render('cart', {
+            user: req.client_info,
+            all_products: req.all_products,
+            fav_html: req.fav_html,
+            title: 'cart'
+        });
     });
 
     app.get('/news', function (req, res) {
-        res.render('news', {user: req.user, all_products: global.all_products, title: 'news'});
+        res.render('news', {
+            user: req.client_info,
+            all_products: req.all_products,
+            fav_html: req.fav_html,
+            title: 'news'
+        });
     });
 
     app.get('/news_1', function (req, res) {
-        res.render('news_1', {user: req.user, all_products: global.all_products, title: 'news_1'});
+        res.render('news_1', {
+            user: req.client_info,
+            all_products: req.all_products,
+            fav_html: req.fav_html,
+            title: 'news_1'
+        });
     });
 
     app.get('/lk', isLoggedIn, function (req, res) {
-        res.render('lk', {user: req.user, all_products: global.all_products, title: 'lk'});
+        res.render('lk', {user: req.client_info, all_products: req.all_products, fav_html: req.fav_html, title: 'lk'});
     });
 
     app.get('/delivery', function (req, res) {
-        res.render('delivery', {user: req.user, all_products: global.all_products, title: 'delivery'});
+        res.render('delivery', {
+            user: req.client_info,
+            all_products: req.all_products,
+            fav_html: req.fav_html,
+            title: 'delivery'
+        });
     });
 
     app.get('/search', function (req, res) {
-        res.render('search', {user: req.user, all_products: global.all_products, title: 'search'});
+        res.render('search', {
+            user: req.client_info,
+            all_products: req.all_products,
+            fav_html: req.fav_html,
+            title: 'search'
+        });
     });
 
-    app.get('/add_product', function (req, res) {
-        res.render('add_product', {user: req.user, all_products: global.all_products, title: 'add_product'});
+    app.get('/add_product', isLoggedIn, isAdmin, function (req, res) {
+        res.render('add_product', {
+            user: req.client_info,
+            all_products: req.all_products,
+            fav_html: req.fav_html,
+            title: 'add_product'
+        });
+    });
+
+    app.get('/all_products', isLoggedIn, isAdmin, function (req, res) {
+        res.render('all_products', {
+            user: req.client_info,
+            all_products: req.all_products,
+            fav_html: req.fav_html,
+            title: 'all_products'
+        });
     });
 
 // app.post('/q_search', productsController.filter);
 
+
+    app.get('/recovery_failed', function (req, res, next) {
+        res.send({email: 'error', recovery_failed: true});
+    });
+
+    app.get('/recovery_success', function (req, res, next) {
+        res.send({email: 'email', recovery_success: true});
+    });
+
+    /*  app.get('/recovery_*', function (req, res, next) {
+          var activation_id = req.params[0];
+  
+          console.log('recovery_', activation_id);
+  
+          db.get().collection('users').findOne({_id: ObjectID(activation_id)}, function (err, doc) {
+  
+              console.log(doc);
+  
+              // db.get().collection('clients').save({
+              //     _id: ObjectID(activation_id),
+              //     first_name: '',
+              //     last_name: '',
+              //     phone: '',
+              //     address: '',
+              //     role: 'customer',
+              //     fav: []
+              // }, function (err, numberAffected, rawResponse) {
+              //     console.log(err, numberAffected, rawResponse);
+              //
+              //     if (err)
+              //         return done(err, numberAffected, rawResponse);
+              //
+              //     res.redirect('/login&email=' + doc.local.email);
+              // });
+          });
+      });*/
+
+    function passRecovery(req, res, options, callback) {
+        if (typeof options == 'function') {
+            callback = options;
+            options = {};
+        }
+        options = options || {};
+
+
+        var restore_email = req.body.email;
+
+        // console.log(req.params);
+
+        db.get().collection('users').findOne({'local.email': restore_email}, function (err, doc) {
+            if (err) {
+                // handle error 
+                console.log(err);
+                res.send('There was an error sending the email');
+                return;
+            }
+
+            if (doc && doc._id != '') {
+                app.mailer.send('email_restore', {
+                    to: restore_email, // REQUIRED. This can be a comma delimited string just like a normal email to field.  
+                    subject: 'dreamsexpress восстановление доступа', // REQUIRED. 
+                    confirmation_url: 'http://localhost:3012/recovery_' + doc._id
+                }, function (err) {
+                    if (err) {
+                        // handle error 
+                        console.log(err);
+                        // res.send({redirectTo: '/recovery_failed'});
+                        // res.end(JSON.stringify({email: restore_email, recovery_failed: true}));
+
+                        return;
+                    }
+
+                    console.log('email sent');
+
+                    res.setHeader(200, {'Content-Type': 'text/html'});
+
+                    res.end();
+
+
+                    // res.send({success: "Updated Successfully", status: 200});
+
+                    // if (options.successRedirect) {
+                    //     res.statusCode = 302;
+                    //     res.setHeader('Location', options.successRedirect);
+                    //     res.setHeader('Content-Length', '0');
+                    //     res.end();
+                    //     // return res.redirect(options.successRedirect);
+                    // }
+
+                    // next();
+
+                    // res.redirect('/recovery_success');
+
+                    // res.send({redirectTo: '/recovery_success'});
+
+                    // res.end(JSON.stringify({email: restore_email, recovery_success: true}));
+
+                });
+            } else {
+                // res.send({redirectTo: '/recovery_failed'});
+
+                // res.end(JSON.stringify({email: restore_email, recovery_failed: true}));
+
+                // res.send({success: "Update Failed", status: 200});
+
+                res.setHeader(200, {'Content-Type': 'text/html'});
+
+                res.end();
+
+                // if (options.failureRedirect) {
+                //     res.statusCode = 302;
+                //     res.setHeader('Location', options.failureRedirect);
+                //     res.setHeader('Content-Length', '0');
+                //     res.end();
+                //
+                //     // return res.redirect(options.failureRedirect);
+                // }
+
+
+            }
+        });
+    }
+
+    app.post('/recovery', function (req, res) {
+        passRecovery(req, res, {
+            successRedirect: '/recovery_success',
+            failureRedirect: '/recovery_failed'
+        })
+    });
+
     app.post('/q_search', function (req, res) {
         // console.log(req.body.name);
 
-        var products_collection = db.get().collection('products'), rx = new RegExp(escapeRegExp(req.body.name), "ig");
+        var rx = new RegExp(escapeRegExp(req.body.name), "ig");
 
-        products_collection.find({name: rx}).toArray(function (err, results) {
+        // products_collection.find({name: rx}).toArray(function (err, results) {
+        productsController.filter({name: rx}, function (err, results) {
             var items = '';
 
             for (var i = 0; i < results.length; i++) {
@@ -134,12 +578,12 @@ module.exports = function (app, passport) {
                 items +=
                     '<li>' +
                     '<div class="product_item">' +
-                    '<a href="product_' + item._id + '" class="product_img">' +
+                    '<a href="product/' + item.url + '" class="product_img">' +
                     '<img src="' + item.main_img + '">' +
-                    '<div class="product_hit">Хит продаж</div>' +
-                    '<div class="product_share_holder">' +
-                    '<div class="product_share">- 30%</div>' +
-                    '</div>' +
+                    (item.is_hit ? '<div class="product_hit">Хит продаж</div>' : '') +
+                    (item.old_price ? '<div class="product_share_holder">' +
+                    '<div class="product_share">- ' + Math.ceil(100 * ((item.price - item.old_price) / item.price )).toFixed() + '%</div>' +
+                    '</div>' : '') +
                     '</a>' +
                     '<h3 class="product_caption">' + item.name + '</h3>' +
                     '<div class="product_price">' +
@@ -156,19 +600,25 @@ module.exports = function (app, passport) {
 
 
     app.post('/filter', function (req, res) {
-        var ret = [], params = removeEmpty(req.body), filter = {};
+        var params = removeEmpty(req.body), filter = {}, sort = {};
 
         for (var field in params) {
             var param = params[field];
 
-            console.log(field, params[field]);
+            // console.log(field, params[field]);
+
+            if ((/price_desc/ig).test(field)) {
+                sort['price_desc'] = (param == 'desc') || false;
+            }
 
             if ((/name/ig).test(field)) {
-                filter['name'] = RXify(param.trim());
+                filter['name'] = RXify(param.replace(/[!@#%&=`~\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '').trim());
             } else if ((/info/ig).test(field)) {
                 filter['info'] = RXify(param.trim());
             } else if ((/adult/ig).test(field)) {
                 filter['adult'] = (param == 'true');
+            } else if ((/in_stock/ig).test(field)) {
+                filter['in_stock'] = (param == 'true');
             } else if ((/gender/ig).test(field)) {
                 filter['gender'] = RXify(param);
             } else if ((/season/ig).test(field)) {
@@ -178,7 +628,7 @@ module.exports = function (app, passport) {
                     $gte: parseInt(('' + param).replace(/\D/g, ''))
                 };
 
-                console.log(params['price_max']);
+                // console.log(params['price_max']);
 
                 if (params['price_max']) {
                     filter['price']['$lte'] = parseInt(('' + params['price_max']).replace(/\D/g, ''));
@@ -188,7 +638,7 @@ module.exports = function (app, passport) {
                     $lte: parseInt(('' + param).replace(/\D/g, ''))
                 };
 
-                console.log(params['price_min'], filter['price']);
+                // console.log(params['price_min'], filter['price']);
 
                 if (params['price_min']) {
                     filter['price']['$gte'] = parseInt(('' + params['price_min']).replace(/\D/g, ''));
@@ -196,33 +646,78 @@ module.exports = function (app, passport) {
             }
         }
 
-        console.log('start', req.body, filter);
+        function sortFunc(a, b) {
+            if (sort['price_desc']) {
+                return b.price - a.price;
+            } else if (!sort['price_desc']) {
+                return a.price - b.price;
+            }
 
-        var products_collection = db.get().collection('products');
+            return 0;
+        }
 
-        products_collection.find(filter).toArray(function (err, results) {
-            res.send(results);
+        // console.log('start', req.body, filter);
+
+        // var products_collection = db.get().collection('products');
+
+        // products_collection.find(filter).toArray(function (err, results) {
+        productsController.filter(filter, function (err, results) {
+            var items = '';
+
+            results.sort(sortFunc);
+
+            for (var i = 0; i < results.length; i++) {
+                var item = results[i];
+
+                // productsController.update({
+                //     url: slug(item.name),
+                //     id: item._id
+                // });
+
+                items +=
+                    '<li>' +
+                    '<div class="product_item">' +
+                    '<a href="product/' + item.url + '" class="product_img">' +
+                    '<img src="' + item.main_img + '">' +
+                    (item.hover_img ? '<div class="hover_img prod_hover"><img src="' + item.hover_img + '"></div>' : '') +
+                    (item.is_hit ? '<div class="product_hit">Хит продаж</div>' : '') +
+                    '<div class="product_share_holder">' +
+                    '<span data-id="' + item._id + '" class="prod_hover prod_fav favBtn' + (checkFav(item._id, req.client_info.fav || []) ? ' favorite' : '') + '"></span>' +
+                    (item.old_price ? '<div class="product_share">- ' + Math.ceil(100 * ((item.price - item.old_price) / item.price )).toFixed() + '%</div>' : '') +
+                    '</div>' +
+                    '<div class="product_q_review violette_btn prod_hover openReview mob_hidden">Быстрый просмотр</div>' +
+                    '</a>' +
+                    '<h3 class="product_caption">' + item.name + '</h3>' +
+                    '<div class="product_price">' +
+                    (item.old_price ? '<span class="old_price">' + formatPrice(item.old_price) + '<span> грн.</span></span>' : '') +
+                    '<span class="new_price">' + formatPrice(item.price) + '<span> грн.</span></span>' +
+                    '</div>' +
+                    '<div class="product_item_overview prod_hover">' +
+                    '<p>Цвета и размеры в наличии</p>' +
+                    '<ul class="prod_colors">' +
+                    colorRender(item.colors) +
+                    '</ul>' +
+                    '<div class="prod_sizes">' + item.sizes + '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</li>';
+            }
+
+            res.send({items: items, count: results.length});
         });
-
-        // for (var i = 0; i < all_products.length; i++) {
-        //     var item = all_products[i];
-        //
-        //
-        // }
-
-        // res.send(all_products);
 
     });
 
-    app.get('/artists', productsController.all);
+    app.post('/add', isLoggedInPost, productsController.create);
 
-    app.get('/artists/:id', productsController.findById);
+    // app.get('/artists', productsController.all);
+    //
+    // app.get('/artists/:id', productsController.findById);
 
-    app.post('/add', productsController.create);
 
-    app.put('/artists/:id', productsController.update);
-
-    app.delete('/artists/:id', productsController.delete);
+    // app.put('/artists/:id', productsController.update);
+    //
+    // app.delete('/artists/:id', productsController.delete);
 
 
     // =====================================
@@ -239,16 +734,18 @@ module.exports = function (app, passport) {
     // });
 
     // update user
-    app.put('/user', isLoggedIn, function (req, res) {
-        console.log(req.session.passport.user);
+    app.put('/user', isLoggedInPost, function (req, res) {
+        // console.log('req.session.passport.user /put', req.session.passport.user, req.body);
 
-        user.update({_id: req.session.passport.user}, {
-            email: req.body.email,
-            password: req.body.password,
-            firstName: req.body.first_name,
-            lastName: req.body.last_name,
-            phone: req.body.displayName,
-            address: req.body.address
+        client.update(req.session.passport.user, {
+            // email: req.body.email,
+            // password: req.body.client_password,
+            first_name: req.body.client_first_name,
+            last_name: req.body.client_last_name,
+            phone: req.body.client_phone,
+            address: req.body.client_address,
+            role: req.client_info.role,
+            fav: req.client_info.fav || []
         }, function (err, numberAffected, rawResponse) {
             console.log(err, numberAffected, rawResponse);
 
@@ -261,24 +758,139 @@ module.exports = function (app, passport) {
 
     });
 
+    // update favorites
+
+    app.post('/fav_rm', isLoggedInPost, function (req, res) {
+        if (!isObjectID(req.body.id)) {
+            return res.send({
+                fav_added: false,
+                items: req.client_info.fav,
+                items_html: req.fav_html
+            });
+        }
+
+        var fav_list = [];
+
+        if (req.client_info) {
+            if (req.client_info.fav) {
+                fav_list = req.client_info.fav;
+            }
+        }
+
+        var index = fav_list.indexOf('' + req.body.id);
+
+        if (index > -1) {
+            fav_list.splice(index, 1);
+
+            favUpdate(fav_list, req, function (html) {
+                res.send({
+                    fav_removed: true,
+                    items: req.client_info.fav,
+                    items_html: html
+                });
+            });
+        } else {
+            getFavList(req.client_info.fav, function (html) {
+                // console.log(549, html);
+
+                res.send({
+                    fav_removed: false,
+                    items: req.client_info.fav,
+                    items_html: html
+                });
+            });
+        }
+    });
+
+    // update favorites
+    app.post('/fav', isLoggedInPost, function (req, res) {
+
+        // console.log('/fav', req.body.id);
+        
+        if (!isObjectID(req.body.id)) {
+            return res.send({
+                fav_added: false,
+                items: req.client_info.fav,
+                items_html: req.fav_html
+            });
+        }
+
+        var fav_list = [];
+
+        if (req.client_info) {
+            if (req.client_info.fav) {
+                fav_list = req.client_info.fav;
+            }
+        }
+
+        var index = fav_list.indexOf('' + req.body.id);
+
+        if (index > -1) {
+            fav_list.splice(index, 1);
+
+            favUpdate(fav_list, req, function (html) {
+                res.send({
+                    fav_removed: true,
+                    items: req.client_info.fav,
+                    items_html: html
+                });
+            });
+        } else {
+            fav_list.push('' + req.body.id);
+
+            favUpdate(fav_list, req, function (html) {
+                res.send({
+                    fav_added: true,
+                    items: req.client_info.fav,
+                    items_html: html
+                });
+            });
+        }
+    });
+
+    // update favorites
+    app.post('/fav_clear', isLoggedInPost, function (req, res) {
+
+        favUpdate([], req, function (html) {
+            res.send({
+                fav_empty: true,
+                items: req.client_info.fav,
+                items_html: html
+            });
+        });
+    });
+
     // GET /auth/google
 //   Use passport.authenticate() as route middleware to authenticate the
 //   request.  The first step in Google authentication will involve
 //   redirecting the user to google.com.  After authorization, Google
 //   will redirect the user back to this application at /auth/google/callback
-    app.get('/auth/google',
-        passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/plus.login']}));
+
+    // app.get('/auth/google', passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/plus.login']}));
 
 // GET /auth/google/callback
 //   Use passport.authenticate() as route middleware to authenticate the
 //   request.  If authentication fails, the user will be redirected back to the
 //   login page.  Otherwise, the primary route function function will be called,
 //   which, in this example, will redirect the user to the home page.
-    app.get('/auth/google/callback',
-        passport.authenticate('google', {failureRedirect: '/login'}),
-        function (req, res) {
-            res.redirect('/');
-        });
+
+    // app.get('/auth/google/callback', passport.authenticate('google', {failureRedirect: '/login'}), function (req, res) {
+    //     res.redirect('/');
+    // });
+
+    /*    app.get('/auth/google',
+            passport.authenticate('google', {
+                    scope: ['https://www.googleapis.com/auth/plus.login',
+                        , 'https://www.googleapis.com/auth/plus.profile.emails.read']
+                }
+            ));
+    
+        app.get('/auth/google/callback',
+            passport.authenticate('google', {
+                successRedirect: '/auth/google/success',
+                failureRedirect: '/auth/google/failure'
+            }));*/
+
 
     // process the login form
     app.post('/login_lk', passport.authenticate('local-login', {
@@ -287,7 +899,7 @@ module.exports = function (app, passport) {
         failureFlash: true // allow flash messages
     }));
 
-    app.post('/login', passport.authenticate('local-login', {
+    app.post('/login', restrict, passport.authenticate('local-login', {
         successRedirect: '/login_success', // redirect to the secure profile section
         failureRedirect: '/login_failed', // redirect back to the signup page if there is an error
         failureFlash: true // allow flash messages
@@ -306,9 +918,14 @@ module.exports = function (app, passport) {
     });
 
     app.get('/login_success', isLoggedIn, function (req, res) {
+        var redirectTo = req.session.prevPage ? req.session.prevPage : '/';
+
+        delete req.session.prevPage;
+
+        // res.redirect(redirectTo);
 
         res.send({
-            redirectTo: '/',
+            redirectTo: redirectTo,
             user: '<li id="user_lk"><a href="/lk" class="menu_link"><span>' + req.user.local.email + '</span></a></li>',
             user_authenticated: true
         });
@@ -353,9 +970,34 @@ module.exports = function (app, passport) {
     // =====================================
     // we will want this protected so you have to be logged in to visit
     // we will use route middleware to verify this (the isLoggedIn function)
-    app.get('/signup_success', isLoggedIn, function (req, res) {
+    app.get('/signup_success', function (req, res) {
 
-        res.send({email: req.user.local.email, user_created: true});
+        // var user_info = db.get().collection('products').findOne();
+
+        db.get().collection('users').findOne({'local.email': req.user.local.email}, function (err, doc) {
+
+            if (err) {
+                // handle error 
+                console.log(err);
+                res.send('There was an error sending the email');
+                return;
+            }
+
+            app.mailer.send('email_confirm', {
+                to: req.user.local.email, // REQUIRED. This can be a comma delimited string just like a normal email to field.  
+                subject: 'dreamsexpress подтверждение e-mail', // REQUIRED. 
+                confirmation_url: 'http://localhost:3012/activate_' + doc._id
+            }, function (err) {
+                if (err) {
+                    // handle error 
+                    console.log(err);
+                    res.send('There was an error sending the email');
+                    return;
+                }
+
+                res.send({email: req.user.local.email, user_created: true});
+            });
+        });
 
         // res.render('profile.ejs', {
         // 	user : req.user // get the user out of session and pass to template
@@ -365,22 +1007,67 @@ module.exports = function (app, passport) {
     // =====================================
     // LOGOUT ==============================
     // =====================================
-    app.post('/logout', function (req, res) {
+    app.post('/logout', restrict, function (req, res) {
         req.logout();
 
-        res.send({redirectTo: '/', logout_done: true});
+        var redirectTo = req.session.prevPage ? req.session.prevPage : '/';
+
+        delete req.session.prevPage;
+
+        res.send({redirectTo: redirectTo, logout_done: true});
     });
+
+    // =====================================
+    // GOOGLE ROUTES =======================
+    // =====================================
+    // send to google to do the authentication
+    // profile gets us their basic information including their name
+    // email gets their emails
+    app.get('/auth/google', passport.authenticate('google', {scope: ['profile', 'email']}));
+
+    // the callback after google has authenticated the user
+    app.get('/auth/google/callback', passport.authenticate('google', {
+        successRedirect: '/profile',
+        failureRedirect: '/'
+    }));
+
 };
 
 // route middleware to make sure
-function isLoggedIn(req, res, next) {
+function isLoggedInPost(req, res, next) {
+    // console.log(req.user);
+    // if user is authenticated in the session, carry on
 
+    console.log('isLoggedInPost', req.isAuthenticated());
+
+    if (req.isAuthenticated())
+        return next();
+
+    res.send({needAuth: true});
+
+    // if they aren't redirect them to the home page
+    // res.redirect('/login');
+}
+
+// route middleware to make sure
+function isLoggedIn(req, res, next) {
     // if user is authenticated in the session, carry on
     if (req.isAuthenticated())
         return next();
 
     // if they aren't redirect them to the home page
     res.redirect('/login');
+}
+
+// route middleware to make sure
+function isAdmin(req, res, next) {
+    // console.log('role', req.client_info, req.client_info.role);
+    // if user is authenticated in the session, carry on
+    if (req.client_info.role == 'admin')
+        return next();
+
+    // if they aren't redirect them to the home page
+    res.redirect('/lk');
 }
 
 function escapeRegExp(str) {
@@ -416,4 +1103,108 @@ function removeEmpty(obj) {
 
 function formatPrice(s) {
     return ('' + s).replace(/(?!^)(?=(\d{3})+(?=\.|$))/gm, ' ');
+}
+
+function isHex(h) {
+    var a = parseInt(h, 16);
+    return (a.toString(16) === h.toLowerCase())
+}
+
+function checkFav(id, list) {
+
+    if (list.length) {
+        // console.log(list, id, list.indexOf('' + id));
+
+        return list.indexOf('' + id) > -1;
+    }
+
+    return false;
+}
+
+function colorRender(colors) {
+    var ret = '', arr = colors.split(',');
+
+    for (var i = 0; i < arr.length; i++) {
+        var clr = (arr[i]).trim();
+
+        if (/^#/.test(clr) && isHex(clr.replace('#', ''))) {
+            ret += '<li><div class="prod_color" style="background:' + clr + ';"></div></li>';
+        } else if (clr.length > 10) {
+            ret += '<li><div class="prod_color"><img src="' + clr + '"></div></li>';
+        }
+    }
+
+    return ret;
+}
+
+function colorList(colors) {
+    var ret = '', arr = colors.split(',');
+
+    for (var i = 0; i < arr.length; i++) {
+        var clr = (arr[i]).trim();
+
+        if (/^#/.test(clr) && isHex(clr.replace('#', ''))) {
+            ret += '<li><label class="option_switch round"> <input class="inp_hidden" value="' + clr + '" type="radio" name="prod_color"/><span class="check_text" class="prod_color"><span class="simple_color" style="background:' + clr + ';"></span></span></label></li>';
+        } else if (clr.length > 10) {
+            ret += '<li><label class="option_switch round"> <input class="inp_hidden" value="' + clr + '" type="radio" name="prod_color"/><span class="check_text"><img src="' + clr + '"></span></label></li>';
+        }
+    }
+
+    return ret;
+}
+
+function sizesList(sizes) {
+    var ret = '', arr = sizes.split(',');
+
+    for (var i = 0; i < arr.length; i++) {
+        var size = (arr[i]).trim();
+
+        ret += '<li><label class="option_switch"> <input class="inp_hidden" value="' + size + '" type="radio" name="prod_size"/><span class="check_text"><span>' + size + '</span></span></label></li>';
+
+    }
+
+    return ret;
+}
+
+function favItemsHtml(items) {
+    var ret = '';
+
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+
+        ret += '<div class="favUnit fav_unit">' +
+            '<div class="product_item">' +
+            '<a href="product/' + item.url + '" class="product_img">' +
+            '<img src="' + item.main_img + '">' +
+            '</a>' +
+            '<div data-id="' + item._id + '" class="prod_rm_btn rmFavBtn"></div>' +
+            '<h3 class="product_caption">' + item.name + '</h3>' +
+            '<div class="product_price">' +
+            '<span class="new_price">' + formatPrice(item.price) + '<span class="_cur"> грн.</span>' +
+            '</span>' +
+            '</div>' +
+            '</div>' +
+            '</div>';
+    }
+
+    return ret + '<div class="favUnitMarker"></div>';
+}
+
+function buildFotorama(hit, img, img2, imgs) {
+    var ret = '<div class="fotorama" data-thumbwidth="60" data-thumbheight="60" data-height="340" data-nav="thumbs" data-thumbmargin="3">';
+
+    ret += fotoramaSlide(hit, img);
+
+    ret += fotoramaSlide(hit, img2);
+
+    for (var i = 0; i < imgs.length; i++) {
+        ret += fotoramaSlide(hit, imgs[i]);
+    }
+
+    return ret + '</div>';
+}
+
+function fotoramaSlide(hit, img) {
+    return img.length ? '<div class="prod_review_img product_img" data-thumb="' + img + '"><img src="' + img + '"/>' +
+    (hit ? '<div class="product_hit">Хит продаж</div>' : '') + '</div>' : '';
 }

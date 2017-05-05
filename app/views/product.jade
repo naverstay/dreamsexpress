@@ -23,7 +23,7 @@ html(lang='ru')
                         .product_block
                             .product_photos
                                 h1.page_title.fw_700
-                                    span Нейлоновая куртка-бомбер
+                                    span= product.name
                                     
                             .product_cart
                                 .product_soc
@@ -31,12 +31,16 @@ html(lang='ru')
                         .product_block
                             .product_photos
                                 .fotorama(data-thumbwidth=68, data-thumbheight=68, data-width='100%', data-height='100%', data-maxwidth=660, data-maxheight=660, data-nav="thumbs")
-                                    .prod_review_img.product_img(data-thumb='images/product_1_thumb.jpg')
-                                        img(src='images/product_1.jpg')
-                                    .prod_review_img.product_img(data-thumb='images/product_1_thumb.jpg')
-                                        img(src='images/product_1.jpg')
-                                    .prod_review_img.product_img(data-thumb='images/product_1_thumb.jpg')
-                                        img(src='images/product_1.jpg')
+                                    - if (product.main_img)
+                                        .prod_review_img.product_img(data-thumb= product.main_img)
+                                            img(src= product.main_img)
+                                    - if (product.hover_img)
+                                        .prod_review_img.product_img(data-thumb= product.hover_img)
+                                            img(src= product.hover_img)
+                                    - if (product.img_list.length)
+                                        - for img, i in product.img_list
+                                            .prod_review_img.product_img(data-thumb= img)
+                                                img(src= img)
                                     
                             .product_cart
                                 .product_soc
@@ -54,12 +58,12 @@ html(lang='ru')
                                 .prod_feature
                                     p Куртка-бомбер из нейлона. На куртке воротник стойка, молния спереди, а также боковые карманы на молнии. Карман на молнии на одном рукаве. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны.
 
-                        #features_tab_2
+                        #features_tab_2(style='display:none')
                             .section_inner
                                 .prod_feature
                                     p Куртка-бомбер из нейлона. На куртке воротник стойка, молния спереди, а также боковые карманы на молнии. Карман на молнии на одном рукаве. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны.Карман на молнии на одном рукаве. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны.
 
-                        #features_tab_3
+                        #features_tab_3(style='display:none')
                             .section_inner
                                 .prod_feature
                                     p Куртка-бомбер из нейлона. На куртке воротник стойка, молния спереди, а также боковые карманы на молнии. Карман на молнии на одном рукаве. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны. Трикотажная резинка снизу на рукавах, а также по нижнему краю. Подкладка из мембраны.
@@ -90,4 +94,5 @@ html(lang='ru')
         +aside_left()
         +aside_right()
         +popups()
+        +scripts("DREAMSEXPRESS Товар " + id || '', false, false, true)
         

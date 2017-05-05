@@ -12,19 +12,20 @@ html(lang='ru')
                     .section_inner
                         +breadcrumbs(['Главная', 'Что-то пошло не так (('])
                         h1.page_title.fw_700
-                            span= 'Ошибка ' + (error || '')
+                            span= 'Ошибка' + (error ? ', ' + error : '') + (message ? '. ' + message : '')
 
-                            - if (url)
-                                h1= url
-                            - if (message)
-                                h1= message
-                            - if (error)
-                                h2= error.status
-                                pre #{error.stack}
+                        - if (url)
+                            h2= url
+                        //- if (message)
+                            h3= message
+                        - if (error)
+                            h4= error.status
+                            pre #{error.stack}
                         
             +footer()
             
         +aside_left()
         +aside_right()
         +popups()
+        +scripts("DREAMSEXPRESS Ошибка", false, false, false, false, false, true)
         

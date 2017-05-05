@@ -3,7 +3,7 @@ var db = require('../config/db');
 
 exports.all = function (cb) {
     db.get().collection('products').find().toArray(function (err, docs) {
-        console.log(docs);
+        // console.log(docs);
         cb(err, docs);
     });
 };
@@ -14,16 +14,26 @@ exports.findById = function (id, cb) {
     });
 };
 
+exports.findList = function (ids, cb) {
+    console.log(ids);
+
+    var obj_ids = ids.map(function (item) {
+        return ObjectID(item);
+    });
+
+    db.get().collection('products').find({_id: {$in: obj_ids}}).toArray(function (err, doc) {
+        cb(err, doc);
+    });
+};
+
 exports.findByName = function (name, cb) {
-    db.get().collection('products').find({name: name}, function (err, doc) {
+    db.get().collection('products').find({name: name}).toArray(function (err, doc) {
         cb(err, doc);
     });
 };
 
 exports.filter = function (params, cb) {
-    console.log(params, {name: params.name});
-
-    db.get().collection('products').find({name: params.name}, function (err, doc) {
+    db.get().collection('products').find(params).toArray(function (err, doc) {
         cb(err, doc);
     });
 };

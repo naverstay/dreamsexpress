@@ -29,13 +29,12 @@ gulp.task('browserSync', function () {
 })
 
 gulp.task('jade', function () {
-    gulp.src(['app/jade/*.jade', '!app/jade/_*.jade'])
-    //.pipe(plumber())
+    gulp.src(['app/views/*.jade', '!app/views/_*.jade'])
+        .pipe(plumber())
         .pipe(pug({pretty: true}))
         .pipe(gulp.dest('app/'))
-        .pipe(browserSync.reload({ // Reloading with Browser Sync
-            stream: true
-        }));
+    // .pipe(browserSync.reload({stream: true}))
+    ;
 })
 
 gulp.task('sass', function () {
@@ -111,9 +110,9 @@ gulp.task('default', function (callback) {
 
 gulp.task('build', function (callback) {
     runSequence(
-        // 'clean:dist',
+        'clean:dist',
         'sass',
-        // 'jade',
+        'jade',
         [
             'useref',
             // 'images',
