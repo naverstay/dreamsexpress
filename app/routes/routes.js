@@ -779,6 +779,27 @@ module.exports = function (app, passport) {
 
     });
 
+    // file remove
+
+    app.post('/remove', function (req, res) {
+        var rm = req.body.remove;
+
+        fs.stat('.' + rm, function (err, stats) {
+            // console.log(stats);
+
+            if (err) {
+                return console.error(err);
+            }
+
+            fs.unlink('.' + rm, function (err) {
+                if (err) return console.log(err);
+                console.log('file "' + rm + '" deleted successfully');
+                res.status(200).send({remove_done: true});
+            });
+        });
+    });
+
+
     // file upload
 
     app.post('/upload', function (req, res) {
@@ -1261,12 +1282,14 @@ function favItemsHtml(items) {
     return ret + '<div class="favUnitMarker"></div>';
 }
 
-function buildFotorama(hit, img, img2, imgs) {
+function buildFotorama(hit, img, img2, gallery) {
     var ret = '<div class="fotorama" data-thumbwidth="60" data-thumbheight="60" data-height="340" data-nav="thumbs" data-thumbmargin="3">';
 
     ret += fotoramaSlide(hit, img);
 
     ret += fotoramaSlide(hit, img2);
+
+    var imgs = gallery.split(',');
 
     for (var i = 0; i < imgs.length; i++) {
         ret += fotoramaSlide(hit, imgs[i]);

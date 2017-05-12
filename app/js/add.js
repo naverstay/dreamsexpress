@@ -37,13 +37,17 @@ $(function ($) {
 
                         for (var i = 0; i < data.files.length; i++) {
                             str += ',' + data.files[i];
+
                             previews += '<li class="prodPreviewItem"><div class="prod_preview"><img src="' + data.files[i] + '"><span class="prod_rm_btn rmProdPreview"></span></div></li>';
                         }
+
+                        console.log(str, str.replace(/^,/, ''));
 
                         if (firedEl.attr('multiple')) {
                             inp_target.val(str.replace(/^,/, '')).next('.uploadPreview').append(previews);
                         } else {
-                            inp_target.val(str.replace(/^,/, '')).next('.uploadPreview').html(previews);
+                            var old_val = inp_target.val();
+                            inp_target.val(old_val.length ? old_val + ',' + str.replace(/^,/, '') : str.replace(/^,/, '')).next('.uploadPreview').html(previews);
                         }
                     }
 
@@ -65,7 +69,7 @@ $(function ($) {
                     $('.preloader').fadeOut(1000);
                 }
             });
-        }, 1000);
+        }, 10);
     });
 
 
