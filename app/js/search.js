@@ -156,6 +156,7 @@ function initReviewPopup() {
                 review_popup.find('.prod_review_options').html(data.prod_review_options);
                 review_popup.find('.product_share_holder').html(data.product_share_holder);
                 review_popup.find('.product_price').html(data.product_price);
+                review_popup.find('.product_fav').html(data.product_fav);
 
                 setTimeout(function () {
                     $('.fotorama', review_popup).fotorama();

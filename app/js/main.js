@@ -36,194 +36,210 @@ $(function ($) {
     searchResults = $('.searchResults');
     qSearchForm = $('.qSearchForm');
 
-    body.delegate('.openMobMenu', 'click', function () {
-        clearTimeout(closeMenuTimer);
+    body
+        .delegate('.openMobMenu', 'click', function () {
+            clearTimeout(closeMenuTimer);
 
-        if (body.hasClass('menu_opened')) {
-            closeMenuTimer = setTimeout(function () {
-                body.removeClass('icon_close');
-            }, 250);
-        }
+            if (body.hasClass('menu_opened')) {
+                closeMenuTimer = setTimeout(function () {
+                    body.removeClass('icon_close');
+                }, 250);
+            }
 
-        body.addClass('icon_close').toggleClass('menu_opened');
-        return false;
+            body.addClass('icon_close').toggleClass('menu_opened');
+            return false;
 
-    }).delegate('.openFav', 'click', function () {
+        })
+        .delegate('.openFav', 'click', function () {
 
-        body.toggleClass('fav_opened');
-        html.toggleClass('no_scroll');
-        return false;
+            body.toggleClass('fav_opened');
+            html.toggleClass('no_scroll');
+            return false;
 
-    }).delegate('.sortBtn', 'click', function () {
-        var firedEl = $(this), inp = $(firedEl.addClass('active').attr('data-target'));
+        })
+        .delegate('.rmProdPreview', 'click', function () {
+            var firedEl = $(this);
 
-        if (inp.val() == 'desc') {
-            firedEl.find('.sort_icon').addClass('i-sort-asc').removeClass('i-sort-desc');
-            $(firedEl.addClass('active').attr('data-target')).val('asc');
-        } else {
-            firedEl.find('.sort_icon').addClass('i-sort-desc').removeClass('i-sort-asc');
-            $(firedEl.addClass('active').attr('data-target')).val('desc');
-        }
+            firedEl.closest('.prodPreviewItem').remove();
 
-        return false;
+            return false;
 
-    }).delegate('.orderExpandBtn', 'click', function () {
-        $(this).closest('.orderRow').toggleClass('opened').next('.orderExpandRow').slideToggle(500).find('.order_row').toggleClass('opened');
+        })
+        .delegate('.sortBtn', 'click', function () {
+            var firedEl = $(this), inp = $(firedEl.addClass('active').attr('data-target'));
 
-        return false;
+            if (inp.val() == 'desc') {
+                firedEl.find('.sort_icon').addClass('i-sort-asc').removeClass('i-sort-desc');
+                $(firedEl.addClass('active').attr('data-target')).val('asc');
+            } else {
+                firedEl.find('.sort_icon').addClass('i-sort-desc').removeClass('i-sort-asc');
+                $(firedEl.addClass('active').attr('data-target')).val('desc');
+            }
 
-    }).delegate('.rmFavBtn', 'click', function () {
-        var firedEl = $(this);
+            return false;
 
-        if (!favoriting) {
-            favoriting = true;
+        })
+        .delegate('.orderExpandBtn', 'click', function () {
+            $(this).closest('.orderRow').toggleClass('opened').next('.orderExpandRow').slideToggle(500).find('.order_row').toggleClass('opened');
 
-            $.ajax({ // инициaлизируeм ajax зaпрoс
-                type: "POST", // oтпрaвляeм в POST фoрмaтe, мoжнo GET
-                url: "/fav_rm", // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
-                dataType: 'json', // oтвeт ждeм в json фoрмaтe
-                data: {id: firedEl.attr('data-id')}, // дaнныe для oтпрaвки
-                beforeSend: function (data) { // сoбытиe дo oтпрaвки
+            return false;
 
-                },
-                success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
+        })
+        .delegate('.rmFavBtn', 'click', function () {
+            var firedEl = $(this);
 
-                    if (data.needAuth) {
-                        setTimeout(function () {
-                            all_dialog_close_gl();
-                            auth_popup.dialog('open');
-                        }, 1);
-                    }
+            if (!favoriting) {
+                favoriting = true;
 
-                    if (data.redirectTo) {
-                        setTimeout(function () {
-                            window.location = data.redirectTo;
-                        }, 1);
-                    }
+                $.ajax({ // инициaлизируeм ajax зaпрoс
+                    type: "POST", // oтпрaвляeм в POST фoрмaтe, мoжнo GET
+                    url: "/fav_rm", // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
+                    dataType: 'json', // oтвeт ждeм в json фoрмaтe
+                    data: {id: firedEl.attr('data-id')}, // дaнныe для oтпрaвки
+                    beforeSend: function (data) { // сoбытиe дo oтпрaвки
 
-                    // console.log(data);
+                    },
+                    success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
 
-                    updateFav(data);
+                        if (data.needAuth) {
+                            setTimeout(function () {
+                                all_dialog_close_gl();
+                                auth_popup.dialog('open');
+                            }, 1);
+                        }
 
-                },
-                error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
+                        if (data.redirectTo) {
+                            setTimeout(function () {
+                                window.location = data.redirectTo;
+                            }, 1);
+                        }
 
-                    console.log(xhr, ajaxOptions, thrownError);
+                        // console.log(data);
 
-                    // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
-                    // alert(thrownError); // и тeкст oшибки
-                },
-                complete: function (data) { // сoбытиe пoслe любoгo исхoдa
-                    favoriting = false;
-                }
-            });
-        }
-
-        return false;
-
-    }).delegate('.clearFavBtn', 'click', function () {
-
-        if (!favoriting) {
-            favoriting = true;
-
-            $.ajax({ // инициaлизируeм ajax зaпрoс
-                type: "POST", // oтпрaвляeм в POST фoрмaтe, мoжнo GET
-                url: "/fav_clear", // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
-                dataType: 'json', // oтвeт ждeм в json фoрмaтe
-                data: {id: ''}, // дaнныe для oтпрaвки
-                beforeSend: function (data) { // сoбытиe дo oтпрaвки
-
-                },
-                success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
-
-                    // console.log(data);
-
-                    if (data.needAuth) {
-                        setTimeout(function () {
-                            all_dialog_close_gl();
-                            auth_popup.dialog('open');
-                        }, 1);
-                    }
-
-                    if (data.redirectTo) {
-                        setTimeout(function () {
-                            window.location = data.redirectTo;
-                        }, 1);
-                    }
-
-                    $('.favUnit').remove();
-
-                    updateFav(data);
-
-                },
-                error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
-
-                    console.log(xhr, ajaxOptions, thrownError);
-
-                    // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
-                    // alert(thrownError); // и тeкст oшибки
-                },
-                complete: function (data) { // сoбытиe пoслe любoгo исхoдa
-                    favoriting = false;
-                }
-            });
-        }
-
-        return false;
-
-    }).delegate('.favBtn', 'click', function () {
-        var firedEl = $(this);
-
-        if (!favoriting) {
-            favoriting = true;
-
-            $.ajax({ // инициaлизируeм ajax зaпрoс
-                type: "POST", // oтпрaвляeм в POST фoрмaтe, мoжнo GET
-                url: "/fav", // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
-                dataType: 'json', // oтвeт ждeм в json фoрмaтe
-                data: {id: firedEl.attr('data-id')}, // дaнныe для oтпрaвки
-                beforeSend: function (data) { // сoбытиe дo oтпрaвки
-
-                },
-                success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
-
-                    // console.log(data);
-
-                    if (data.needAuth) {
-                        setTimeout(function () {
-                            all_dialog_close_gl();
-                            auth_popup.dialog('open');
-                        }, 1);
-                    } else if (data.redirectTo) {
-                        setTimeout(function () {
-                            window.location = data.redirectTo;
-                        }, 1);
-                    } else {
                         updateFav(data);
+
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
+
+                        console.log(xhr, ajaxOptions, thrownError);
+
+                        // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
+                        // alert(thrownError); // и тeкст oшибки
+                    },
+                    complete: function (data) { // сoбытиe пoслe любoгo исхoдa
+                        favoriting = false;
                     }
+                });
+            }
 
-                },
-                error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
+            return false;
 
-                    console.log(xhr, ajaxOptions, thrownError);
+        })
+        .delegate('.clearFavBtn', 'click', function () {
 
-                    // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
-                    // alert(thrownError); // и тeкст oшибки
-                },
-                complete: function (data) { // сoбытиe пoслe любoгo исхoдa
-                    favoriting = false;
-                }
-            });
-        }
+            if (!favoriting) {
+                favoriting = true;
 
-        return false;
+                $.ajax({ // инициaлизируeм ajax зaпрoс
+                    type: "POST", // oтпрaвляeм в POST фoрмaтe, мoжнo GET
+                    url: "/fav_clear", // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
+                    dataType: 'json', // oтвeт ждeм в json фoрмaтe
+                    data: {id: ''}, // дaнныe для oтпрaвки
+                    beforeSend: function (data) { // сoбытиe дo oтпрaвки
 
-    }).delegate('.toggleOneClick', 'click', function () {
+                    },
+                    success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
 
-        $(this).closest('.prod_review_controls_w').find('.oneClickForm').toggle();
+                        // console.log(data);
 
-        return false;
-    });
+                        if (data.needAuth) {
+                            setTimeout(function () {
+                                all_dialog_close_gl();
+                                auth_popup.dialog('open');
+                            }, 1);
+                        }
+
+                        if (data.redirectTo) {
+                            setTimeout(function () {
+                                window.location = data.redirectTo;
+                            }, 1);
+                        }
+
+                        $('.favUnit').remove();
+
+                        updateFav(data);
+
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
+
+                        console.log(xhr, ajaxOptions, thrownError);
+
+                        // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
+                        // alert(thrownError); // и тeкст oшибки
+                    },
+                    complete: function (data) { // сoбытиe пoслe любoгo исхoдa
+                        favoriting = false;
+                    }
+                });
+            }
+
+            return false;
+
+        })
+        .delegate('.favBtn', 'click', function () {
+            var firedEl = $(this);
+
+            if (!favoriting) {
+                favoriting = true;
+
+                $.ajax({ // инициaлизируeм ajax зaпрoс
+                    type: "POST", // oтпрaвляeм в POST фoрмaтe, мoжнo GET
+                    url: "/fav", // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
+                    dataType: 'json', // oтвeт ждeм в json фoрмaтe
+                    data: {id: firedEl.attr('data-id')}, // дaнныe для oтпрaвки
+                    beforeSend: function (data) { // сoбытиe дo oтпрaвки
+
+                    },
+                    success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
+
+                        // console.log(data);
+
+                        if (data.needAuth) {
+                            setTimeout(function () {
+                                all_dialog_close_gl();
+                                auth_popup.dialog('open');
+                            }, 1);
+                        } else if (data.redirectTo) {
+                            setTimeout(function () {
+                                window.location = data.redirectTo;
+                            }, 1);
+                        } else {
+                            updateFav(data);
+                        }
+
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
+
+                        console.log(xhr, ajaxOptions, thrownError);
+
+                        // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
+                        // alert(thrownError); // и тeкст oшибки
+                    },
+                    complete: function (data) { // сoбытиe пoслe любoгo исхoдa
+                        favoriting = false;
+                    }
+                });
+            }
+
+            return false;
+
+        })
+        .delegate('.toggleOneClick', 'click', function () {
+
+            $(this).closest('.prod_review_controls_w').find('.oneClickForm').toggle();
+
+            return false;
+        });
 
     qSearchForm.on('submit', function () {
         qSearchFunc();
@@ -395,8 +411,7 @@ function plural(n, str1, str2, str5, num) {
 }
 
 function isHex(h) {
-    var a = parseInt(h, 16);
-    return (a.toString(16) === h.toLowerCase())
+    return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(h.trim());
 }
 
 function formatPrice(s) {
@@ -451,7 +466,7 @@ function initValidation() {
             //doNotShowAllErrosOnSubmit: true,
             //focusFirstField          : false,
             autoHidePrompt: true,
-            autoHideDelay: 2000,
+            autoHideDelay: 3000,
             autoPositionUpdate: false,
             prettySelect: true,
             //useSuffix                : "_VE_field",
@@ -720,9 +735,6 @@ function sendForm(form, cb) {
             } else if (data.recovery_failed) {
                 $('#auth_tab_1 .tab_content').prepend('<p class="auth_msg">E-mail' + data.message[0] + ' не зарегистрирован</p>');
             } else if (data.recovery_success) {
-
-                console.log(form);
-
                 $('.successText').text('Инструкции отправлены на e-mail ' + data.message[0]);
 
                 success_popup.dialog('open');
@@ -849,20 +861,23 @@ function initRecoveryPopup() {
 
 function initAsideSubmenu() {
 
-    $('body').delegate('.menuItem', 'mouseenter ', function (e) {
-        $(this).addClass('hovered just_hovered');
-    }).delegate('.menuItem', 'mouseleave', function (e) {
-        $(this).removeClass('hovered just_hovered');
-    }).delegate('.menuItem', 'click', function (e) {
+    $('body')
+        .delegate('.menuItem', 'mouseenter ', function (e) {
+            $(this).addClass('hovered just_hovered');
+        })
+        .delegate('.menuItem', 'mouseleave', function (e) {
+            $(this).removeClass('hovered just_hovered');
+        })
+        .delegate('.menuItem', 'click', function (e) {
 
-        var el = $(this);
+            var el = $(this);
 
-        if (el.hasClass('just_hovered')) {
-            el.removeClass('just_hovered');
-        } else {
-            el.toggleClass('hovered');
-        }
-    });
+            if (el.hasClass('just_hovered')) {
+                el.removeClass('just_hovered');
+            } else {
+                el.toggleClass('hovered');
+            }
+        });
 
 }
 
@@ -870,7 +885,7 @@ function initTabs() {
 
     $('.tabBlock').each(function (ind) {
         var tab = $(this);
-        
+
         tab.tabs({
             active: 0,
             tabContext: tab.attr('data-tab-context'),

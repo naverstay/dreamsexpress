@@ -4,6 +4,7 @@ module.exports = function (app, passport) {
     var productsController = require('../controllers/products');
     var clientsController = require('../controllers/clients');
     var ObjectID = require('mongodb').ObjectID;
+    var fs = require('fs');
 
     var user = require('../models/user');
     var client = require('../models/clients');
@@ -12,6 +13,8 @@ module.exports = function (app, passport) {
     var db = require('../config/db');
 
     var slug = require('slug');
+
+    var prod_upload_dir = '/upload/products/';
 
     function restrict(req, res, next) {
         req.session.prevPage = req.body.pathname || '/';
@@ -22,6 +25,22 @@ module.exports = function (app, passport) {
         var rxObjectID = new RegExp("^[0-9a-fA-F]{24}$");
         return rxObjectID.test(str);
     }
+
+    function isArray_(test) {
+        // Use compiler's own isArray when available
+        if (test.isArray) {
+            return test.isArray;
+        }
+
+        // Retain references to variables for performance
+        // optimization
+        var objectToStringFn = Object.prototype.toString,
+            arrayToStringResult = objectToStringFn.call([]);
+
+        return function (subject) {
+            return objectToStringFn.call(subject) === arrayToStringResult;
+        };
+    };
 
     function favUpdate(list, req, cb) {
         client.update(req.session.passport.user, {
@@ -333,10 +352,12 @@ module.exports = function (app, passport) {
                     '<p>' +
                     (item.description ? item.description : '') +
                     '</p>' +
-                    '<div class="footer_info_control"><a class="gl_link" href="product/' + item.url + '">На страницу товара</a></div>' +
+                    '<div class="footer_info_control"><a class="gl_link" href="/product/' + item.url + '">На страницу товара</a></div>' +
                     '</div>';
 
-                var product_share_holder = (item.old_price ? '<div class="product_share">- ' + Math.ceil(100 * ((item.price - item.old_price) / item.price )).toFixed() + '%</div>' : '');
+                var product_fav = '<a href="#" data-id="' + item._id + '" class="prod_fav favBtn' + (checkFav(item._id, req.client_info.fav || []) ? ' favorite' : '') + '"></a>';
+
+                var product_share_holder = (item.old_price ? '<div class="product_share">' + Math.ceil(100 * ((item.price - item.old_price) / item.price )).toFixed() + '%</div>' : '');
 
                 var product_price = '<span class="new_price">' + formatPrice(item.price) +
                     '<span class="_cur"> грн.</span></span>' +
@@ -347,6 +368,7 @@ module.exports = function (app, passport) {
                     prod_review: prod_review,
                     product_share_holder: product_share_holder,
                     product_price: product_price,
+                    product_fav: product_fav,
                     prod_review_options: prod_review_options
                 });
             } else {
@@ -578,11 +600,11 @@ module.exports = function (app, passport) {
                 items +=
                     '<li>' +
                     '<div class="product_item">' +
-                    '<a href="product/' + item.url + '" class="product_img">' +
-                    '<img src="' + item.main_img + '">' +
+                    '<a href="/product/' + item.url + '" class="product_img">' +
+                    '<img src="' + checkSlash(item.main_img) + '">' +
                     (item.is_hit ? '<div class="product_hit">Хит продаж</div>' : '') +
                     (item.old_price ? '<div class="product_share_holder">' +
-                    '<div class="product_share">- ' + Math.ceil(100 * ((item.price - item.old_price) / item.price )).toFixed() + '%</div>' +
+                    '<div class="product_share">' + Math.ceil(100 * ((item.price - item.old_price) / item.price )).toFixed() + '%</div>' +
                     '</div>' : '') +
                     '</a>' +
                     '<h3 class="product_caption">' + item.name + '</h3>' +
@@ -677,13 +699,13 @@ module.exports = function (app, passport) {
                 items +=
                     '<li>' +
                     '<div class="product_item">' +
-                    '<a href="product/' + item.url + '" class="product_img">' +
-                    '<img src="' + item.main_img + '">' +
-                    (item.hover_img ? '<div class="hover_img prod_hover"><img src="' + item.hover_img + '"></div>' : '') +
+                    '<a href="/product/' + item.url + '" class="product_img">' +
+                    '<img src="' + checkSlash(item.main_img) + '">' +
+                    (item.hover_img ? '<div class="hover_img prod_hover"><img src="' + checkSlash(item.hover_img) + '"></div>' : '') +
                     (item.is_hit ? '<div class="product_hit">Хит продаж</div>' : '') +
                     '<div class="product_share_holder">' +
                     '<span data-id="' + item._id + '" class="prod_hover prod_fav favBtn' + (checkFav(item._id, req.client_info.fav || []) ? ' favorite' : '') + '"></span>' +
-                    (item.old_price ? '<div class="product_share">- ' + Math.ceil(100 * ((item.price - item.old_price) / item.price )).toFixed() + '%</div>' : '') +
+                    (item.old_price ? '<div class="product_share">' + Math.ceil(100 * ((item.price - item.old_price) / item.price )).toFixed() + '%</div>' : '') +
                     '</div>' +
                     '<div class="product_q_review violette_btn prod_hover openReview mob_hidden">Быстрый просмотр</div>' +
                     '</a>' +
@@ -705,7 +727,6 @@ module.exports = function (app, passport) {
 
             res.send({items: items, count: results.length});
         });
-
     });
 
     app.post('/add', isLoggedInPost, productsController.create);
@@ -758,6 +779,55 @@ module.exports = function (app, passport) {
 
     });
 
+    // file upload
+
+    app.post('/upload', function (req, res) {
+        var files = [], ret_files = [];
+
+        // console.log(req.files);
+
+        for (var key in req.files) {
+            if (req.files.hasOwnProperty(key)) {
+
+                if (key == 'imgs') {
+                    if (req.files.imgs[0]) {
+                        files = (req.files[key].slice(0));
+                    } else {
+                        files.push(req.files[key]);
+                    }
+
+                    for (var i = 0; i < files.length; i++) {
+                        var sampleFile = files[i], counter = 0;
+
+                        function nameChecker(name) {
+                            if (fs.existsSync('.' + prod_upload_dir + name)) {
+                                counter++;
+                                nameChecker(slug((sampleFile.name).replace(/\.[a-z0-9]*$/, '') + '-' + counter) +
+                                    (sampleFile.name).replace(/.*(\.[a-z0-9]*$)/, '$1'));
+                            } else {
+
+                                sampleFile.mv('.' + prod_upload_dir + name, function (err) {
+                                    if (err) {
+                                        console.log(err);
+                                        return res.status(500).send(err);
+                                    }
+                                });
+
+                                ret_files.push(prod_upload_dir + name);
+                            }
+                        }
+
+                        nameChecker(slug((sampleFile.name).replace(/\.[a-z0-9]*$/, '')) + (sampleFile.name).replace(/.*(\.[a-z0-9]*$)/, '$1'));
+
+                    }
+
+                    res.status(200).send({upload_done: !!ret_files.length, files: ret_files});
+
+                }
+            }
+        }
+    });
+
     // update favorites
 
     app.post('/fav_rm', isLoggedInPost, function (req, res) {
@@ -806,7 +876,7 @@ module.exports = function (app, passport) {
     app.post('/fav', isLoggedInPost, function (req, res) {
 
         // console.log('/fav', req.body.id);
-        
+
         if (!isObjectID(req.body.id)) {
             return res.send({
                 fav_added: false,
@@ -1106,15 +1176,16 @@ function formatPrice(s) {
 }
 
 function isHex(h) {
-    var a = parseInt(h, 16);
-    return (a.toString(16) === h.toLowerCase())
+    return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(h.trim());
+}
+
+function checkSlash(str) {
+    return str.slice(0, 1) == '/' ? str : '/' + str;
 }
 
 function checkFav(id, list) {
 
     if (list.length) {
-        // console.log(list, id, list.indexOf('' + id));
-
         return list.indexOf('' + id) > -1;
     }
 
@@ -1127,10 +1198,10 @@ function colorRender(colors) {
     for (var i = 0; i < arr.length; i++) {
         var clr = (arr[i]).trim();
 
-        if (/^#/.test(clr) && isHex(clr.replace('#', ''))) {
+        if (/^#/.test(clr) && isHex(clr)) {
             ret += '<li><div class="prod_color" style="background:' + clr + ';"></div></li>';
         } else if (clr.length > 10) {
-            ret += '<li><div class="prod_color"><img src="' + clr + '"></div></li>';
+            ret += '<li><div class="prod_color"><img src="' + checkSlash(clr) + '"></div></li>';
         }
     }
 
@@ -1143,10 +1214,10 @@ function colorList(colors) {
     for (var i = 0; i < arr.length; i++) {
         var clr = (arr[i]).trim();
 
-        if (/^#/.test(clr) && isHex(clr.replace('#', ''))) {
+        if (/^#/.test(clr) && isHex(clr)) {
             ret += '<li><label class="option_switch round"> <input class="inp_hidden" value="' + clr + '" type="radio" name="prod_color"/><span class="check_text" class="prod_color"><span class="simple_color" style="background:' + clr + ';"></span></span></label></li>';
         } else if (clr.length > 10) {
-            ret += '<li><label class="option_switch round"> <input class="inp_hidden" value="' + clr + '" type="radio" name="prod_color"/><span class="check_text"><img src="' + clr + '"></span></label></li>';
+            ret += '<li><label class="option_switch round"> <input class="inp_hidden" value="' + clr + '" type="radio" name="prod_color"/><span class="check_text"><img src="' + checkSlash(clr) + '"></span></label></li>';
         }
     }
 
@@ -1174,8 +1245,8 @@ function favItemsHtml(items) {
 
         ret += '<div class="favUnit fav_unit">' +
             '<div class="product_item">' +
-            '<a href="product/' + item.url + '" class="product_img">' +
-            '<img src="' + item.main_img + '">' +
+            '<a href="/product/' + item.url + '" class="product_img">' +
+            '<img src="' + checkSlash(item.main_img) + '">' +
             '</a>' +
             '<div data-id="' + item._id + '" class="prod_rm_btn rmFavBtn"></div>' +
             '<h3 class="product_caption">' + item.name + '</h3>' +
@@ -1205,6 +1276,6 @@ function buildFotorama(hit, img, img2, imgs) {
 }
 
 function fotoramaSlide(hit, img) {
-    return img.length ? '<div class="prod_review_img product_img" data-thumb="' + img + '"><img src="' + img + '"/>' +
+    return img.length ? '<div class="prod_review_img product_img" data-thumb="' + checkSlash(img) + '"><img src="' + checkSlash(img) + '"/>' +
     (hit ? '<div class="product_hit">Хит продаж</div>' : '') + '</div>' : '';
 }

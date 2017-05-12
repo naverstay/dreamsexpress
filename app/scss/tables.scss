@@ -27,7 +27,7 @@
 
   .col_3_w {
     width: 15.2%;
-    
+
     @include respond-to-min($resp_s) {
       font-size: 18px;
     }
@@ -65,26 +65,28 @@
 }
 
 .order_row {
-  @include transition_all(background .5s);
+  @include transition_all(background .5s, border .5s);
   @extend %clearfix;
   background: #f5f5f5;
-  border-bottom: 1px solid $gl_gray_lines;
+  border-bottom: 1px solid #000;
   line-height: 30px;
   padding-right: 35px;
   position: relative;
+
+  &.opened {
+    background: $gl_white;
+    border-bottom: 1px solid $gl_gray_lines;
+
+    .order_expand_btn:before {
+      content: $i-chevron-up;
+    }
+  }
 
   &.collapsed {
     padding-top: 5px;
     padding-bottom: 5px;
     line-height: 50px;
-  }
-
-  &.opened {
-    background: $gl_white;
-
-    .order_expand_btn:before {
-      content: $i-chevron-up;
-    }
+    border-bottom: 1px solid #000;
   }
 
   &.caption_row {
@@ -98,12 +100,12 @@
 
   @include respond-to-max($resp_s) {
     font-size: 10px;
-    
+
     .prod_f_inf {
       font-size: 10px;
     }
   }
-  
+
   @include respond-to-min($resp_s) {
     line-height: 50px;
     padding-right: 55px;
@@ -125,22 +127,31 @@
     line-height: normal;
   }
 
+  p {
+    line-height: normal;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #333;
+  }
+
   @include respond-to-min($resp_s) {
     padding-left: 20px;
   }
-
 }
 
 .order_product {
   @extend %clearfix;
-
 }
 
 .order_img {
   float: left;
+  width: 50px;
+  margin-right: 5px;
 
   img {
     display: block;
+    max-width: 100%;
+    max-height: 50px;
   }
 
   + .order_cell {

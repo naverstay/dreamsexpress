@@ -67,20 +67,19 @@ exports.filter = function (params, cb) {
 };
 
 exports.create = function (req, res) {
-    // console.log(req.body);
 
-    var new_name = slug(req.body.product_name), counter = 0;
+    var new_url = slug(req.body.product_name);
 
-
-    function urlMaker() {
-        Products.filter({url: new_name}, function (err, results) {
+    function urlMaker(new_url, counter) {
+        console.log(new_url);
+        
+        Products.filter({url: new_url + (counter > 1 ? '-' + counter : '')}, function (err, results) {
             if (results.length) {
-                counter++;
-                urlMaker(new_name + '-' + counter);
+                urlMaker(new_url, counter + 1);
             } else {
                 var product = {
                     name: req.body.product_name,
-                    url: new_name,
+                    url: new_url + (counter > 1 ? '-' + counter : ''),
                     info: req.body.product_info,
                     description: req.body.product_description,
                     main_img: req.body.product_main_img,
@@ -110,7 +109,7 @@ exports.create = function (req, res) {
         });
     }
 
-    urlMaker(new_name);
+    urlMaker(new_url, 1);
 
 };
 

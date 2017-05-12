@@ -367,6 +367,39 @@
   }
 }
 
+.upload_preview {
+  @extend %clearfix;
+  margin-left: -10px;
+
+  li {
+    float: left;
+    margin: 10px 0;
+    padding-left: 10px;
+  }
+}
+
+.prod_preview {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  line-height: 70px;
+  text-align: center;
+
+  img {
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 100%;
+    max-height: 100%;
+    line-height: 1;
+  }
+
+  .prod_rm_btn {
+    opacity: 1;
+    right: 1px;
+    line-height: 24px;
+  }
+}
+
 .cart_unit_info {
   padding: 15px 15px 8px;
 

@@ -798,9 +798,21 @@ body {
 
 .gl_link {
   text-decoration: underline;
+  cursor: pointer;
 
   &:hover {
     text-decoration: none;
+  }
+
+  &.inner_link {
+    @include transition_all(border .3s);
+    text-decoration: none;
+    color: $gl_violette;
+    border-bottom: 1px dashed $gl_violette;
+
+    &:hover {
+      border-bottom-color: transparent;
+    }
   }
 }
 

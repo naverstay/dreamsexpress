@@ -3,6 +3,7 @@ var db_url = 'mongodb://localhost:27017/rags';
 var compression = require('compression');
 var express = require('express');
 var path = require('path');
+// var fs = require('fs');
 var logger = require('morgan');
 
 var cookieParser = require('cookie-parser');
@@ -20,6 +21,7 @@ var passport = require('passport');
 var flash = require('connect-flash');
 
 var mailer = require('express-mailer');
+var fileUpload = require('express-fileupload');
 var slug = require('slug');
 
 var app = express();
@@ -86,6 +88,10 @@ app.set('case sensitive routing', false);
 
 app.use(compression());
 
+app.use(fileUpload({
+    // safeFileNames: true,
+    limits: {fileSize: 50 * 1024 * 1024}
+}));
 
 // required for passport
 app.use(session({
@@ -141,18 +147,26 @@ db.connect(db_url, function (err) {
     app.listen(3012, function () {
         console.log('Mongo connected. Listning on 3012.');
 
+        var chars = slug.charmap;
+
+        chars['.'] = '_';
+        chars['й'] = 'y';
+        chars['Й'] = 'Y';
+        chars['щ'] = 'sch';
+        chars['Щ'] = 'Sch';
+
         slug.defaults.mode = 'pretty';
 
         slug.defaults.modes['pretty'] = {
             replacement: '-',
             symbols: true,
-            remove: /[.]/g,
+            remove: '',
             lower: true,
-            charmap: slug.charmap,
+            charmap: chars,
             multicharmap: slug.multicharmap
         };
 
-        print(slug('НЕЙЛОНОВАЯ КУРТКА-БОМБЕР плащ подъезд'));
+        print(slug('НЕЙЛОНОВАЯ КУРТКА-БОМБЕР платье плащ подъезд'));
 
         // var products_collection = db.get().collection('products');
 

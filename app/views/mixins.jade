@@ -6,12 +6,13 @@ block variables
 //- no_min = false;
 - var year = new Date();
 
+- function isHex(h) {return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(h.trim())}
 - function formatPrice(s) {return ('' + s).replace(/(?!^)(?=(\d{3})+(?=\.|$))/gm, ' ')}
 - function plural(n, str1, str2, str5, num) {return (num ? n + ' ': '') + ((((n % 10) == 1) && ((n % 100) != 11)) ? (str1) : (((((n % 10) >= 2) && ((n % 10) <= 4)) && (((n % 100) < 10) || ((n % 100) >= 20))) ? (str2) : (str5)));}
 
 //- var head_menu = ['Новинки','Акции','Оплата','Доставка','О компании']
 - var head_menu = ['Каталог','Новинки','Акции','Доставка и оплата','О компании']
-- var head_menu_link = ['catalog','news','lk','delivery','cart']
+- var head_menu_link = ['/catalog','/news','/lk','/delivery','/cart']
 - var aside_menu = ['Детская одежда','Детская обувь','Игрушки','Коляски','Детские товары','Мамам','Автокресла']
 - var aside_menu_icon = ['baby-onesie-with-front-pocket-outline','baby-shoes','bear-toy','baby-transport-side-view','baby-diaper-outline','baby-onesie-outline','baby-chair']
     
@@ -19,16 +20,22 @@ block variables
     
 mixin dev_head(page_title, index, news, search, product, lk, cart, add)
     head
-        title= (title || '') + ' ' + page_title
+        meta(charset="utf-8")
+        title= (title || "") + " " + page_title
         | 
         | <!-- saved from url=(0014)about:internet -->
-        //-| <base href="/">
-        meta(charset='utf-8')
-        meta(name='viewport', content="width=device-width, initial-scale=1.0")
+        - if (page_description)
+            meta(name="description", content= page_description)
+        - if (page_keywords)
+            meta(name="keywords", content= page_keywords)
+        //-meta(http-equiv="content-language" content="ru")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
         meta(name="SKYPE_TOOLBAR", content="SKYPE_TOOLBAR_PARSER_COMPATIBLE")
         meta(name="apple-mobile-web-app-capable", content="yes")
         meta(name="format-detection", content="telephone=no")
-
+        
+        meta(property="og:title" content= (title || "") + " " + page_title)
+        
         - if (no_min)
             | 
             | <!--build:css css/styles.min.css-->
@@ -400,9 +407,9 @@ mixin aside_left()
                         +aside_submenu(7, 'Контакты')
                 
         ul.main_menu
-            - if (user && user.role == 'admin')
+            - if (user && (user.role == 'admin' || user.role == 'admin_g'))
                 li
-                    a.menu_link(href='add_product' + (dev ? '.html' : '')): span Добавить товар
+                    a.menu_link(href='/add_product' + (dev ? '.html' : '')): span Добавить товар
                 
             for item, i in head_menu
                 li
@@ -628,7 +635,7 @@ mixin prod_review_info(product_page)
                         a.btn_v1.blue_btn.cart_btn.addToCart(href='#') В корзину
                     li
                         a.btn_v1.violette_btn_transp.cart_btn.toggleOneClick(href='#') Купить в 1 клик
-                    li
+                    li.product_fav
                         a.prod_fav.favBtn(href='#' data-id= ('' + id).replace(/"/g, '') class=(user && user.fav && user.fav.indexOf(id) > -1 ? ' favorite' : ''))
 
                 .prod_review_1_click.oneClickForm
