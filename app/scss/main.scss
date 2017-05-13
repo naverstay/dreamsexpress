@@ -810,13 +810,19 @@ body {
   }
 
   &.inner_link {
-    @include transition_all(border .3s);
+    @include transition_all(border .3s, color .3s);
     text-decoration: none;
     color: $gl_violette;
     border-bottom: 1px dashed $gl_violette;
+    margin-right: 10px;
 
     &:hover {
       border-bottom-color: transparent;
+    }
+
+    .form_cell .error ~ & {
+      border-color: #ff606d;
+      color: #ff606d;
     }
   }
 }

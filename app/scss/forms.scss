@@ -2,6 +2,24 @@
   display: none !important;
 }
 
+.input_w {
+  position: relative;
+}
+
+.color_picker_cell .f_input {
+  padding-right: 100px;
+}
+
+.picker_controls {
+  background: #fff;
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  bottom: 1px;
+  line-height: 38px;
+  padding-right: 5px;
+}
+
 .f_input {
   display: block;
   width: 100%;

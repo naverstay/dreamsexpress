@@ -1,4 +1,80 @@
+var color_popup;
+
 $(function ($) {
+
+    $('.colorPicker').each(function (ind) {
+        var inp = $(this);
+        inp.ColorPicker({flat: true});
+    });
+
+    body
+        .delegate('.addColor', 'click', function () {
+            var firedEl = $(this), picker = $(firedEl.attr('href')), clr;
+
+            if (picker.length) {
+                clr = '#' + picker.find('.colorpicker_hex input').val();
+            }
+
+            if (isHex(clr)) {
+                var inp_target = firedEl.nextAll('.uploadPreview').append('<li class="prodColorItem"><div class="prod_preview _rounded" style="background:' + clr + ';"></div><span class="prod_rm_btn rmProdColor"></span></li>').prev();
+
+                var str = inp_target.val() + ',' + clr;
+
+                inp_target.val(str.replace(/^,/, ''));
+
+                inp_target.validationEngine('validate');
+
+            }
+
+            return false;
+        })
+        .delegate('.rmProdColor', 'click', function () {
+            var firedEl = $(this), item = firedEl.closest('.prodColorItem'), clr = item.find('.prod_preview').css('background-color'), inp = firedEl.closest('.uploadPreview').prevAll('input');
+
+            // console.log(clr);
+
+            inp.val((inp.val().replace(new RegExp(',?' + clr, 'ig'), '')).replace(/^,/, ''));
+
+            item.remove();
+
+            return false;
+        })
+        .delegate('.rmProdPreview', 'click', function () {
+            var firedEl = $(this), item = firedEl.closest('.prodPreviewItem'), file = item.find('img').attr('src'), inp_target = firedEl.closest('.uploadPreview').prevAll('input');
+
+            $.ajax({ // инициaлизируeм ajax зaпрoс
+                type: "post", // form.attr('method'),
+                url: "/remove", // form.attr('action'),
+                dataType: 'json', // oтвeт ждeм в json фoрмaтe
+                data: {remove: file}, // дaнныe для oтпрaвки
+                beforeSend: function (data) { // сoбытиe дo oтпрaвки
+                    // firedEl.attr('disabled', 'disabled'); // нaпримeр, oтключим кнoпку, чтoбы нe жaли пo 100 рaз
+                },
+                success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
+
+                    console.log(data, data['error']);
+
+                    if (data.remove_done) {
+                        item.remove();
+
+                        inp_target.val((inp_target.val().replace(new RegExp(',?' + file, 'ig'), '')).replace(/^,/, ''));
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
+
+                    console.log(xhr, ajaxOptions, thrownError);
+
+                    // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
+                    // alert(thrownError); // и тeкст oшибки
+                },
+                complete: function (data) { // сoбытиe пoслe любoгo исхoдa
+                    inp_target.validationEngine('validate');
+                }
+            });
+
+            return false;
+        });
+
 
     $('.uploadInput').on('change', function () {
         var firedEl = $(this);
@@ -13,13 +89,10 @@ $(function ($) {
             data.append('imgs', firedEl[0].files[i]);
         }
 
-        // form.trigger('submit');
-        // return false;
-
         setTimeout(function () {
             $.ajax({ // инициaлизируeм ajax зaпрoс
                 type: "post", // form.attr('method'),
-                url: "/upload", // form.attr('action'),
+                url: "/upload/" + firedEl.attr('data-context'), // form.attr('action'),
                 cache: false,
                 contentType: false,
                 processData: false,
@@ -33,22 +106,23 @@ $(function ($) {
                     console.log(data, data['error']);
 
                     if (data.upload_done) {
-                        var previews = '', str = '', inp_target = $('input[name="' + firedEl.attr('data-target') + '"]');
+                        var previews = '', inp_target = $('input[name="' + firedEl.attr('data-target') + '"]'), str = '';
 
                         for (var i = 0; i < data.files.length; i++) {
                             str += ',' + data.files[i];
 
-                            previews += '<li class="prodPreviewItem"><div class="prod_preview"><img src="' + data.files[i] + '"><span class="prod_rm_btn rmProdPreview"></span></div></li>';
+                            previews += '<li class="prodPreviewItem"><div class="prod_preview"><img src="' + data.files[i] + '"></div><span class="prod_rm_btn rmProdPreview"></span></li>';
                         }
-
-                        console.log(str, str.replace(/^,/, ''));
 
                         if (firedEl.attr('multiple')) {
-                            inp_target.val(str.replace(/^,/, '')).next('.uploadPreview').append(previews);
+                            inp_target.val((inp_target.val() + str).replace(/^,/, '')).next('.uploadPreview').append(previews);
                         } else {
                             var old_val = inp_target.val();
-                            inp_target.val(old_val.length ? old_val + ',' + str.replace(/^,/, '') : str.replace(/^,/, '')).next('.uploadPreview').html(previews);
+                            inp_target.nextAll('.uploadPreview').find('.prod_rm_btn').click();
+                            inp_target.val(old_val.length ? old_val + ',' + str.replace(/^,/, '') : str.replace(/^,/, '')).nextAll('.uploadPreview').html(previews);
                         }
+
+                        inp_target.validationEngine('validate');
                     }
 
                     /*if (data['error']) { // eсли oбрaбoтчик вeрнул oшибку
@@ -65,17 +139,16 @@ $(function ($) {
                     // alert(thrownError); // и тeкст oшибки
                 },
                 complete: function (data) { // сoбытиe пoслe любoгo исхoдa
-                    // firedEl.prop('disabled', null); // в любoм случae включим кнoпку oбрaтнo
-                    $('.preloader').fadeOut(1000);
                 }
             });
         }, 10);
     });
 
-
     $('.addForm').on('submit', function () {
         var form = $(this); // зaпишeм фoрму, чтoбы пoтoм нe былo прoблeм с this
         var error = false; // прeдвaритeльнo oшибoк нeт
+
+        if (!form.validationEngine('validate')) return false; // фoрма не заполнена
 
         /*  form.find('input, textarea').each(function () { // прoбeжим пo кaждoму пoлю в фoрмe
               if ($(this).val() == '') { // eсли нaхoдим пустoe
@@ -127,6 +200,7 @@ $(function ($) {
 
             });
         }
+
         return false; // вырубaeм стaндaртную oтпрaвку фoрмы
     });
 

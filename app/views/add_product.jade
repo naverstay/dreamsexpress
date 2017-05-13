@@ -23,56 +23,63 @@ html(lang='ru')
                                     .tab_content: .cart_block
                                         .cart_col
                                             .cart_unit.checkout_block(style='margin:0')
-                                                form.addForm(action='/add' method="POST")
+                                                form.validateMe.addForm(action='/add' method="POST")
                                                     .cart_unit_info
                                                         .checkout_caption Заполните поля
                                                         .form_cell
-                                                            input.f_input.input_v6(placeholder='Название' name='product_name' required)
+                                                            input.f_input.input_v6(placeholder='Название' name='product_name' class='validate[required]')
                                                             
                                                         .form_cell
-                                                            textarea.f_input.input_v6(placeholder='Короткое писание' name='product_info' required) какое-то короткое описание
+                                                            textarea.f_input.input_v6(placeholder='Короткое писание' name='product_info' class='validate[required]') какое-то короткое описание
 
                                                         .form_cell
                                                             textarea.f_input.input_v6(placeholder='Длинное описание' name='product_description') какое-то длинное описание для страницы товара
 
                                                         .form_cell
+                                                            input.f_input.input_v6.inp_hidden.validateHidden(placeholder='Основная картинка' name='product_main_img' class='validate[required]')
                                                             label.gl_link.inner_link
-                                                                input.inp_hidden.uploadInput(name='imgs' type='file' data-target='product_main_img')
+                                                                input.inp_hidden.uploadInput(type='file' data-context='products' data-target='product_main_img')
                                                                 span Загрузить основную картинку
-                                                            input.f_input.input_v6.inp_hidden(placeholder='Основная картинка' name='product_main_img' required)
                                                             ul.upload_preview.uploadPreview
                                                                 
                                                         .form_cell
+                                                            input.f_input.input_v6.inp_hidden.validateHidden(placeholder='Ховер картинка' name='product_hover_img' class='validate[required]')
                                                             label.gl_link.inner_link
-                                                                input.inp_hidden.uploadInput(name='img' type='file' data-target='product_hover_img')
+                                                                input.inp_hidden.uploadInput(type='file' data-context='products' data-target='product_hover_img')
                                                                 span Загрузить ховер картинку
-                                                            input.f_input.input_v6.inp_hidden(placeholder='Ховер картинка' name='product_hover_img' required)
                                                             ul.upload_preview.uploadPreview
                                                             
                                                         .form_cell
+                                                            input.f_input.input_v6.inp_hidden.validateHidden(placeholder='Галерея картинок' name='product_img_list')
                                                             label.gl_link.inner_link
-                                                                input.inp_hidden.uploadInput(name='img' type='file' data-target='product_img_list' multiple)
+                                                                input.inp_hidden.uploadInput(type='file' data-context='products' data-target='product_img_list' multiple)
                                                                 span Загрузить картинки для галереи
-                                                            input.f_input.input_v6.inp_hidden(placeholder='Галерея картинок' name='product_img_list')
                                                             ul.upload_preview.uploadPreview
 
                                                         .form_cell
                                                             input.f_input.input_v6(placeholder='Старая цена' name='product_old_price')
                                                             
                                                         .form_cell
-                                                            input.f_input.input_v6(placeholder='Цена' name='product_price' required)
+                                                            input.f_input.input_v6(placeholder='Цена' name='product_price' class='validate[required]')
                                                             
                                                         .form_cell
-                                                            input.f_input.input_v6(placeholder='Размер' name='product_sizes' required)
+                                                            input.f_input.input_v6(placeholder='Размер' name='product_sizes' class='validate[required]')
                                                             
                                                         .form_cell
-                                                            input.f_input.input_v6(placeholder='Цвета' name='product_colors' required)
+                                                            #color_picker_1.colorPicker
+                                                        .form_cell
+                                                            input.f_input.input_v6.inp_hidden.validateHidden(placeholder='Цвета' name='product_colors' class='validate[required]')
+                                                            a.gl_link.inner_link.addColor(href='#color_picker_1') Добавить цвет
+                                                            label.gl_link.inner_link
+                                                                input.inp_hidden.uploadInput(type='file' data-context='colors' data-target='product_colors' multiple)
+                                                                span Загрузить образец цвета
+                                                            ul.upload_preview.uploadPreview
                                                             
                                                         .form_cell
-                                                            input.f_input.input_v6(placeholder='Категория' name='product_category' required)
+                                                            input.f_input.input_v6(placeholder='Категория' name='product_category' class='validate[required]')
                                                             
                                                         .form_cell
-                                                            input.f_input.input_v6(placeholder='Артикул' name='product_code' required)
+                                                            input.f_input.input_v6(placeholder='Артикул' name='product_code' class='validate[required]')
                                                             
                                                         .form_row
                                                             .form_cell

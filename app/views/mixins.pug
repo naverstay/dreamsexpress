@@ -1,10 +1,14 @@
 block variables
 
 - var dev = false;
-- var no_min = false;
+- var no_min = true;
 - var scripts_in_head = true;
-//- no_min = false;
+- no_min = false;
 - var year = new Date();
+    
+- if (!dev) 
+    - var all_products = []; 
+    - var user = {email: '123@321', data : []}; 
 
 - function isHex(h) {return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(h.trim())}
 - function formatPrice(s) {return ('' + s).replace(/(?!^)(?=(\d{3})+(?=\.|$))/gm, ' ')}
@@ -12,7 +16,7 @@ block variables
 
 //- var head_menu = ['Новинки','Акции','Оплата','Доставка','О компании']
 - var head_menu = ['Каталог','Новинки','Акции','Доставка и оплата','О компании']
-- var head_menu_link = ['/catalog','/news','/lk','/delivery','/cart']
+- var head_menu_link = ['catalog','news','lk','delivery','cart']
 - var aside_menu = ['Детская одежда','Детская обувь','Игрушки','Коляски','Детские товары','Мамам','Автокресла']
 - var aside_menu_icon = ['baby-onesie-with-front-pocket-outline','baby-shoes','bear-toy','baby-transport-side-view','baby-diaper-outline','baby-onesie-outline','baby-chair']
     
@@ -33,110 +37,107 @@ mixin dev_head(page_title, index, news, search, product, lk, cart, add)
         meta(name="SKYPE_TOOLBAR", content="SKYPE_TOOLBAR_PARSER_COMPATIBLE")
         meta(name="apple-mobile-web-app-capable", content="yes")
         meta(name="format-detection", content="telephone=no")
-        
+
         meta(property="og:title" content= (title || "") + " " + page_title)
         
         - if (no_min)
             | 
             | <!--build:css css/styles.min.css-->
-            link(rel='stylesheet', href='/css/main_global.css', media='all')
+            link(rel='stylesheet', href='css/main_global.css', media='all')
             | 
             | <!--endbuild-->
         - else
-            //-link(rel='stylesheet', href='/css/styles.min.css', media='all')
+            //-link(rel='stylesheet', href='css/styles.min.css', media='all')
             
-            link(rel='stylesheet', href='/css/main_global.css', media='all')
+            link(rel='stylesheet', href='css/main_global.css', media='all')
             
         link(href='//fonts.googleapis.com/css?family=Rubik:300,400,500,700', rel='stylesheet', type='text/css')
         
         - if (scripts_in_head)
             - if (no_min)
                 | 
-                | <!--build:js /js/main.min.js -->
-                script(src='/js/lib/jquery-1.12.1.min.js')
-                script(src='/js/lib/jquery-ui-1.11.4.js')
-                script(src='/js/lib/slick.js')
-                script(src='/js/lib/jquery.validationEngine.js')
-                script(src='/js/lib/jquery.validationEngine-ru.js')
-                script(src='/js/lib/select2.js')
-                //-script(src='/js/lib/jquery.mousewheel.min.js')
-                script(src='/js/lib/jquery.mCustomScrollbar.min.js')
-                script(src='/js/lib/jquery.inputmask.bundle.js')
-                script(src='/js/main.js')
+                | <!--build:js js/main.min.js -->
+                script(src='js/lib/jquery-1.12.1.min.js')
+                script(src='js/lib/jquery-ui-1.11.4.js')
+                script(src='js/lib/slick.js')
+                script(src='js/lib/jquery.validationEngine.js')
+                script(src='js/lib/jquery.validationEngine-ru.js')
+                script(src='js/lib/select2.js')
+                //-script(src='js/lib/jquery.mousewheel.min.js')
+                script(src='js/lib/jquery.mCustomScrollbar.min.js')
+                script(src='js/lib/jquery.inputmask.bundle.js')
+                script(src='js/main.js')
                 | 
                 | <!--endbuild-->
             - else
-                script(src='/js/main.min.js')
+                script(src='js/main.min.js')
             
             - if (index)
                 - if (no_min)
                     | 
-                    | <!--build:js /js/index.min.js -->
-                    script(src='/js/index.js')
+                    | <!--build:js js/index.min.js -->
+                    script(src='js/index.js')
                     | 
                     | <!--endbuild-->
                 - else
-                    script(src='/js/index.min.js')
+                    script(src='js/index.min.js')
             - if (news)
                 - if (no_min)
                     | 
-                    | <!--build:js /js/news.min.js -->
-                    script(src='/js/lib/imagesloaded.pkgd.min.js')
-                    script(src='/js/lib/isotope.pkgd.min.js')
-                    script(src='/js/lib/packery-mode.pkgd.js')
-                    script(src='/js/news.js')
+                    | <!--build:js js/news.min.js -->
+                    script(src='js/lib/imagesloaded.pkgd.min.js')
+                    script(src='js/lib/isotope.pkgd.min.js')
+                    script(src='js/lib/packery-mode.pkgd.js')
+                    script(src='js/news.js')
                     | 
                     | <!--endbuild-->
                 - else
-                    script(src='/js/news.min.js')
-        
+                    script(src='js/news.min.js')
+    
             - if (search)
                 link(href='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css' rel="stylesheet")
                 script(src='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js')
                 - if (no_min)
                     | 
-                    | <!--build:js /js/search.min.js -->
-                    script(src='/js/lib/nouislider.min.js')
-                    script(src='/js/search.js')
+                    | <!--build:js js/search.min.js -->
+                    script(src='js/lib/nouislider.min.js')
+                    script(src='js/search.js')
                     | 
                     | <!--endbuild-->
                 - else
-                    script(src='/js/search.min.js')
-        
+                    script(src='js/search.min.js')
+    
             //- if (lk)
                  - if (no_min)
                     | 
-                    | <!--build:js /js/lk.min.js -->
-                    script(src='/js/lk.js')
+                    | <!--build:js js/lk.min.js -->
+                    script(src='js/lk.js')
                     | 
                     | <!--endbuild-->
                  - else
-                    script(src='/js/lk.min.js')
-        
+                        script(src='js/lk.min.js')
+    
             - if (cart)
                 - if (no_min)
                     | 
-                    | <!--build:js /js/cart.min.js -->
-                    script(src='/js/lib/jquery.inputmask.bundle.js')
-                    script(src='/js/cart.js')
+                    | <!--build:js js/cart.min.js -->
+                    script(src='js/lib/jquery.inputmask.bundle.js')
+                    script(src='js/cart.js')
                     | 
                     | <!--endbuild-->
                 - else
-                    script(src='/js/cart.min.js')
+                    script(src='js/cart.min.js')
                 
             - if (add)
                 - if (no_min)
                     | 
-                    | <!--build:js /js/add.min.js -->
-                    script(src='/js/lib/colorpicker.js')
-                    script(src='/js/lib/eye.js')
-                    script(src='/js/lib/utils.js')
-                    script(src='/js/add.js')
+                    | <!--build:js js/add.min.js -->
+                    script(src='js/add.js')
                     | 
                     | <!--endbuild-->
                 - else
-                    script(src='/js/add.min.js')
-        
+                    script(src='js/add.min.js')
+
 mixin loop_while(counter)
     -i=0;
     while i < counter
@@ -146,9 +147,9 @@ mixin loop_while(counter)
 mixin product_item(old_price)
     .product_item
         a.product_img(href='product_' + (dev ? '.html' : ''))
-            img(src='/images/dress_1.jpg')
+            img(src='images/dress_1.jpg')
             .hover_img.prod_hover
-                img(src='/images/hover_1.jpg')
+                img(src='images/hover_1.jpg')
             .product_hit Хит продаж
             .product_share_holder
                 span.prod_hover.prod_fav.favBtn(data-id='')
@@ -167,16 +168,16 @@ mixin product_item(old_price)
             ul.prod_colors
                 li
                     .prod_color
-                        img(src='/images/color_1.png')
+                        img(src='images/color_1.png')
                 li
                     .prod_color
-                        img(src='/images/color_2.png')
+                        img(src='images/color_2.png')
                 li
                     .prod_color
-                        img(src='/images/color_3.png')
+                        img(src='images/color_3.png')
                 li
                     .prod_color
-                        img(src='/images/color_4.png')
+                        img(src='images/color_4.png')
             .prod_sizes xs, s, m, xxl, xxxl
         
 mixin header(active)
@@ -184,23 +185,7 @@ mixin header(active)
         input#js_needed.inp_hidden(type='checkbox')
         label(for='js_needed').js_needed 
             span Включите javascript
-
-    div.dev_log
-        - if (product)
-            p= product.name + '  ' + product.url
-        - if (fav_html)
-            p= fav_html.length
-        p= title
-        p= user
-        p= user.length || '#'
-        //- comment for gulp 
-        - if (user)
-            - for item, i in user 
-                p
-                    span= i
-                    |  :  
-                    span= item
-        
+            
     div.header
         a.mob_menu_btn.openMobMenu(href='#')
         a.mob_search_btn.quickSearchBtn(href='#')
@@ -314,7 +299,7 @@ mixin footer()
                     span= year.getFullYear()
                     |  dreamsexpress.biz, Все права защищены.
                 .payments
-                    img(src='/images/pay_icons.png')
+                    img(src='images/pay_icons.png')
                     
 mixin aside_right()
     - if (user && user.email)
@@ -325,11 +310,11 @@ mixin aside_right()
                         span.user_m_icon.i-baby-abacus-toy
                 li
                     a.user_m_link.openFav(href='#' title='Избранное')
-                        span.user_m_icon.i-star-rounded
+                        span.user_m_icon.i-toy-ball
                         span.user_m_counter.favCounter #{fav_html ? fav_html.length : 0}
                 li
-                    a.user_m_link.cartLink(href='/cart' title='Корзина')
-                        span.user_m_icon.i-cart
+                    a.user_m_link.openSuccessPopup.cartLink(href='#' title='Корзина')
+                        span.user_m_icon.i-truck-side-view-outline
                         span.user_m_counter 6
                         
         .gl_overlay
@@ -339,8 +324,7 @@ mixin aside_right()
             .fav_close_btn.openFav
     
             .fav_list.mCSB
-                //- comment for gulp
-                - if (fav_html)
+                //- if (fav_html)
                     - for item, i in fav_html
                         .favUnit.fav_unit
                             .product_item
@@ -356,7 +340,7 @@ mixin aside_right()
                     .favUnit.fav_unit
                         .product_item
                             a.product_img(href='product' + (dev ? '.html' : ''))
-                                img(src='/images/fav_1.jpg')
+                                img(src='images/fav_1.jpg')
                             .prod_rm_btn.rmFavBtn(data-id='')
                             h3.product_caption Трикотажное платье с рисунком
                             .product_price
@@ -365,7 +349,7 @@ mixin aside_right()
                     .favUnit.fav_unit
                         .product_item
                             a.product_img(href='product' + (dev ? '.html' : ''))
-                                img(src='/images/fav_1.jpg')
+                                img(src='images/fav_1.jpg')
                             .prod_rm_btn.rmFavBtn(data-id='')
                             h3.product_caption длинное название Трикотажного  <br>  платья с рисунком
                             .product_price
@@ -410,9 +394,9 @@ mixin aside_left()
                         +aside_submenu(7, 'Контакты')
                 
         ul.main_menu
-            - if (user && (user.role == 'admin' || user.role == 'admin_g'))
+            - if (user && user.role == 'admin')
                 li
-                    a.menu_link(href='/add_product' + (dev ? '.html' : '')): span Добавить товар
+                    a.menu_link(href='add_product' + (dev ? '.html' : '')): span Добавить товар
                 
             for item, i in head_menu
                 li
@@ -422,7 +406,7 @@ mixin aside_left()
                         a.menu_link(href=head_menu_link[i]): span=item
 
         ul.auth_menu
-            - if (user)
+            - if (user && user.email.length)
                 li#user_lk
                     a.menu_link(href='/lk')
                         span= user.email
@@ -433,7 +417,7 @@ mixin aside_left()
                     span.authenticated Выйти
                 
     .logo_block.header_logo: a.logo(href= (dev ? 'index.html' : '/'))
-        img(src='/images/logo.svg')
+        img(src='images/logo.svg')
 
 mixin aside_submenu(ind, title)
     
@@ -502,7 +486,7 @@ mixin main_slider()
     .main_slider.mainSlider
         +loop_while(4)
             .slide
-                img(src='/images/slide_1.jpg')
+                img(src='images/slide_1.jpg')
                 .slide_description
                     p В нашем магазине действует акция -30% 
                         span.mob_hidden <br> 
@@ -537,7 +521,7 @@ mixin hit_slider(items)
                 +loop_while(6)
                     .slide
                         a.product_img(href='product' + (dev ? '.html' : ''))
-                            img(src='/images/hit_1.jpg')
+                            img(src='images/hit_1.jpg')
                             .product_hit Хит продаж
                             .product_share_holder: .product_share - 30%
                         h3.product_caption Трикотажное платье с рисунком
@@ -548,7 +532,7 @@ mixin hit_slider(items)
                                 span._cur  грн.
                     .slide
                         a.product_img(href='product' + (dev ? '.html' : ''))
-                            img(src='/images/hit_1.jpg')
+                            img(src='images/hit_1.jpg')
                             .product_hit Хит продаж
                             .product_share_holder: .product_share - 30%
                         h3.product_caption Трикотажное платье с рисунком
@@ -565,22 +549,22 @@ mixin pop_slider()
             +loop_while(3)
                 .slide
                     a.product_img(href='product' + (dev ? '.html' : ''))
-                        img(src='/images/brand_1.png')
+                        img(src='images/brand_1.png')
                 .slide
                     a.product_img(href='product' + (dev ? '.html' : ''))
-                        img(src='/images/brand_2.png')
+                        img(src='images/brand_2.png')
                 .slide
                     a.product_img(href='product' + (dev ? '.html' : ''))
-                        img(src='/images/brand_3.png')
+                        img(src='images/brand_3.png')
                 .slide
                     a.product_img(href='product' + (dev ? '.html' : ''))
-                        img(src='/images/brand_4.png')
+                        img(src='images/brand_4.png')
                 .slide
                     a.product_img(href='product' + (dev ? '.html' : ''))
-                        img(src='/images/brand_5.png')
+                        img(src='images/brand_5.png')
                 .slide
                     a.product_img(href='product' + (dev ? '.html' : ''))
-                        img(src='/images/brand_6.png')
+                        img(src='images/brand_6.png')
     
         .slide_prev
         .slide_next
@@ -638,8 +622,8 @@ mixin prod_review_info(product_page)
                         a.btn_v1.blue_btn.cart_btn.addToCart(href='#') В корзину
                     li
                         a.btn_v1.violette_btn_transp.cart_btn.toggleOneClick(href='#') Купить в 1 клик
-                    li.product_fav
-                        a.prod_fav.favBtn(href='#' data-id= ('' + id).replace(/"/g, '') class=(user && user.fav && user.fav.indexOf(id) > -1 ? ' favorite' : ''))
+                    li
+                        a.prod_fav.favBtn(href='#' data-id= id class=(user && user.fav && user.fav.indexOf(id) > -1 ? ' favorite' : ''))
 
                 .prod_review_1_click.oneClickForm
                     form.validateMe(action='/one_click_buy')
@@ -674,13 +658,13 @@ mixin prod_review_info(product_page)
                     label.option_switch.round
                         input.inp_hidden(type='radio' name='prod_color')
                         span.check_text
-                            img(src='/images/color_1_big.png')
+                            img(src='images/color_1_big.png')
 
                 li
                     label.option_switch.round
                         input.inp_hidden(type='radio' name='prod_color')
                         span.check_text
-                            img(src='/images/color_2_big.png')
+                            img(src='images/color_2_big.png')
 
             dl.prod_options
                 dt Размер: 
@@ -723,13 +707,13 @@ mixin prod_review_info(product_page)
                         span Товар в наличии
                     .prod_f_inf.felivery
                         span.prod_f_icon.i-truck-side-view-outline
-                        span Срок отправки 1-2 дня
+                        span Срок доставки 1-2 дня
                 
             - if (!product_page)
                 p Мужские джинсы PlanB, выполненные из плотного денима на основе хлопка. Традиционный силуэт, прямой крой и средняя посадка. 
                 
                 .footer_info_control
-                    a.gl_link.prod_link(href='product' + (dev ? '.html' : '')) На страницу товара
+                    a.gl_link(href='product' + (dev ? '.html' : '')) На страницу товара
                 
 mixin order_info(count)
     .orderExpandRow(style='display:none;')
@@ -738,7 +722,7 @@ mixin order_info(count)
                 .order_cell.col_1_w
                     .order_product
                         a.order_img(href='product' + (dev ? '.html' : ''))
-                            img(src='/images/cart_1.jpg')
+                            img(src='images/cart_1.jpg')
                         .order_cell
                             .cell_val
                                 a.order_name(href='product' + (dev ? '.html' : '')) Трикотажное платье с рисунком
@@ -1135,7 +1119,7 @@ mixin filter_form(search)
                         li
                             +product_item(false)
             
-mixin auth_forms(suffix, email)
+mixin auth_forms(suffix)
     .popup_inner
         ul#auth_switcher.tab_holder.tab_v2
             li.ui-state-active: a.tab_link(href='#auth_tab_1'): span Вход
@@ -1146,7 +1130,7 @@ mixin auth_forms(suffix, email)
                 .tab_content
                     form.authForm.validateMe(action='/login' method='POST')
                         .form_cell
-                            input#auth_email.f_input.input_v2(placeholder='Email' name='email' class='validate[required, custom[email]]' value= email ? email : '')
+                            input#auth_email.f_input.input_v2(placeholder='Email' name='email' class='validate[required, custom[email]]')
 
                         .form_cell
                             input#auth_pass.f_input.input_v2(placeholder='пароль' name='password' class='validate[required, minSize[6]]')
@@ -1199,87 +1183,87 @@ mixin scripts(page_title, index, news, search, product, lk, cart, add)
     - if (!scripts_in_head)
         - if (no_min)
             | 
-            | <!--build:js /js/main.min.js -->
-            script(src='/js/lib/jquery-1.12.1.min.js')
-            script(src='/js/lib/jquery-ui-1.11.4.js')
-            script(src='/js/lib/slick.js')
-            script(src='/js/lib/jquery.validationEngine.js')
-            script(src='/js/lib/jquery.validationEngine-ru.js')
-            script(src='/js/lib/select2.js')
-            //-script(src='/js/lib/jquery.mousewheel.min.js')
-            script(src='/js/lib/jquery.mCustomScrollbar.min.js')
-            script(src='/js/lib/jquery.inputmask.bundle.js')
-            script(src='/js/main.js')
+            | <!--build:js js/main.min.js -->
+            script(src='js/lib/jquery-1.12.1.min.js')
+            script(src='js/lib/jquery-ui-1.11.4.js')
+            script(src='js/lib/slick.js')
+            script(src='js/lib/jquery.validationEngine.js')
+            script(src='js/lib/jquery.validationEngine-ru.js')
+            script(src='js/lib/select2.js')
+            //-script(src='js/lib/jquery.mousewheel.min.js')
+            script(src='js/lib/jquery.mCustomScrollbar.min.js')
+            script(src='js/lib/jquery.inputmask.bundle.js')
+            script(src='js/main.js')
             | 
             | <!--endbuild-->
         - else
-            script(src='/js/main.min.js')
+            script(src='js/main.min.js')
         
         - if (index)
             - if (no_min)
                 | 
-                | <!--build:js /js/index.min.js -->
-                script(src='/js/index.js')
+                | <!--build:js js/index.min.js -->
+                script(src='js/index.js')
                 | 
                 | <!--endbuild-->
             - else
-                script(src='/js/index.min.js')
+                script(src='js/index.min.js')
         - if (news)
             - if (no_min)
                 | 
-                | <!--build:js /js/news.min.js -->
-                script(src='/js/lib/imagesloaded.pkgd.min.js')
-                script(src='/js/lib/isotope.pkgd.min.js')
-                script(src='/js/lib/packery-mode.pkgd.js')
-                script(src='/js/news.js')
+                | <!--build:js js/news.min.js -->
+                script(src='js/lib/imagesloaded.pkgd.min.js')
+                script(src='js/lib/isotope.pkgd.min.js')
+                script(src='js/lib/packery-mode.pkgd.js')
+                script(src='js/news.js')
                 | 
                 | <!--endbuild-->
             - else
-                script(src='/js/news.min.js')
+                script(src='js/news.min.js')
     
         - if (search)
             link(href='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css' rel="stylesheet")
             script(src='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js')
             - if (no_min)
                 | 
-                | <!--build:js /js/search.min.js -->
-                script(src='/js/lib/nouislider.min.js')
-                script(src='/js/search.js')
+                | <!--build:js js/search.min.js -->
+                script(src='js/lib/nouislider.min.js')
+                script(src='js/search.js')
                 | 
                 | <!--endbuild-->
             - else
-                script(src='/js/search.min.js')
+                script(src='js/search.min.js')
     
         //- if (lk)
              - if (no_min)
                 | 
-                | <!--build:js /js/lk.min.js -->
-                script(src='/js/lk.js')
+                | <!--build:js js/lk.min.js -->
+                script(src='js/lk.js')
                 | 
                 | <!--endbuild-->
              - else
-                script(src='/js/lk.min.js')
+                script(src='js/lk.min.js')
     
         - if (cart)
             - if (no_min)
                 | 
-                | <!--build:js /js/cart.min.js -->
-                script(src='/js/lib/jquery.inputmask.bundle.js')
-                script(src='/js/cart.js')
+                | <!--build:js js/cart.min.js -->
+                script(src='js/lib/jquery.inputmask.bundle.js')
+                script(src='js/cart.js')
                 | 
                 | <!--endbuild-->
             - else
-                script(src='/js/cart.min.js')
+                script(src='js/cart.min.js')
             
         - if (add)
             - if (no_min)
                 | 
-                | <!--build:js /js/add.min.js -->
-                script(src='/js/add.js')
+                | <!--build:js js/add.min.js -->
+                script(src='js/add.js')
                 | 
                 | <!--endbuild-->
             - else
-                script(src='/js/add.min.js')
+                script(src='js/add.min.js')
 
 mixin popups()
     form.logoutForm.hide(action='/logout' method='POST')
@@ -1299,7 +1283,7 @@ mixin popups()
                 li
                     .product_item
                         a.product_img(href='product_58e95666d4a12e2c21c3d587' + (dev ? '.html' : ''))
-                            img(src='/images/search_rslt_1.jpg')
+                            img(src='images/search_rslt_1.jpg')
                             .product_hit Хит продаж
                             .product_share_holder: .product_share - 30%
                         h3.product_caption Трикотажное платье  <br> с рисунком
@@ -1313,16 +1297,16 @@ mixin popups()
         .popup_inner
             .prod_review 
                 .prod_review_photos
-                    h3.prod_name Топ и брючки тонкой вязки
+                    h3 Топ и брючки тонкой вязки
                     .fotorama(data-thumbwidth=60, data-thumbheight=60, data-height=340, data-nav="thumbs", data-thumbmargin=3)
-                        .prod_review_img.product_img(data-thumb='/images/preview_small_1.jpg')
-                            img(src='/images/preview_main_1.jpg')
+                        .prod_review_img.product_img(data-thumb='images/preview_small_1.jpg')
+                            img(src='images/preview_main_1.jpg')
                             .product_hit Хит продаж
-                        .prod_review_img.product_img(data-thumb='/images/preview_small_2.jpg')
-                            img(src='/images/preview_main_1.jpg')
+                        .prod_review_img.product_img(data-thumb='images/preview_small_2.jpg')
+                            img(src='images/preview_main_1.jpg')
                             .product_hit Хит продаж
-                        .prod_review_img.product_img(data-thumb='/images/preview_small_3.jpg')
-                            img(src='/images/preview_main_1.jpg')
+                        .prod_review_img.product_img(data-thumb='images/preview_small_3.jpg')
+                            img(src='images/preview_main_1.jpg')
                             .product_hit Хит продаж
 
             +prod_review_info()
@@ -1364,7 +1348,7 @@ mixin popups()
     #fail_popup.popup.popup_v3.popup_fail
         .popup_inner.form_cell_v1
             .popup_caption Ошибка
-            .popup_msg.failText Вы указали почту, которой нет.  <br>  Попробуйте еще раз
+            .popup_msg Вы указали почту, которой нет.  <br>  Попробуйте еще раз
             
             .form_cell
                 a.btn_v1.blue_btn.order_btn.mod_2(href='#') Попробовать еще раз
@@ -1408,7 +1392,7 @@ mixin popups()
                     li
                         .product_item
                             a.product_img(href='product' + (dev ? '.html' : ''))
-                                img(src='/images/fav_1.jpg')
+                                img(src='images/fav_1.jpg')
                             h3.product_caption Трикотажное платье с рисунком
                             .product_price
                                 span.new_price 200
@@ -1417,7 +1401,7 @@ mixin popups()
                     li
                         .product_item
                             a.product_img(href='product' + (dev ? '.html' : ''))
-                                img(src='/images/fav_1.jpg')
+                                img(src='images/fav_1.jpg')
                             h3.product_caption длинное название длинное название длинное название
                             .product_price
                                 span.new_price 200
@@ -1426,7 +1410,7 @@ mixin popups()
                     li
                         .product_item
                             a.product_img(href='product' + (dev ? '.html' : ''))
-                                img(src='/images/fav_1.jpg')
+                                img(src='images/fav_1.jpg')
                             h3.product_caption ФУтболка
                             .product_price
                                 span.new_price 200

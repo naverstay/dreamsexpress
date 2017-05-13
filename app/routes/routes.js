@@ -14,7 +14,7 @@ module.exports = function (app, passport) {
 
     var slug = require('slug');
 
-    var prod_upload_dir = '/upload/products/';
+    var prod_upload_dir = '/upload/';
 
     function restrict(req, res, next) {
         req.session.prevPage = req.body.pathname || '/';
@@ -802,10 +802,11 @@ module.exports = function (app, passport) {
 
     // file upload
 
-    app.post('/upload', function (req, res) {
-        var files = [], ret_files = [];
+    app.post('/upload/:path', function (req, res) {
+        var files = [], ret_files = [],
+            dir = prod_upload_dir + (req.param('path').length ? req.param('path') + '/' : '');
 
-        // console.log(req.files);
+        // console.log(req.files, dir);
 
         for (var key in req.files) {
             if (req.files.hasOwnProperty(key)) {
@@ -821,20 +822,20 @@ module.exports = function (app, passport) {
                         var sampleFile = files[i], counter = 0;
 
                         function nameChecker(name) {
-                            if (fs.existsSync('.' + prod_upload_dir + name)) {
+                            if (fs.existsSync('.' + dir + name)) {
                                 counter++;
                                 nameChecker(slug((sampleFile.name).replace(/\.[a-z0-9]*$/, '') + '-' + counter) +
                                     (sampleFile.name).replace(/.*(\.[a-z0-9]*$)/, '$1'));
                             } else {
 
-                                sampleFile.mv('.' + prod_upload_dir + name, function (err) {
+                                sampleFile.mv('.' + dir + name, function (err) {
                                     if (err) {
                                         console.log(err);
                                         return res.status(500).send(err);
                                     }
                                 });
 
-                                ret_files.push(prod_upload_dir + name);
+                                ret_files.push(dir + name);
                             }
                         }
 
