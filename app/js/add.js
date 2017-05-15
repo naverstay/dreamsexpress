@@ -1,5 +1,3 @@
-var color_popup;
-
 $(function ($) {
 
     $('.colorPicker').each(function (ind) {
@@ -16,24 +14,31 @@ $(function ($) {
             }
 
             if (isHex(clr)) {
-                var inp_target = firedEl.nextAll('.uploadPreview').append('<li class="prodColorItem"><div class="prod_preview _rounded" style="background:' + clr + ';"></div><span class="prod_rm_btn rmProdColor"></span></li>').prev();
+                var inp_target = firedEl.nextAll('.uploadPreview').append('<li class="prodColorItem"><div class="prod_preview" style="background:' + clr + ';"></div><span class="prod_rm_btn rmProdColor"></span></li>').prevAll('input');
 
                 var str = inp_target.val() + ',' + clr;
 
                 inp_target.val(str.replace(/^,/, ''));
 
                 inp_target.validationEngine('validate');
-
             }
 
             return false;
         })
         .delegate('.rmProdColor', 'click', function () {
-            var firedEl = $(this), item = firedEl.closest('.prodColorItem'), clr = item.find('.prod_preview').css('background-color'), inp = firedEl.closest('.uploadPreview').prevAll('input');
+            var firedEl = $(this), item = firedEl.closest('.prodColorItem'),
+                clr = item.find('.prod_preview').css('background-color'),
+                inp_target = firedEl.closest('.uploadPreview').prevAll('input');
 
-            // console.log(clr);
+            clr = (isHex(clr) ? clr : rgb2hex(clr));
 
-            inp.val((inp.val().replace(new RegExp(',?' + clr, 'ig'), '')).replace(/^,/, ''));
+            var rx = new RegExp('(,?' + clr + ')|(,?' + clr.replace(/([a-f0-9])([a-f0-9])/g, '$1') + ')', 'ig');
+
+            console.log(clr, rx, inp_target.val().replace(' ', '').replace(rx, ''));
+
+            inp_target.val((inp_target.val().replace(' ', '').replace(rx, '')).replace(/^,/, ''));
+
+            inp_target.validationEngine('validate');
 
             item.remove();
 
@@ -57,7 +62,9 @@ $(function ($) {
                     if (data.remove_done) {
                         item.remove();
 
-                        inp_target.val((inp_target.val().replace(new RegExp(',?' + file, 'ig'), '')).replace(/^,/, ''));
+                        var rx = new RegExp(',?[/]?' + file.replace(/^\//, ''), 'ig');
+
+                        inp_target.val((inp_target.val().replace(rx, '')).replace(/^,/, ''));
                     }
                 },
                 error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
@@ -71,6 +78,17 @@ $(function ($) {
                     inp_target.validationEngine('validate');
                 }
             });
+
+            return false;
+        })
+        .delegate('.rmProdBtn', 'click', function () {
+            var firedEl = $(this);
+
+            $('.confirmCaption').text('ВНИМАНИЕ!!!');
+            $('.confirmAction').attr('href', 'javascript:removeProduct("' + firedEl.attr('data-id') + '");');
+            $('.confirmText').html('Товар <b>' + firedEl.attr('data-name') + '</b> будет удален.<br>Это действие не обратимо.');
+
+            confirmation_popup.dialog('open');
 
             return false;
         });
@@ -115,7 +133,7 @@ $(function ($) {
                         }
 
                         if (firedEl.attr('multiple')) {
-                            inp_target.val((inp_target.val() + str).replace(/^,/, '')).next('.uploadPreview').append(previews);
+                            inp_target.val((inp_target.val() + str).replace(/^,/, '')).nextAll('.uploadPreview').append(previews);
                         } else {
                             var old_val = inp_target.val();
                             inp_target.nextAll('.uploadPreview').find('.prod_rm_btn').click();
@@ -150,19 +168,12 @@ $(function ($) {
 
         if (!form.validationEngine('validate')) return false; // фoрма не заполнена
 
-        /*  form.find('input, textarea').each(function () { // прoбeжим пo кaждoму пoлю в фoрмe
-              if ($(this).val() == '') { // eсли нaхoдим пустoe
-                  alert('Зaпoлнитe пoлe "' + $(this).attr('placeholder') + '"!'); // гoвoрим зaпoлняй!
-                  error = true; // oшибкa
-              }
-          });*/
-
         if (!error) { // eсли oшибки нeт
             var data = form.serialize(); // пoдгoтaвливaeм дaнныe
 
             $('.preloader').fadeIn(1000);
 
-            console.log(form.attr('method'), form.attr('action'), data);
+            // console.log(form.attr('method'), form.attr('action'), data);
 
             $.ajax({ // инициaлизируeм ajax зaпрoс
                 type: form.attr('method'), // oтпрaвляeм в POST фoрмaтe, мoжнo GET
@@ -178,20 +189,23 @@ $(function ($) {
 
                     $('.successText').text('Товар добавлен.');
 
-                    success_popup.dialog('open');
-
-                    /*if (data['error']) { // eсли oбрaбoтчик вeрнул oшибку
-                        alert(data['error']); // пoкaжeм eё тeкст
-                    } else { // eсли всe прoшлo oк
-                        alert('Письмo oтврaвлeнo! Чeкaйтe пoчту! =)'); // пишeм чтo всe oк
-                    }*/
+                    if (data.redirectTo) {
+                        redirectTo(data.redirectTo);
+                    } else if (data.product_added) {
+                        $('#orders_table').append(data.prod_title).append(data.prod_info);
+                        success_popup.dialog('open');
+                    } else if (data.update_failed) {
+                        $('.failText').html(data.fail_text);
+                        fail_popup.dialog('open');
+                    } else {
+                        $('.failText').text('Что-то пошло не так');
+                        fail_popup.dialog('open');
+                    }
                 },
                 error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
 
                     console.log(xhr, ajaxOptions, thrownError);
 
-                    // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
-                    // alert(thrownError); // и тeкст oшибки
                 },
                 complete: function (data) { // сoбытиe пoслe любoгo исхoдa
                     form.find('.saveBtn').prop('disabled', null); // в любoм случae включим кнoпку oбрaтнo
@@ -205,3 +219,58 @@ $(function ($) {
     });
 
 });
+
+var hexDigits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
+
+//Function to convert rgb color to hex format
+function rgb2hex(rgb) {
+    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+}
+
+function hex(x) {
+    return isNaN(x) ? "00" : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
+}
+
+function removeProduct(id) {
+    var item = $('.rmProdBtn[data-id="' + id + '"]').closest('.orderRow'), info = item.next('.orderExpandRow');
+
+    console.log(id, item, info);
+
+    $.ajax({ // инициaлизируeм ajax зaпрoс
+        type: "delete", // form.attr('method'),
+        url: "/product/" + id, // form.attr('action'),
+        dataType: 'json', // oтвeт ждeм в json фoрмaтe
+        data: {}, // дaнныe для oтпрaвки
+        beforeSend: function (data) { // сoбытиe дo oтпрaвки
+            // firedEl.attr('disabled', 'disabled'); // нaпримeр, oтключим кнoпку, чтoбы нe жaли пo 100 рaз
+        },
+        success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
+
+            console.log(data, data['error']);
+
+            if (data.remove_done) {
+                item.remove();
+                info.remove();
+
+                confirmation_popup.dialog('close');
+
+                $('.successText').text('Товар удален.');
+
+                success_popup.dialog('open');
+
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
+
+            console.log(xhr, ajaxOptions, thrownError);
+
+            // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
+            // alert(thrownError); // и тeкст oшибки
+        },
+        complete: function (data) { // сoбытиe пoслe любoгo исхoдa
+
+        }
+    });
+
+}

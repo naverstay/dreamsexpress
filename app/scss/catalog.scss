@@ -115,6 +115,12 @@
       margin-bottom: 75px;
     }
   }
+
+  @include respond-to-max($resp_s) {
+    .fotorama__stage {
+      //height: auto !important;
+    }
+  }
 }
 
 .product_feature_tabs {
@@ -156,6 +162,7 @@
 }
 
 .product_photos {
+  margin-bottom: 30px;
 
   .product_img img {
     width: 100%;
@@ -403,8 +410,9 @@
     line-height: 1;
   }
 
-  &._rounded {
+  ._rounded & {
     border-radius: 100%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .75);
   }
 }
 

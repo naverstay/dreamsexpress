@@ -104,8 +104,12 @@
       display: inline-block;
       vertical-align: middle;
       line-height: 1;
-      margin-left: 20px;
       margin-top: 20px;
+      margin-left: 20px;
+
+      &:first-child {
+        margin-left: 0;
+      }
     }
   }
 }
@@ -117,7 +121,7 @@
   position: fixed;
   width: 30px;
   height: 30px;
-  top: 26px;
+  top: 16px;
   right: 26px;
   z-index: 1002;
   font-size: 26px;
@@ -150,6 +154,10 @@
 
   .modal_opened & {
     display: block;
+  }
+
+  @include respond-to-min($resp_s) {
+    top: 26px;
   }
 }
 
@@ -188,7 +196,10 @@
     top: 0;
     right: 0;
     left: 0;
-    padding-right: 250px;
+
+    @include respond-to-min($resp_s) {
+      padding-right: 250px;
+    }
   }
 
   .search_container & {
@@ -218,8 +229,6 @@
     //padding-right: 50px;
   }
 
-  
-  
 }
 
 .q_search_results {
@@ -233,7 +242,11 @@
   }
 
   .product_share_holder {
-    right: -10px;
+    right: 0;
+
+    @include respond-to-min($resp_s) {
+      right: -10px;
+    }
   }
 
   .product_share_holder,
@@ -259,6 +272,10 @@
 
   .product_price {
     padding-bottom: 20px;
+  }
+
+  .product_img {
+    height: 260px;
   }
 
   > li {
@@ -300,16 +317,19 @@
   @include respond-to-min($resp_xxl) {
     margin-right: -4%;
   }
-
 }
 
 .adv_search_box {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  width: 240px;
-  line-height: 50px;
+
+  @include respond-to-min($resp_s) {
+    position: absolute;
+    line-height: 50px;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    margin-left: 0;
+    width: 240px;
+  }
 
   .gl_link {
     @include transition_all(color .3s);
@@ -322,6 +342,18 @@
 
     &:hover {
       color: $gl_violette_link_hover;
+    }
+  }
+
+  @include respond-to-max($resp_s) {
+    text-align: center;
+    background: #fff;
+    margin-left: -60px;
+
+    .gl_link {
+      display: block;
+      line-height: 30px;
+      margin-top: 10px;
     }
   }
 }

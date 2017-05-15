@@ -9,6 +9,7 @@ var body, html, doc, wnd, search_delay,
     callback_popup,
     auth_popup,
     fail_popup,
+    confirmation_popup,
     success_popup,
     quick_search_popup,
     add2cart_popup,
@@ -68,6 +69,8 @@ $(function ($) {
                 $(firedEl.addClass('active').attr('data-target')).val('desc');
             }
 
+            $(this).closest('form').trigger('submit');
+
             return false;
 
         })
@@ -101,9 +104,8 @@ $(function ($) {
                         }
 
                         if (data.redirectTo) {
-                            setTimeout(function () {
-                                window.location = data.redirectTo;
-                            }, 1);
+                            redirectTo(data.redirectTo);
+                            return;
                         }
 
                         // console.log(data);
@@ -152,9 +154,8 @@ $(function ($) {
                         }
 
                         if (data.redirectTo) {
-                            setTimeout(function () {
-                                window.location = data.redirectTo;
-                            }, 1);
+                            redirectTo(data.redirectTo);
+                            return;
                         }
 
                         $('.favUnit').remove();
@@ -202,9 +203,7 @@ $(function ($) {
                                 auth_popup.dialog('open');
                             }, 1);
                         } else if (data.redirectTo) {
-                            setTimeout(function () {
-                                window.location = data.redirectTo;
-                            }, 1);
+                            redirectTo(data.redirectTo);
                         } else {
                             updateFav(data);
                         }
@@ -256,6 +255,8 @@ $(function ($) {
     initFailPopup();
 
     initSuccessPopup();
+    
+    initConfirmationPopup();
 
     initAddToCartPopup();
 
@@ -478,7 +479,7 @@ function initMask(target) {
     }
 
     if (!inp.length) return;
-    
+
     inp.each(function (i, el) {
         var inp = $(el), param = inputMaskEvents;
 
@@ -712,7 +713,7 @@ function sendForm(form, cb) {
                 }, 1);
             } else if (data.redirectTo) {
                 setTimeout(function () {
-                    window.location = data.redirectTo;
+                    redirectTo(data.redirectTo);
                 }, 1);
             } else if (data.user_created) {
                 $('#auth_tab_1 .tab_content').prepend('<p class="auth_msg">Подтвердите e-mail ' + data.email + '</p>');
@@ -763,6 +764,16 @@ function sendForm(form, cb) {
     });
 }
 
+function redirectTo(url) {
+    setTimeout(function () {
+        if (url == true) {
+            location.reload(true);
+        } else {
+            window.location = url;
+        }
+    }, 1);
+}
+
 function initFailPopup() {
 
     fail_popup = $('#fail_popup').dialog({
@@ -791,6 +802,31 @@ function initFailPopup() {
         fail_popup.dialog('open');
 
         return false;
+    });
+
+}
+
+function initConfirmationPopup() {
+
+    confirmation_popup = $('#confirmation_popup').dialog({
+        autoOpen: false,
+        modal: true,
+        closeOnEscape: true,
+        closeText: '',
+        dialogClass: 'no_close_mod dialog_g_size_1',
+        //appendTo: '.wrapper',
+        width: 462,
+        draggable: true,
+        collision: "fit",
+        position: {my: "top center", at: "top center", of: window},
+        open: function (event, ui) {
+            body.addClass('modal_opened overlay_v2');
+            html.addClass('no_scroll');
+        },
+        close: function (event, ui) {
+            body.removeClass('modal_opened overlay_v2');
+            html.removeClass('no_scroll');
+        }
     });
 
 }

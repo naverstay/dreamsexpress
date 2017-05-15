@@ -29,6 +29,10 @@
     text-decoration: underline;
     color: $gl_cool_black;
   }
+  
+  ._link_controls & {
+    margin-right: 10px;
+  }
 }
 
 .caption_v1 {

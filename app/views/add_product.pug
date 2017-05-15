@@ -57,10 +57,10 @@ html(lang='ru')
                                                             ul.upload_preview.uploadPreview
 
                                                         .form_cell
-                                                            input.f_input.input_v6(placeholder='Старая цена' name='product_old_price')
+                                                            input.f_input.input_v6(placeholder='Старая цена' data-inputmask="'alias': 'numeric', 'rightAlign': 'false'" name='product_old_price')
                                                             
                                                         .form_cell
-                                                            input.f_input.input_v6(placeholder='Цена' name='product_price' class='validate[required]')
+                                                            input.f_input.input_v6(placeholder='Цена' data-inputmask="'alias': 'numeric', 'rightAlign': 'false'" name='product_price' class='validate[required,custom[onlyNumberSp]]')
                                                             
                                                         .form_cell
                                                             input.f_input.input_v6(placeholder='Размер' name='product_sizes' class='validate[required]')
@@ -73,7 +73,7 @@ html(lang='ru')
                                                             label.gl_link.inner_link
                                                                 input.inp_hidden.uploadInput(type='file' data-context='colors' data-target='product_colors' multiple)
                                                                 span Загрузить образец цвета
-                                                            ul.upload_preview.uploadPreview
+                                                            ul.upload_preview.uploadPreview._rounded
                                                             
                                                         .form_cell
                                                             input.f_input.input_v6(placeholder='Категория' name='product_category' class='validate[required]')
@@ -139,7 +139,7 @@ html(lang='ru')
                                 #product_tab_1
                                     .tab_content
                                         - if (all_products && all_products.length)
-                                            .orders_table
+                                            #orders_table.orders_table
                                                 .order_row.caption_row
                                                     .order_cell.col_1
                                                         span.cell_val Название
@@ -150,78 +150,81 @@ html(lang='ru')
                                                     .order_cell.col_4
                                                         span.cell_val Инфо
                                                         
-                                                - for prod in all_products
-                                                    .order_row.orderRow
-                                                        .order_expand_btn.orderExpandBtn
-                                                        .order_cell.col_1
-                                                            - if (prod.main_img)
-                                                                a.order_img(href='/product/' + prod.url + (dev ? '.html' : '') target='_blank')
-                                                                    img(src= prod.main_img)
-                                                            span.cell_val= prod.name
-                                                        .order_cell.col_2
-                                                            span.cell_val
-                                                                span.prod_f_icon(class = prod.in_stock ? 'in_stock' : 'expected')
-                                                                span= formatPrice(prod.price) + ' грн.'
-                                                                - if (prod.old_price)
-                                                                    span= ', старая цена ' + formatPrice(prod.old_price) + ' грн.'
-
-                                                        .order_cell.col_3
-                                                            span.cell_val
-                                                                //-.prod_f_inf
-                                                                span.prod_f_icon(class = prod.is_hit ? 'in_stock' : 'expected')
-                                                                span= prod.category
-
-                                                        .order_cell.col_4
-                                                            span.cell_val.fw_500: a.black_link(href='/edit/' + prod.url target = '_blank') Редактировать
+                                                - if (all_products.length)
+                                                    for prod in all_products
+                                                        .order_row.orderRow
+                                                            .order_expand_btn.orderExpandBtn
+                                                            .order_cell.col_1
+                                                                - if (prod.main_img)
+                                                                    a.order_img(href='/product/' + prod.url + (dev ? '.html' : '') target='_blank')
+                                                                        img(src= prod.main_img)
+                                                                span.cell_val= prod.name
+                                                            .order_cell.col_2
+                                                                span.cell_val
+                                                                    span.prod_f_icon(class = prod.in_stock ? 'in_stock' : 'expected')
+                                                                    span= formatPrice(prod.price) + ' грн.'
+                                                                    - if (prod.old_price)
+                                                                        span= ', старая цена ' + formatPrice(prod.old_price) + ' грн.'
     
-                                                    .orderExpandRow(style='display:none;')
-                                                        .order_row.collapsed
-                                                            .order_cell.col_1_w
-                                                                .order_product
-                                                                    - if (prod.hover_img)
-                                                                        a.order_img(href='/product/' + prod.url + (dev ? '.html' : '') target='_blank')
-                                                                            img(src= prod.hover_img)
-                                                                    - if (prod.img_list && prod.img_list.length)
-                                                                        - var arr = prod.img_list.split(',');
-                                                                        - for img in arr
+                                                            .order_cell.col_3
+                                                                span.cell_val
+                                                                    //-.prod_f_inf
+                                                                    span.prod_f_icon(class = prod.is_hit ? 'in_stock' : 'canceled')
+                                                                    span= prod.category
+    
+                                                            .order_cell.col_4
+                                                                span.cell_val.fw_500._link_controls
+                                                                    a.black_link(href='/edit/' + prod.url target = '_blank') Редактировать
+                                                                    a.black_link.rmProdBtn(href='#' data-id= prod.url data-name= prod.name) Удалить
+        
+                                                        .orderExpandRow(style='display:none;')
+                                                            .order_row.collapsed
+                                                                .order_cell.col_1_w
+                                                                    .order_product
+                                                                        - if (prod.hover_img)
                                                                             a.order_img(href='/product/' + prod.url + (dev ? '.html' : '') target='_blank')
-                                                                                img(src= img.trim())
-                                                                
-                                                                - if (prod.info && prod.info.length)
-                                                                    p= prod.info
+                                                                                img(src= prod.hover_img)
+                                                                        - if (prod.img_list && prod.img_list.length)
+                                                                            - var arr = prod.img_list.split(',');
+                                                                            for img in arr
+                                                                                a.order_img(href='/product/' + prod.url + (dev ? '.html' : '') target='_blank')
+                                                                                    img(src= img.trim())
                                                                     
-                                                                - if (prod.description && prod.description.length)
-                                                                    p= prod.description
-
-                                                            .order_cell.col_2_w
-                                                                .cell_val
-                                                                    - var arr = prod.colors.split(',');
-                                                                    ul.prod_colors
-                                                                        - for item, i in arr
-                                                                            li
-                                                                                - var clr = item.trim();
-                                                                                - if (/^#/.test(clr) && isHex(clr))
-                                                                                    .prod_color(style='background:' + clr)
-                                                                                - else
-                                                                                    .prod_color
-                                                                                        img(src= clr)
-                                                                                
-                                                                    p 
-                                                                        | Пол: 
-                                                                        span= prod.gender
+                                                                    - if (prod.info && prod.info.length)
+                                                                        p= prod.info
                                                                         
-                                                                    p 
-                                                                        | Сезон: 
-                                                                        span= prod.season
-                                                                        
-                                                                        
-                                                            .order_cell.col_3_w
-                                                                .cell_val
-                                                                    p Размеры: #{prod.sizes}
-
-                                                                    p Для #{prod.adult ? 'взрослых' : 'детей'}
-
-                                                                    p Артикул: #{prod.product_code}
+                                                                    - if (prod.description && prod.description.length)
+                                                                        p= prod.description
+    
+                                                                .order_cell.col_2_w
+                                                                    .cell_val()
+                                                                        - var arr = prod.colors.split(',');
+                                                                        ul.prod_colors
+                                                                            for item, i in arr
+                                                                                li
+                                                                                    - var clr = item.trim();
+                                                                                    - if (isHex(clr))
+                                                                                        .prod_color(style='background:' + clr)
+                                                                                    - else
+                                                                                        .prod_color
+                                                                                            img(src= clr)
+                                                                                    
+                                                                        p 
+                                                                            | Пол: 
+                                                                            span= prod.gender
+                                                                            
+                                                                        p 
+                                                                            | Сезон: 
+                                                                            span= prod.season
+                                                                            
+                                                                            
+                                                                .order_cell.col_3_w
+                                                                    .cell_val
+                                                                        p Размеры: #{prod.sizes}
+    
+                                                                        p Для #{prod.adult ? 'взрослых' : 'детей'}
+    
+                                                                        p Артикул: #{prod.product_code}
 
             +footer()
             

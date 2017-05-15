@@ -2,7 +2,7 @@ include mixins
 
 - var gender = ['Любой', 'Девочки','Мальчики']
 - var age = ['Любой', 1,2,3,4,5,6,7,8,9,10,11,12,13,14]
-- var sizes = ['Любой', '5','10','15','20','25','30','35','40']
+- var sizes = ['Любой', 'XS','S','M','L','XL','XXL','XXXL']
 - var seasons = ['Любой', 'Лето','Зима','Демисезон']
 - var colors = ['Любой', 'Оранжевый','Красный','Черный','Белый','Синий']
 - var brands = ['Любой', 'Zara','H&M','Okaidi','Puma','Nike','Mothercare','Addidas','Reebok']
@@ -20,31 +20,33 @@ html(lang='ru')
                     .section_inner
                         +breadcrumbs(['Главная', 'Каталог', 'Детская одежда', 'Верхняя одежда', 'Нейлоновая куртка-бомбер'])
 
-                        .product_block
-                            .product_photos
-                                h1.page_title.fw_700
-                                    span= product.name
-                                    
-                            .product_cart
-                                .product_soc
-                                    
-                        .product_block
-                            .product_photos
-                                .fotorama(data-thumbwidth=68, data-thumbheight=68, data-width='100%', data-height='100%', data-maxwidth=660, data-maxheight=660, data-nav="thumbs")
-                                    - if (product.main_img)
-                                        .prod_review_img.product_img(data-thumb= product.main_img)
-                                            img(src= product.main_img)
-                                    - if (product.hover_img)
-                                        .prod_review_img.product_img(data-thumb= product.hover_img)
-                                            img(src= product.hover_img)
-                                    - if (product.img_list.length)
-                                        - for img, i in product.img_list
-                                            .prod_review_img.product_img(data-thumb= img)
-                                                img(src= img)
-                                    
-                            .product_cart
-                                .product_soc
-                                    +prod_review_info(true)
+                        - if (product)
+                            .product_block
+                                .product_photos
+                                    h1.page_title.fw_700
+                                        span= product.name || 'product.name'
+                                        
+                                .product_cart
+                                    .product_soc
+                                        
+                            .product_block
+                                .product_photos
+                                    .fotorama(data-thumbwidth=68, data-thumbheight=68, data-width='100%', data-maxwidth=660, data-maxheight=660, data-ratio="178/260", data-nav="thumbs")
+                                        - if (product.main_img)
+                                            .prod_review_img.product_img(data-thumb= checkSlash(product.main_img))
+                                                img(src= checkSlash(product.main_img))
+                                        - if (product.hover_img)
+                                            .prod_review_img.product_img(data-thumb= checkSlash(product.hover_img))
+                                                img(src= checkSlash(product.hover_img))
+                                        - if (product.img_list && product.img_list.length)
+                                            - var arr = product.img_list.split(',')
+                                            for img, i in arr
+                                                .prod_review_img.product_img(data-thumb= checkSlash(img))
+                                                    img(src= checkSlash(img))
+                                        
+                                .product_cart
+                                    .product_soc
+                                        +prod_review_info(true)
                                 
                     .section_inner
                         ul#features_switcher.tab_holder.tab_v4

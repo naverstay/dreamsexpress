@@ -45,7 +45,9 @@ exports.update = function (id, newData, cb) {
 
     // db.get().collection('clients').findOne({_id: ObjectID(id)}, function (err, doc) {
     //     client = doc;
-    // });
+    // }); 
+    // 
+    // updateOne
 
     db.get().collection('clients').save(
         {

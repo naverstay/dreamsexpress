@@ -40,7 +40,7 @@ module.exports = function (app, passport) {
         return function (subject) {
             return objectToStringFn.call(subject) === arrayToStringResult;
         };
-    };
+    }
 
     function favUpdate(list, req, cb) {
         client.update(req.session.passport.user, {
@@ -91,7 +91,7 @@ module.exports = function (app, passport) {
     }
 
     app.use(function (req, res, next) {
-        var clients_collection = db.get().collection('clients');
+        // var clients_collection = db.get().collection('clients');
 
         req.client_info = {};
 
@@ -199,40 +199,40 @@ module.exports = function (app, passport) {
 //     }
 // });
 
-    app.get('/products/:id', function (req, res, next) {
-
-        console.log(req.originalUrl); // '/admin/new'
-        console.log(req.baseUrl); // '/admin'
-        console.log(req.path); // '/new'
-
-        console.log('1=========' + JSON.stringify(req.params), (req.params.id).length);
-        // if the user ID is 0, skip to the next route
-        if ((req.params.id).length) {
-            console.log('route');
-            next('route');
-        } else {
-            console.log('else route');
-
-            // otherwise pass the control to the next middleware function in this stack
-            next();
-        }
-
-    }, function (req, res, next) {
-        // render a regular page
-        console.log('next');
-
-        res.json({
-            id: req.param('id'),
-            path: req.param(0)
-        });
-
-        res.render('products', {
-            user: req.client_info,
-            all_products: req.all_products,
-            fav_html: req.fav_html,
-            title: 'regular page'
-        });
-    });
+    // app.get('/products/:id', function (req, res, next) {
+    //
+    //     console.log(req.originalUrl); // '/admin/new'
+    //     console.log(req.baseUrl); // '/admin'
+    //     console.log(req.path); // '/new'
+    //
+    //     console.log('1=========' + JSON.stringify(req.params), (req.params.id).length);
+    //     // if the user ID is 0, skip to the next route
+    //     if ((req.params.id).length) {
+    //         console.log('route');
+    //         next('route');
+    //     } else {
+    //         console.log('else route');
+    //
+    //         // otherwise pass the control to the next middleware function in this stack
+    //         next();
+    //     }
+    //
+    // }, function (req, res, next) {
+    //     // render a regular page
+    //     console.log('next');
+    //
+    //     res.json({
+    //         id: req.param('id'),
+    //         path: req.param(0)
+    //     });
+    //
+    //     res.render('products', {
+    //         user: req.client_info,
+    //         all_products: req.all_products,
+    //         fav_html: req.fav_html,
+    //         title: 'regular page'
+    //     });
+    // });
 
     app.get('/activate_*', function (req, res, next) {
         var activation_id = req.params[0];
@@ -313,6 +313,8 @@ module.exports = function (app, passport) {
 
 // handler for the /user/:id path, which renders a special page
 
+    app.delete('/product/:id', isLoggedInPost, isAdmin, productsController.delete);
+
     app.post('/product/:id', function (req, res, next) {
         // console.log('2=========' + JSON.stringify(req.params));
 
@@ -321,9 +323,9 @@ module.exports = function (app, passport) {
         //     path: req.param(0)
         // });
 
-        var filter = [{url: req.params.id}], checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
+        var filter = [{url: req.params.id}];
 
-        if (checkForHexRegExp.test(req.params.id)) {
+        if (isObjectID(req.params.id)) {
             filter.push({_id: ObjectID('' + req.params.id)});
         }
 
@@ -332,28 +334,33 @@ module.exports = function (app, passport) {
             if (results.length) {
                 var item = results[0];
 
-                var prod_review = '<div class="prod_review_photos"> ' +
-                    '<h3>Топ и брючки тонкой вязки</h3> ' +
-                    buildFotorama(item.is_hit, item.main_img, item.hover_img, item.img_list) +
+// @formatter:off
+
+                var prod_review =
+                    '<div class="prod_review_photos"> ' +
+                        '<h3>' + item.name + '</h3> ' +
+                        buildFotorama(item.is_hit, item.main_img, item.hover_img, item.img_list) +
                     '</div>';
 
-                var prod_review_options = '<div class="prod_review_options">' +
-                    '<dl class="prod_options">' +
-                    '<dt>Цвет: </dt>' +
-                    '<dd></dd>' +
-                    '</dl>' +
-                    '<ul class="prod_options_switch">' +
-                    colorList(item.colors) +
-                    '</ul>' +
-                    '<dl class="prod_options"><dt>Размер: </dt><dd>&nbsp;</dd></dl>' +
-                    '<ul class="prod_options_switch">' +
-                    sizesList(item.sizes) +
-                    '</ul>' +
-                    '<p>' +
-                    (item.description ? item.description : '') +
-                    '</p>' +
-                    '<div class="footer_info_control"><a class="gl_link" href="/product/' + item.url + '">На страницу товара</a></div>' +
+                var prod_review_options = 
+                    '<div class="prod_review_options">' +
+                        '<dl class="prod_options">' +
+                            '<dt>Цвет: </dt>' +
+                            '<dd></dd>' +
+                        '</dl>' +
+                        '<ul class="prod_options_switch">' +
+                            colorList(item.colors) +
+                        '</ul>' +
+                        '<dl class="prod_options"><dt>Размер: </dt><dd>&nbsp;</dd></dl>' +
+                        '<ul class="prod_options_switch">' +
+                            sizesList(item.sizes) +
+                        '</ul>' +
+                        '<p>' +
+                            (item.description ? item.description : '') +
+                        '</p>' +
+                        '<div class="footer_info_control"><a class="gl_link" href="/product/' + item.url + '">На страницу товара</a></div>' +
                     '</div>';
+// @formatter:on
 
                 var product_fav = '<a href="#" data-id="' + item._id + '" class="prod_fav favBtn' + (checkFav(item._id, req.client_info.fav || []) ? ' favorite' : '') + '"></a>';
 
@@ -441,6 +448,51 @@ module.exports = function (app, passport) {
             all_products: req.all_products,
             fav_html: req.fav_html,
             title: 'add_product'
+        });
+    });
+
+    app.get('/edit/:id', isLoggedIn, isAdmin, function (req, res) {
+        var filter = [{url: req.params.id}];
+
+        if (isObjectID(req.params.id)) {
+            filter.push({_id: ObjectID('' + req.params.id)});
+        }
+
+        productsController.filter({$or: filter}, function (err, results) {
+
+            if (results.length) {
+                res.render('edit', {
+                    user: req.client_info,
+                    // all_products: req.all_products,
+                    product: results[0],
+                    fav_html: req.fav_html,
+                    title: 'edit product',
+                    id: results[0]._id
+                });
+            } else {
+                res.status(404);
+
+                // respond with html page
+                if (req.accepts('html')) {
+                    res.render('error', {
+                        url: req.url,
+                        error: 404,
+                        user: req.client_info,
+                        title: 'ERROR 404',
+                        message: 'Товар не найден'
+                    });
+                    return;
+                }
+
+                // respond with json
+                if (req.accepts('json')) {
+                    res.send({error: 'Not found'});
+                    return;
+                }
+
+                // default to plain-text. send()
+                res.type('txt').send('Not found');
+            }
         });
     });
 
@@ -585,6 +637,8 @@ module.exports = function (app, passport) {
         })
     });
 
+    // quick search
+
     app.post('/q_search', function (req, res) {
         // console.log(req.body.name);
 
@@ -620,6 +674,7 @@ module.exports = function (app, passport) {
         });
     });
 
+    // filter
 
     app.post('/filter', function (req, res) {
         var params = removeEmpty(req.body), filter = {}, sort = {};
@@ -640,11 +695,15 @@ module.exports = function (app, passport) {
             } else if ((/adult/ig).test(field)) {
                 filter['adult'] = (param == 'true');
             } else if ((/in_stock/ig).test(field)) {
-                filter['in_stock'] = (param == 'true');
+                filter['in_stock'] = (param == 'on');
+            } else if ((/is_hit/ig).test(field)) {
+                filter['is_hit'] = (param == 'on');
             } else if ((/gender/ig).test(field)) {
                 filter['gender'] = RXify(param);
             } else if ((/season/ig).test(field)) {
                 filter['season'] = RXify(param);
+            } else if ((/size/ig).test(field)) {
+                filter['size'] = RXify(param);
             } else if ((/price_min/ig).test(field)) {
                 filter['price'] = {
                     $gte: parseInt(('' + param).replace(/\D/g, ''))
@@ -674,62 +733,79 @@ module.exports = function (app, passport) {
             } else if (!sort['price_desc']) {
                 return a.price - b.price;
             }
-
             return 0;
         }
 
-        // console.log('start', req.body, filter);
-
-        // var products_collection = db.get().collection('products');
-
-        // products_collection.find(filter).toArray(function (err, results) {
-        productsController.filter(filter, function (err, results) {
-            var items = '';
-
-            results.sort(sortFunc);
-
-            for (var i = 0; i < results.length; i++) {
-                var item = results[i];
-
-                // productsController.update({
-                //     url: slug(item.name),
-                //     id: item._id
-                // });
-
-                items +=
-                    '<li>' +
-                    '<div class="product_item">' +
-                    '<a href="/product/' + item.url + '" class="product_img">' +
-                    '<img src="' + checkSlash(item.main_img) + '">' +
-                    (item.hover_img ? '<div class="hover_img prod_hover"><img src="' + checkSlash(item.hover_img) + '"></div>' : '') +
-                    (item.is_hit ? '<div class="product_hit">Хит продаж</div>' : '') +
-                    '<div class="product_share_holder">' +
-                    '<span data-id="' + item._id + '" class="prod_hover prod_fav favBtn' + (checkFav(item._id, req.client_info.fav || []) ? ' favorite' : '') + '"></span>' +
-                    (item.old_price ? '<div class="product_share">' + Math.ceil(100 * ((item.price - item.old_price) / item.price )).toFixed() + '%</div>' : '') +
-                    '</div>' +
-                    '<div class="product_q_review violette_btn prod_hover openReview mob_hidden">Быстрый просмотр</div>' +
-                    '</a>' +
-                    '<h3 class="product_caption">' + item.name + '</h3>' +
-                    '<div class="product_price">' +
-                    (item.old_price ? '<span class="old_price">' + formatPrice(item.old_price) + '<span> грн.</span></span>' : '') +
-                    '<span class="new_price">' + formatPrice(item.price) + '<span> грн.</span></span>' +
-                    '</div>' +
-                    '<div class="product_item_overview prod_hover">' +
-                    '<p>Цвета и размеры в наличии</p>' +
-                    '<ul class="prod_colors">' +
-                    colorRender(item.colors) +
-                    '</ul>' +
-                    '<div class="prod_sizes">' + item.sizes + '</div>' +
-                    '</div>' +
-                    '</div>' +
-                    '</li>';
+        var count = 0;
+        for (var k in filter) {
+            if (filter.hasOwnProperty(k)) {
+                ++count;
             }
+        }
 
-            res.send({items: items, count: results.length});
-        });
+        // console.log('start', req.body, filter, count);
+
+        if (count > 2) {
+            // var products_collection = db.get().collection('products');
+
+            // products_collection.find(filter).toArray(function (err, results) {
+            productsController.filter(filter, function (err, results) {
+                var items = '';
+
+                results.sort(sortFunc);
+
+                for (var i = 0; i < results.length; i++) {
+                    var item = results[i];
+
+                    // productsController.update({
+                    //     url: slug(item.name),
+                    //     id: item._id
+                    // });
+
+// @formatter:off
+
+                    items +=
+                        '<li>' +
+                            '<div class="product_item">' +
+                                '<a href="/product/' + item.url + '" class="product_img">' +
+                                    '<img src="' + checkSlash(item.main_img) + '">' +
+                                    (item.hover_img ? '<div class="hover_img prod_hover"><img src="' + checkSlash(item.hover_img) + '"></div>' : '') +
+                                    (item.is_hit ? '<div class="product_hit">Хит продаж</div>' : '') +
+                                    '<div class="product_share_holder">' +
+                                        '<span data-id="' + item._id + '" class="prod_hover prod_fav favBtn' + (checkFav(item._id, req.client_info.fav || []) ? ' favorite' : '') + '"></span>' +
+                                        (item.old_price ? '<div class="product_share">' + Math.ceil(100 * ((item.price - item.old_price) / item.price )).toFixed() + '%</div>' : '') +
+                                    '</div>' +
+                                    '<div class="product_q_review violette_btn prod_hover openReview mob_hidden">Быстрый просмотр</div>' +
+                                '</a>' +
+                                '<h3 class="product_caption">' + item.name + '</h3>' +
+                                '<div class="product_price">' +
+                                    (item.old_price ? '<span class="old_price">' + formatPrice(item.old_price) + '<span> грн.</span></span>' : '') +
+                                    '<span class="new_price">' + formatPrice(item.price) + '<span> грн.</span></span>' +
+                                '</div>' +
+                                '<div class="product_item_overview prod_hover">' +
+                                    '<p>Цвета и размеры в наличии</p>' +
+                                    '<ul class="prod_colors">' +
+                                         colorRender(item.colors) +
+                                    '</ul>' +
+                                    '<div class="prod_sizes">' + item.sizes + '</div>' +
+                                '</div>' +
+                            '</div>' +
+                        '</li>';
+
+// @formatter:on
+
+                }
+
+                res.send({items: items, count: results.length});
+            });
+        } else {
+            res.status(200).send({items: '', count: -1});
+        }
+
     });
 
     app.post('/add', isLoggedInPost, productsController.create);
+
 
     // app.get('/artists', productsController.all);
     //
@@ -1155,7 +1231,7 @@ function isLoggedIn(req, res, next) {
 function isAdmin(req, res, next) {
     // console.log('role', req.client_info, req.client_info.role);
     // if user is authenticated in the session, carry on
-    if (req.client_info.role == 'admin')
+    if (req.client_info.role == 'admin' || req.client_info.role == 'admin_g')
         return next();
 
     // if they aren't redirect them to the home page
@@ -1265,19 +1341,25 @@ function favItemsHtml(items) {
     for (var i = 0; i < items.length; i++) {
         var item = items[i];
 
-        ret += '<div class="favUnit fav_unit">' +
-            '<div class="product_item">' +
-            '<a href="/product/' + item.url + '" class="product_img">' +
-            '<img src="' + checkSlash(item.main_img) + '">' +
-            '</a>' +
-            '<div data-id="' + item._id + '" class="prod_rm_btn rmFavBtn"></div>' +
-            '<h3 class="product_caption">' + item.name + '</h3>' +
-            '<div class="product_price">' +
-            '<span class="new_price">' + formatPrice(item.price) + '<span class="_cur"> грн.</span>' +
-            '</span>' +
-            '</div>' +
-            '</div>' +
+// @formatter:off
+
+        ret += 
+            '<div class="favUnit fav_unit">' +
+                '<div class="product_item">' +
+                    '<a href="/product/' + item.url + '" class="product_img">' +
+                        '<img src="' + checkSlash(item.main_img) + '">' +
+                    '</a>' +
+                    '<div data-id="' + item._id + '" class="prod_rm_btn rmFavBtn"></div>' +
+                    '<h3 class="product_caption">' + item.name + '</h3>' +
+                    '<div class="product_price">' +
+                        '<span class="new_price">' + formatPrice(item.price) + '<span class="_cur"> грн.</span>' +
+                        '</span>' +
+                    '</div>' +
+                '</div>' +
             '</div>';
+
+// @formatter:on
+
     }
 
     return ret + '<div class="favUnitMarker"></div>';

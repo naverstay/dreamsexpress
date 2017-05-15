@@ -104,8 +104,14 @@ function filterFunc(form) {
 function renderFilterResult(data, form) {
     var counter = data.count;
 
-    form.find('.filterCounterTxt').text(plural(counter, 'Найден ', 'Найдено ', 'Найдено '));
-    form.find('.filterCounter').text(plural(counter, 'товар', 'товара', 'товаров', true));
+    if (counter == -1) {
+        form.find('.filterCounterTxt').text('Ничего не найдено. ');
+        form.find('.filterCounter').text('Уточните параметры фильтра.');
+    } else {
+        form.find('.filterCounterTxt').text(plural(counter, 'Найден ', 'Найдено ', 'Найдено '));
+        form.find('.filterCounter').text(plural(counter, 'товар', 'товара', 'товаров', true));
+    }
+
 
     form.find('.filterResults').html(data.items);
 }
@@ -134,8 +140,6 @@ function initReviewPopup() {
     body.delegate('.openReview', 'click', function () {
         var btn = $(this), id = btn.closest('a').attr('href');
 
-        console.log(id);
-
         $.ajax({ // инициaлизируeм ajax зaпрoс
             type: "POST", // oтпрaвляeм в POST фoрмaтe, мoжнo GET
             url: btn.closest('a').attr('href'), // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
@@ -147,9 +151,8 @@ function initReviewPopup() {
             success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
 
                 if (data.redirectTo) {
-                    setTimeout(function () {
-                        window.location = data.redirectTo;
-                    }, 1);
+                    redirectTo(data.redirectTo);
+                    return;
                 }
 
                 review_popup.find('.prod_review').html(data.prod_review);
@@ -305,6 +308,10 @@ function initCatDropDown() {
         return false;
     });
 
+    $('.updateFilter').on('change', function (e) {
+        $(this).closest('form').trigger('submit');
+    });
+
     $('.catApply').on('click', function (e) {
         var firedEl = $(this), val = '';
 
@@ -322,7 +329,7 @@ function initCatDropDown() {
 
         val = val.slice(2);
 
-        console.log(val, val.length);
+        // console.log(val, val.length);
 
         param.toggleClass('active', val.length > 0).find('.catVal').text(val.length ? val : param.find('.catList').attr('data-default'));
 
