@@ -1,3 +1,5 @@
+var shared = require('../shared.js');
+
 var Products = require('../models/products');
 var slug = require('slug');
 var ObjectID = require('mongodb').ObjectID;
@@ -19,11 +21,6 @@ var fieldTypes = {
     product_code: 'exact',
     in_stock: 'bool'
 };
-
-function isObjectID(str) {
-    var rxObjectID = new RegExp("^[0-9a-fA-F]{24}$");
-    return rxObjectID.test(str);
-}
 
 exports.all = function (req, res) {
     Products.all(function (err, docs) {
@@ -77,7 +74,7 @@ exports.create = function (req, res) {
 
     // console.log(req.body);
 
-    if (req.body._id && isObjectID(req.body._id)) {
+    if (req.body._id && shared.isObjectID(req.body._id)) {
 
         // Products.filter({name: req.body.product_name}, function (err, results) {
         //     if (err) {
@@ -178,8 +175,8 @@ exports.create = function (req, res) {
                                     '<div class="order_cell col_2">' +
                                         '<span class="cell_val">' +
                                             '<span class="prod_f_icon ' + (product.in_stock ? 'in_stock' : 'expected') + '"></span>' +
-                                            '<span>' + formatPrice(product.price) + ' грн.</span>' +
-                                            (product.old_price? ', старая цена ' + formatPrice(product.old_price) + ' грн.' : '') +
+                                            '<span>' + shared.formatPrice(product.price) + ' грн.</span>' +
+                                            (product.old_price? ', старая цена ' + shared.formatPrice(product.old_price) + ' грн.' : '') +
                                         '</span>' +
                                     '</div>' +
                                     '<div class="order_cell col_3">' +
@@ -262,7 +259,7 @@ exports.delete = function (req, res) {
 
     var filter = [{url: req.params.id}];
 
-    if (isObjectID(req.params.id)) {
+    if (shared.isObjectID(req.params.id)) {
         filter.push({_id: ObjectID('' + req.params.id)});
     }
 
@@ -297,7 +294,7 @@ exports.delete = function (req, res) {
                     for (var i = 0; i < colors.length; i++) {
                         var clr = colors[i];
 
-                        if (!isHex(clr)) {
+                        if (!shared.isHex(clr)) {
                             cleanUp(clr);
                         }
                     }
@@ -312,61 +309,27 @@ exports.delete = function (req, res) {
 };
 
 function cleanUp(file) {
-    console.log('cleanUp', file);
+    if (file && file.length) {
 
-    var target = '.' + checkSlash(file);
+        var target = '.' + shared.checkSlash(file);
 
-    fs.stat(target, function (err, stats) {
-        // console.log(stats);
+        fs.stat(target, function (err, stats) {
+            // console.log(stats);
 
-        if (err) {
-            return console.error(err);
-        }
+            if (err) {
+                return console.error(err);
+            }
 
-        fs.unlink(target, function (err) {
-            if (err) return console.log(err);
-            console.log('file "' + target + '" deleted successfully');
+            if (/^\.\/uploads/i.test(target) && stats.isFile()) {
+                fs.unlink(target, function (err) {
+                    if (err) return console.log(err);
+                    console.log('file "' + target + '" deleted successfully');
+                });
+            } else {
+                res.status(200).send({remove_done: false, fail_msg: 'Удаление запрещено.'});
+            }
         });
-    });
-}
-
-function escapeRegExp(str) {
-    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-}
-
-function RXify(str) {
-    return new RegExp(escapeRegExp(str), "ig");
-}
-
-function removeEmpty(obj) {
-    Object.keys(obj).forEach(function (key) {
-        if (obj[key] && typeof obj[key] === 'object') {
-            removeEmpty(obj[key])
-        } else if (obj[key] === null) {
-            delete obj[key]
-        }
-    });
-    return obj;
-}
-
-function paramTypeFix(val, type) {
-    var ret;
-
-    switch (type) {
-        case "rx":
-            ret = RXify(val);
-            break;
-        case "str":
-            break;
-        case "range":
-            break;
-        case "bool":
-            break;
-        case "exact":
-            break;
     }
-
-    return ret || val;
 }
 
 function previewBuilder(hover_img, img_arr, href) {
@@ -386,28 +349,16 @@ function previewLink(img, url) {
     '</a>' : '');
 }
 
-function checkSlash(str) {
-    return str.slice(0, 1) == '/' ? str : '/' + str;
-}
-
-function formatPrice(s) {
-    return ('' + s).replace(/(?!^)(?=(\d{3})+(?=\.|$))/gm, ' ');
-}
-
-function isHex(h) {
-    return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(h.trim());
-}
-
 function colorBuilder(colors) {
     var ret = '', arr = colors.split(',');
 
     for (var i = 0; i < arr.length; i++) {
         var clr = (arr[i]).trim();
 
-        if (/^#/.test(clr) && isHex(clr)) {
+        if (shared.isHex(clr)) {
             ret += '<li><div class="prod_color" style="background:' + clr + ';"></div></li>';
         } else if (clr.length > 10) {
-            ret += '<li><div class="prod_color"><img src="' + checkSlash(clr) + '"></div></li>';
+            ret += '<li><div class="prod_color"><img src="' + shared.checkSlash(clr) + '"></div></li>';
         }
     }
 

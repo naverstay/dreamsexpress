@@ -1,11 +1,18 @@
 block variables
 
 - var use_slash = '/'; // '' for gulp build, '/' for node 
-- var dev = false;
+- var dev = !!locals['dev']; // true for gulp, false for node
 - var no_min = true;
 - var scripts_in_head = true;
-//- no_min = false;
 - var year = new Date();
+    
+//- dev = true; // true for gulp, false for node
+    
+- if (dev)
+    //- no_min = false; // false for gulp build, true for node 
+    - use_slash = '';
+    - var all_products = [];
+    - var user = {email: '123@321', data : []};
 
 - function checkSlash(url) {return url.slice(0,1) == '/' ? url : '/' + url}
 - function isHex(h) {return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(h.trim())}
@@ -41,7 +48,7 @@ mixin dev_head(page_title, index, news, search, product, lk, cart, add)
         - if (no_min)
             | 
             | <!--build:css css/styles.min.css-->
-            link(rel='stylesheet', href= use_slash + 'css/main_global.css', media='all')
+            link(rel='stylesheet', href= use_slash + (dev ? 'css/main_global.css' : 'css/styles.min.css'), media='all')
             | 
             | <!--endbuild-->
         - else
@@ -66,8 +73,8 @@ mixin dev_head(page_title, index, news, search, product, lk, cart, add)
                 script(src= use_slash + 'js/lib/jquery.inputmask.bundle.js')
                     
                 script(src= use_slash + 'js/lib/colorpicker.js')
-                //script(src= use_slash + 'js/lib/eye.js')
-                //script(src= use_slash + 'js/lib/utils.js')
+                //-script(src= use_slash + 'js/lib/eye.js')
+                //-script(src= use_slash + 'js/lib/utils.js')
                     
                 script(src= use_slash + 'js/main.js')
                 | 
@@ -189,21 +196,22 @@ mixin header(active)
         label(for='js_needed').js_needed 
             span Включите javascript
 
-    div.dev_log
-        - if (product)
-            p= product.name + '  ' + product.url
-        - if (fav_html)
-            p= fav_html.length
-        p= title
-        p= user
-        p= user.length || '#'
-        //- comment for gulp 
-        - if (user)
-            for item, i in user 
-                p
-                    span= i
-                    |  :  
-                    span= item
+    - if (!dev)
+        div.dev_log
+            - if (product)
+                p= product.name + '  ' + product.url
+            - if (fav_html)
+                p= fav_html.length
+            p= title
+            
+            - if (user)
+                p= user
+                p= user.length || '#'
+                for item, i in user 
+                    p
+                        span= i
+                        |  :  
+                        span= item
         
     div.header
         a.mob_menu_btn.openMobMenu(href='#')
@@ -670,50 +678,66 @@ mixin prod_review_info(product_page)
                         li
                             span.prod_rating
                     li (5)
+    
+            - if (product && product.colors && product.colors.length)
+                dl.prod_options
+                    dt Цвет: 
+                    dd &nbsp;
+
+                ul.prod_options_switch
+                    //-li
+                        label.option_switch.round
+                            input.inp_hidden(type='radio' name='prod_color')
+                            span.check_text
+                                img(src= use_slash + 'images/color_1_big.png')
+    
+                    - var arr = product.colors.split(',');
+                    for item, i in arr
+                        li
+                            label.option_switch.round
+                                input.inp_hidden(type='radio' name='prod_color')
+                                span.check_text
+                                    - var clr = item.trim();
+                                    - if (isHex(clr))
+                                        span.check_color(style='background:' + clr)
+                                    - else
+                                        img(src= checkSlash(clr))
                 
-            dl.prod_options
-                dt Цвет: 
-                dd Белый в синюю полоску
+            - if (product && product.sizes && product.sizes.length)
+                dl.prod_options
+                    dt Размер: 
+                    dd &nbsp;
+    
+                ul.prod_options_switch
+                    - var arr = product.sizes.split(',');
+                    for item, i in arr
+                        li
+                            label.option_switch
+                                input.inp_hidden(type='radio' name='prod_size')
+                                span.check_text
+                                    span= item
 
-            ul.prod_options_switch
-                li
-                    label.option_switch.round
-                        input.inp_hidden(type='radio' name='prod_color')
-                        span.check_text
-                            img(src= use_slash + 'images/color_1_big.png')
-
-                li
-                    label.option_switch.round
-                        input.inp_hidden(type='radio' name='prod_color')
-                        span.check_text
-                            img(src= use_slash + 'images/color_2_big.png')
-
-            dl.prod_options
-                dt Размер: 
-                dd &nbsp;
-
-            ul.prod_options_switch
-                li
+                //-li
                     label.option_switch
                         input.inp_hidden(type='radio' name='prod_size')
                         span.check_text: span xs
-                li
+                //-li
                     label.option_switch
                         input.inp_hidden(type='radio' name='prod_size')
                         span.check_text: span s
-                li
+                //-li
                     label.option_switch
                         input.inp_hidden(type='radio' name='prod_size' disabled)
                         span.check_text: span m
-                li
+                //-li
                     label.option_switch
                         input.inp_hidden(type='radio' name='prod_size')
                         span.check_text: span l
-                li
+                //-li
                     label.option_switch
                         input.inp_hidden(type='radio' name='prod_size')
                         span.check_text: span xl
-                li
+                //-li
                     label.option_switch
                         input.inp_hidden(type='radio' name='prod_size' disabled)
                         span.check_text: span xxl
@@ -721,15 +745,23 @@ mixin prod_review_info(product_page)
             - if (product_page)
                 dl.prod_options
                     dt Артикул: 
-                    dd 0350205001
+                    dd= product.product_code
                 
                 .prod_footer_info
-                    .prod_f_inf
-                        span.prod_f_icon.in_stock
-                        span Товар в наличии
-                    .prod_f_inf.felivery
-                        span.prod_f_icon.i-truck-side-view-outline
-                        span Срок отправки 1-2 дня
+                    - if (product.in_stock)
+                        .prod_f_inf
+                            span.prod_f_icon.in_stock
+                            span Товар в наличии
+                        .prod_f_inf.delivery
+                            span.prod_f_icon.i-truck-side-view-outline
+                            span Срок отправки 1-2 дня
+                    - else
+                        .prod_f_inf
+                            span.prod_f_icon.expected
+                            span Товар ожидается
+                        .prod_f_inf.delivery
+                            span.prod_f_icon.i-truck-side-view-outline
+                            span Срок поставки 2-3 дня
                 
             - if (!product_page)
                 p Мужские джинсы PlanB, выполненные из плотного денима на основе хлопка. Традиционный силуэт, прямой крой и средняя посадка. 

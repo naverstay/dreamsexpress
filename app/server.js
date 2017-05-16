@@ -35,30 +35,6 @@ mongoose.connect(db_url); // connect to our database
 
 require('./config/passport')(passport); // pass passport for configuration
 
-// var Products = require('./models/products');
-// var Clients = require('./models/client');
-
-// global.all_products;
-
-// global.user;
-
-// var fieldTypes = {
-//     name: 'rx',
-//     info: 'rx',
-//     main_img: 'str',
-//     hover_img: 'str',
-//     img_list: 'str',
-//     price: 'range',
-//     sizes: 'rx',
-//     colors: 'rx',
-//     adult: 'str',
-//     gender: 'str',
-//     season: 'str',
-//     category: 'str',
-//     product_code: 'exact',
-//     in_stock: 'bool'
-// };
-
 var ageTable = {
     1: 86,
     2: 92,
@@ -180,38 +156,6 @@ db.connect(db_url, function (err) {
         // });
     });
 });
-
-function paramTypeFix(field, val) {
-    var ret;
-
-    console.log(val);
-
-    if ((/name|info/ig).test(field)) {
-        ret = RXify(val);
-    } else if ((/price_min/ig).test(field)) {
-        ret = {$gte: 20};
-    } else if ((/price_max/ig).test(field)) {
-        ret = {$lte: 20};
-    } else {
-        ret = val;
-    }
-
-    // switch (type) {
-    //     case "rx":
-    //         ret = RXify(val);
-    //         break;
-    //     case "str":
-    //         break;
-    //     case "range":
-    //         break;
-    //     case "bool":
-    //         break;
-    //     case "exact":
-    //         break;
-    // }
-
-    return ret;
-}
 
 function logErrors(err, req, res, next) {
     console.error(err.stack);

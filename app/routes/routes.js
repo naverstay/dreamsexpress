@@ -1,5 +1,6 @@
 // app/routes.js
 module.exports = function (app, passport) {
+    var shared = require('../shared.js');
 
     var productsController = require('../controllers/products');
     var clientsController = require('../controllers/clients');
@@ -19,27 +20,6 @@ module.exports = function (app, passport) {
     function restrict(req, res, next) {
         req.session.prevPage = req.body.pathname || '/';
         next();
-    }
-
-    function isObjectID(str) {
-        var rxObjectID = new RegExp("^[0-9a-fA-F]{24}$");
-        return rxObjectID.test(str);
-    }
-
-    function isArray_(test) {
-        // Use compiler's own isArray when available
-        if (test.isArray) {
-            return test.isArray;
-        }
-
-        // Retain references to variables for performance
-        // optimization
-        var objectToStringFn = Object.prototype.toString,
-            arrayToStringResult = objectToStringFn.call([]);
-
-        return function (subject) {
-            return objectToStringFn.call(subject) === arrayToStringResult;
-        };
     }
 
     function favUpdate(list, req, cb) {
@@ -269,7 +249,7 @@ module.exports = function (app, passport) {
 
         // console.log('2=========', req.params.id, checkForHexRegExp.test(req.params.id));
 
-        if (isObjectID(req.params.id)) {
+        if (shared.isObjectID(req.params.id)) {
             filter.push({_id: ObjectID('' + req.params.id)});
         }
 
@@ -325,7 +305,7 @@ module.exports = function (app, passport) {
 
         var filter = [{url: req.params.id}];
 
-        if (isObjectID(req.params.id)) {
+        if (shared.isObjectID(req.params.id)) {
             filter.push({_id: ObjectID('' + req.params.id)});
         }
 
@@ -366,9 +346,9 @@ module.exports = function (app, passport) {
 
                 var product_share_holder = (item.old_price ? '<div class="product_share">' + Math.ceil(100 * ((item.price - item.old_price) / item.price )).toFixed() + '%</div>' : '');
 
-                var product_price = '<span class="new_price">' + formatPrice(item.price) +
+                var product_price = '<span class="new_price">' + shared.formatPrice(item.price) +
                     '<span class="_cur"> грн.</span></span>' +
-                    (item.old_price ? '<span class="old_price">' + formatPrice(item.old_price) +
+                    (item.old_price ? '<span class="old_price">' + shared.formatPrice(item.old_price) +
                     '<span class="_cur"> грн.</span></span>' : '');
 
                 res.send({
@@ -454,7 +434,7 @@ module.exports = function (app, passport) {
     app.get('/edit/:id', isLoggedIn, isAdmin, function (req, res) {
         var filter = [{url: req.params.id}];
 
-        if (isObjectID(req.params.id)) {
+        if (shared.isObjectID(req.params.id)) {
             filter.push({_id: ObjectID('' + req.params.id)});
         }
 
@@ -642,7 +622,7 @@ module.exports = function (app, passport) {
     app.post('/q_search', function (req, res) {
         // console.log(req.body.name);
 
-        var rx = new RegExp(escapeRegExp(req.body.name), "ig");
+        var rx = new RegExp(shared.escapeRegExp(req.body.name), "ig");
 
         // products_collection.find({name: rx}).toArray(function (err, results) {
         productsController.filter({name: rx}, function (err, results) {
@@ -655,7 +635,7 @@ module.exports = function (app, passport) {
                     '<li>' +
                     '<div class="product_item">' +
                     '<a href="/product/' + item.url + '" class="product_img">' +
-                    '<img src="' + checkSlash(item.main_img) + '">' +
+                    '<img src="' + shared.checkSlash(item.main_img) + '">' +
                     (item.is_hit ? '<div class="product_hit">Хит продаж</div>' : '') +
                     (item.old_price ? '<div class="product_share_holder">' +
                     '<div class="product_share">' + Math.ceil(100 * ((item.price - item.old_price) / item.price )).toFixed() + '%</div>' +
@@ -663,8 +643,8 @@ module.exports = function (app, passport) {
                     '</a>' +
                     '<h3 class="product_caption">' + item.name + '</h3>' +
                     '<div class="product_price">' +
-                    (item.old_price ? '<span class="old_price">' + formatPrice(item.old_price) + '<span> грн.</span></span>' : '') +
-                    '<span class="new_price">' + formatPrice(item.price) + '<span> грн.</span></span>' +
+                    (item.old_price ? '<span class="old_price">' + shared.formatPrice(item.old_price) + '<span> грн.</span></span>' : '') +
+                    '<span class="new_price">' + shared.formatPrice(item.price) + '<span> грн.</span></span>' +
                     '</div>' +
                     '</div>' +
                     '</li>';
@@ -677,7 +657,7 @@ module.exports = function (app, passport) {
     // filter
 
     app.post('/filter', function (req, res) {
-        var params = removeEmpty(req.body), filter = {}, sort = {};
+        var params = shared.removeEmpty(req.body), filter = {}, sort = {};
 
         for (var field in params) {
             var param = params[field];
@@ -689,9 +669,9 @@ module.exports = function (app, passport) {
             }
 
             if ((/name/ig).test(field)) {
-                filter['name'] = RXify(param.replace(/[!@#%&=`~\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '').trim());
+                filter['name'] = shared.RXify(param.replace(/[!@#%&=`~\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '').trim());
             } else if ((/info/ig).test(field)) {
-                filter['info'] = RXify(param.trim());
+                filter['info'] = shared.RXify(param.trim());
             } else if ((/adult/ig).test(field)) {
                 filter['adult'] = (param == 'true');
             } else if ((/in_stock/ig).test(field)) {
@@ -699,11 +679,11 @@ module.exports = function (app, passport) {
             } else if ((/is_hit/ig).test(field)) {
                 filter['is_hit'] = (param == 'on');
             } else if ((/gender/ig).test(field)) {
-                filter['gender'] = RXify(param);
+                filter['gender'] = shared.RXify(param);
             } else if ((/season/ig).test(field)) {
-                filter['season'] = RXify(param);
+                filter['season'] = shared.RXify(param);
             } else if ((/size/ig).test(field)) {
-                filter['size'] = RXify(param);
+                filter['size'] = shared.RXify(param);
             } else if ((/price_min/ig).test(field)) {
                 filter['price'] = {
                     $gte: parseInt(('' + param).replace(/\D/g, ''))
@@ -768,8 +748,8 @@ module.exports = function (app, passport) {
                         '<li>' +
                             '<div class="product_item">' +
                                 '<a href="/product/' + item.url + '" class="product_img">' +
-                                    '<img src="' + checkSlash(item.main_img) + '">' +
-                                    (item.hover_img ? '<div class="hover_img prod_hover"><img src="' + checkSlash(item.hover_img) + '"></div>' : '') +
+                                    '<img src="' + shared.checkSlash(item.main_img) + '">' +
+                                    (item.hover_img ? '<div class="hover_img prod_hover"><img src="' + shared.checkSlash(item.hover_img) + '"></div>' : '') +
                                     (item.is_hit ? '<div class="product_hit">Хит продаж</div>' : '') +
                                     '<div class="product_share_holder">' +
                                         '<span data-id="' + item._id + '" class="prod_hover prod_fav favBtn' + (checkFav(item._id, req.client_info.fav || []) ? ' favorite' : '') + '"></span>' +
@@ -779,8 +759,8 @@ module.exports = function (app, passport) {
                                 '</a>' +
                                 '<h3 class="product_caption">' + item.name + '</h3>' +
                                 '<div class="product_price">' +
-                                    (item.old_price ? '<span class="old_price">' + formatPrice(item.old_price) + '<span> грн.</span></span>' : '') +
-                                    '<span class="new_price">' + formatPrice(item.price) + '<span> грн.</span></span>' +
+                                    (item.old_price ? '<span class="old_price">' + shared.formatPrice(item.old_price) + '<span> грн.</span></span>' : '') +
+                                    '<span class="new_price">' + shared.formatPrice(item.price) + '<span> грн.</span></span>' +
                                 '</div>' +
                                 '<div class="product_item_overview prod_hover">' +
                                     '<p>Цвета и размеры в наличии</p>' +
@@ -858,23 +838,26 @@ module.exports = function (app, passport) {
     // file remove
 
     app.post('/remove', function (req, res) {
-        var rm = req.body.remove;
+        var target = '.' + shared.checkSlash(req.body.remove);
 
-        fs.stat('.' + rm, function (err, stats) {
+        fs.stat(target, function (err, stats) {
             // console.log(stats);
 
             if (err) {
                 return console.error(err);
             }
 
-            fs.unlink('.' + rm, function (err) {
-                if (err) return console.log(err);
-                console.log('file "' + rm + '" deleted successfully');
-                res.status(200).send({remove_done: true});
-            });
+            if (/^\.\/uploads/i.test(target) && stats.isFile()) {
+                fs.unlink(target, function (err) {
+                    if (err) return console.log(err);
+                    console.log('file "' + target + '" deleted successfully');
+                    res.status(200).send({remove_done: true});
+                });
+            } else {
+                res.status(200).send({remove_done: false, fail_msg: 'Удаление запрещено.'});
+            }
         });
     });
-
 
     // file upload
 
@@ -929,7 +912,7 @@ module.exports = function (app, passport) {
     // update favorites
 
     app.post('/fav_rm', isLoggedInPost, function (req, res) {
-        if (!isObjectID(req.body.id)) {
+        if (!shared.isObjectID(req.body.id)) {
             return res.send({
                 fav_added: false,
                 items: req.client_info.fav,
@@ -975,7 +958,7 @@ module.exports = function (app, passport) {
 
         // console.log('/fav', req.body.id);
 
-        if (!isObjectID(req.body.id)) {
+        if (!shared.isObjectID(req.body.id)) {
             return res.send({
                 fav_added: false,
                 items: req.client_info.fav,
@@ -1238,49 +1221,6 @@ function isAdmin(req, res, next) {
     res.redirect('/lk');
 }
 
-function escapeRegExp(str) {
-    return ('' + str).replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-}
-
-function RXify(str) {
-    if (typeof str == 'string') {
-        return new RegExp(escapeRegExp(str), "ig");
-    }
-
-    if (typeof str == 'object') {
-        var ret = '';
-        for (var i = 0; i < str.length; i++) {
-            var item = str[i];
-            ret += '|' + item;
-        }
-
-        return new RegExp(ret.slice(1), "ig");
-    }
-}
-
-function removeEmpty(obj) {
-    Object.keys(obj).forEach(function (key) {
-        if (obj[key] && typeof obj[key] === 'object') {
-            removeEmpty(obj[key])
-        } else if (obj[key] === null) {
-            delete obj[key]
-        }
-    });
-    return obj;
-}
-
-function formatPrice(s) {
-    return ('' + s).replace(/(?!^)(?=(\d{3})+(?=\.|$))/gm, ' ');
-}
-
-function isHex(h) {
-    return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(h.trim());
-}
-
-function checkSlash(str) {
-    return str.slice(0, 1) == '/' ? str : '/' + str;
-}
-
 function checkFav(id, list) {
 
     if (list.length) {
@@ -1296,10 +1236,10 @@ function colorRender(colors) {
     for (var i = 0; i < arr.length; i++) {
         var clr = (arr[i]).trim();
 
-        if (/^#/.test(clr) && isHex(clr)) {
+        if (shared.isHex(clr)) {
             ret += '<li><div class="prod_color" style="background:' + clr + ';"></div></li>';
         } else if (clr.length > 10) {
-            ret += '<li><div class="prod_color"><img src="' + checkSlash(clr) + '"></div></li>';
+            ret += '<li><div class="prod_color"><img src="' + shared.checkSlash(clr) + '"></div></li>';
         }
     }
 
@@ -1312,10 +1252,10 @@ function colorList(colors) {
     for (var i = 0; i < arr.length; i++) {
         var clr = (arr[i]).trim();
 
-        if (/^#/.test(clr) && isHex(clr)) {
+        if (shared.isHex(clr)) {
             ret += '<li><label class="option_switch round"> <input class="inp_hidden" value="' + clr + '" type="radio" name="prod_color"/><span class="check_text" class="prod_color"><span class="simple_color" style="background:' + clr + ';"></span></span></label></li>';
         } else if (clr.length > 10) {
-            ret += '<li><label class="option_switch round"> <input class="inp_hidden" value="' + clr + '" type="radio" name="prod_color"/><span class="check_text"><img src="' + checkSlash(clr) + '"></span></label></li>';
+            ret += '<li><label class="option_switch round"> <input class="inp_hidden" value="' + clr + '" type="radio" name="prod_color"/><span class="check_text"><img src="' + shared.checkSlash(clr) + '"></span></label></li>';
         }
     }
 
@@ -1347,12 +1287,12 @@ function favItemsHtml(items) {
             '<div class="favUnit fav_unit">' +
                 '<div class="product_item">' +
                     '<a href="/product/' + item.url + '" class="product_img">' +
-                        '<img src="' + checkSlash(item.main_img) + '">' +
+                        '<img src="' + shared.checkSlash(item.main_img) + '">' +
                     '</a>' +
                     '<div data-id="' + item._id + '" class="prod_rm_btn rmFavBtn"></div>' +
                     '<h3 class="product_caption">' + item.name + '</h3>' +
                     '<div class="product_price">' +
-                        '<span class="new_price">' + formatPrice(item.price) + '<span class="_cur"> грн.</span>' +
+                        '<span class="new_price">' + shared.formatPrice(item.price) + '<span class="_cur"> грн.</span>' +
                         '</span>' +
                     '</div>' +
                 '</div>' +
@@ -1382,6 +1322,6 @@ function buildFotorama(hit, img, img2, gallery) {
 }
 
 function fotoramaSlide(hit, img) {
-    return img.length ? '<div class="prod_review_img product_img" data-thumb="' + checkSlash(img) + '"><img src="' + checkSlash(img) + '"/>' +
+    return img.length ? '<div class="prod_review_img product_img" data-thumb="' + shared.checkSlash(img) + '"><img src="' + shared.checkSlash(img) + '"/>' +
     (hit ? '<div class="product_hit">Хит продаж</div>' : '') + '</div>' : '';
 }

@@ -383,21 +383,21 @@ function renderQSearchResult(data) {
     searchResults.html(items);
 }
 
-function colorRender(colors) {
-    var ret = '', arr = colors.split(',');
-
-    for (var i = 0; i < arr.length; i++) {
-        var clr = (arr[i]).trim();
-
-        if (/^#/.test(clr) && isHex(clr.replace('#', ''))) {
-            ret += '<li><div class="prod_color" style="background:' + clr + ';"></div></li>';
-        } else if (clr.length > 10) {
-            ret += '<li><div class="prod_color"><img src="' + clr + '"></div></li>';
-        }
-    }
-
-    return ret;
-}
+// function colorRender(colors) {
+//     var ret = '', arr = colors.split(',');
+//
+//     for (var i = 0; i < arr.length; i++) {
+//         var clr = (arr[i]).trim();
+//
+//         if (/^#/.test(clr) && isHex(clr.replace('#', ''))) {
+//             ret += '<li><div class="prod_color" style="background:' + clr + ';"></div></li>';
+//         } else if (clr.length > 10) {
+//             ret += '<li><div class="prod_color"><img src="' + clr + '"></div></li>';
+//         }
+//     }
+//
+//     return ret;
+// }
 
 function plural(n, str1, str2, str5, num) {
     return (num ? n + ' ' : '') + ((((n % 10) == 1) && ((n % 100) != 11)) ? (str1) : (((((n % 10) >= 2) && ((n % 10) <= 4)) && (((n % 100) < 10) || ((n % 100) >= 20))) ? (str2) : (str5)));

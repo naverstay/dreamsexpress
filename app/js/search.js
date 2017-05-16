@@ -166,26 +166,6 @@ function initReviewPopup() {
 
                     review_popup.dialog('open');
                 }, 10);
-
-                // review_popup.find('.prod_name').text(data.name);
-                //
-                // review_popup.find('.prod_link').attr('href', id);
-                //
-                // review_popup.find('.prod_review_img img').attr('src', data.main_img);
-                //
-                // review_popup.find('.new_price').text(data.price);
-                //
-                // review_popup.find('.fotorama').html(buildFotorama(data.is_hit, data.main_img, data.hover_img, data.img_list));
-                //
-                // if (data.old_price) {
-                //     review_popup.find('.old_price').text(data.old_price).show();
-                // } else {
-                //     review_popup.find('.old_price').hide();
-                // }
-                //
-                // review_popup.find('.product_hit').toggle(data.is_hit);
-
-
             },
             error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
 

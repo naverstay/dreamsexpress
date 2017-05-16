@@ -29,9 +29,14 @@ gulp.task('browserSync', function () {
 })
 
 gulp.task('jade', function () {
-    gulp.src(['app/views/*.jade', '!app/views/_*.jade'])
+    gulp.src(['app/views/*.pug', '!app/views/_*.pug'])
         .pipe(plumber())
-        .pipe(pug({pretty: true}))
+        .pipe(pug({
+            pretty: true,
+            locals: {
+                'dev': true
+            }
+        }))
         .pipe(gulp.dest('app/'))
     // .pipe(browserSync.reload({stream: true}))
     ;
@@ -42,9 +47,11 @@ gulp.task('sass', function () {
         .pipe(sass()) // Passes it through a gulp-sass
         .pipe(cssnano()) // Passes it through a gulp-sass
         .pipe(gulp.dest('app/css')) // Outputs it in the css folder
-        .pipe(browserSync.reload({ // Reloading with Browser Sync
-            stream: true
-        }));
+        // .pipe(gulp.dest('app/public')) // Outputs it in the css folder
+        // .pipe(browserSync.reload({ // Reloading with Browser Sync
+        //     stream: true
+        // }))
+        ;
 })
 
 // Watchers
@@ -64,6 +71,7 @@ gulp.task('useref', function () {
         .pipe(gulpIf('*.js', uglify()))
         .pipe(gulpIf('*.css', cssnano()))
         //.pipe(htmlmin({collapseWhitespace: true}))
+        .pipe(gulp.dest('app/'))
         .pipe(gulp.dest('app/public'));
 });
 
@@ -74,24 +82,36 @@ gulp.task('images', function () {
         .pipe(cache(imagemin({
             interlaced: true,
         })))
-        .pipe(gulp.dest('dist/images'))
+        .pipe(gulp.dest('public/images'))
 });
 
 // Copying fonts 
 gulp.task('fonts', function () {
     return gulp.src('app/fonts/**/*')
-        .pipe(gulp.dest('dist/fonts'))
+        .pipe(gulp.dest('public/fonts'))
+})
+
+// Copying minified css files 
+gulp.task('copy_min_css', function () {
+    return gulp.src('app/public/css/**/*')
+        .pipe(gulp.dest('app/css'))
+})
+
+// Copying minified js files 
+gulp.task('copy_min_js', function () {
+    return gulp.src('app/public/js/**/*')
+        .pipe(gulp.dest('app/js'))
 })
 
 // Cleaning 
 gulp.task('clean', function () {
-    return del.sync('dist').then(function (cb) {
+    return del.sync('public').then(function (cb) {
         return cache.clearAll(cb);
     });
 })
 
-gulp.task('clean:dist', function () {
-    return del.sync(['dist/**/*', '!dist/images', '!dist/images/**/*']);
+gulp.task('clean:public', function () {
+    return del.sync(['public/**/*', '!public/*__', '!public/*__/**/*', '!public/images', '!public/images/**/*']);
 });
 
 // Build Sequences
@@ -110,11 +130,13 @@ gulp.task('default', function (callback) {
 
 gulp.task('build', function (callback) {
     runSequence(
-        'clean:dist',
+        'clean:public',
         'sass',
         'jade',
         [
             'useref',
+            'copy_min_css',
+            'copy_min_js',
             // 'images',
             // 'fonts'
         ],

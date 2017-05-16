@@ -17,148 +17,149 @@ html(lang='ru')
                             .tab_content: .cart_block
                                 .cart_col
                                     .cart_unit.checkout_block(style='margin:0')
-                                        form.validateMe.addForm(action='/add' method="POST")
-                                            .cart_unit_info
-                                                input.inp_hidden(name='_id' value= product._id)
-                                                .checkout_caption= product.name
-                                                .form_cell
-                                                    input.f_input.input_v6(placeholder='Название' name='product_name' class='validate[required]' value= product.name)
-                                                    
-                                                .form_cell
-                                                    textarea.f_input.input_v6(placeholder='Короткое писание' name='product_info' class='validate[required]')= product.info
-
-                                                .form_cell
-                                                    textarea.f_input.input_v6(placeholder='Длинное описание' name='product_description')= product.description
-
-                                                .form_cell
-                                                    input.f_input.input_v6.inp_hidden.validateHidden(placeholder='Основная картинка' name='product_main_img' class='validate[required]' value= product.main_img || '')
-                                                    label.gl_link.inner_link
-                                                        input.inp_hidden.uploadInput(type='file' data-context='products' data-target='product_main_img')
-                                                        span Загрузить основную картинку
-                                                    ul.upload_preview.uploadPreview
-                                                        - if (product.main_img && product.main_img.length)
-                                                            li.prodPreviewItem
-                                                                .prod_preview
-                                                                    img(src= checkSlash(product.main_img))
-                                                                span.prod_rm_btn.rmProdPreview
+                                        - if (product)
+                                            form.validateMe.addForm(action='/add' method="POST")
+                                                .cart_unit_info
+                                                    input.inp_hidden(name='_id' value= product._id)
+                                                    .checkout_caption= product.name
+                                                    .form_cell
+                                                        input.f_input.input_v6(placeholder='Название' name='product_name' class='validate[required]' value= product.name)
                                                         
-                                                .form_cell
-                                                    input.f_input.input_v6.inp_hidden.validateHidden(placeholder='Ховер картинка' name='product_hover_img' class='validate[required]' value= product.hover_img || '')
-                                                    label.gl_link.inner_link
-                                                        input.inp_hidden.uploadInput(type='file' data-context='products' data-target='product_hover_img')
-                                                        span Загрузить ховер картинку
-                                                    ul.upload_preview.uploadPreview
-                                                        - if (product.hover_img && product.hover_img.length)
-                                                            li.prodPreviewItem
-                                                                .prod_preview
-                                                                    img(src= checkSlash(product.hover_img))
-                                                                span.prod_rm_btn.rmProdPreview
-                                                    
-                                                .form_cell
-                                                    input.f_input.input_v6.inp_hidden.validateHidden(placeholder='Галерея картинок' name='product_img_list' value= product.img_list ? product.img_list.replace(/ /ig, '') : '')
-                                                    label.gl_link.inner_link
-                                                        input.inp_hidden.uploadInput(type='file' data-context='products' data-target='product_img_list' multiple)
-                                                        span Загрузить картинки для галереи
-                                                    ul.upload_preview.uploadPreview
-                                                        - if (product.img_list && product.img_list.length)
-                                                            - var arr = product.img_list.split(',')
-                                                            for img in arr
+                                                    .form_cell
+                                                        textarea.f_input.input_v6(placeholder='Короткое писание' name='product_info' class='validate[required]')= product.info
+    
+                                                    .form_cell
+                                                        textarea.f_input.input_v6(placeholder='Длинное описание' name='product_description')= product.description
+    
+                                                    .form_cell
+                                                        input.f_input.input_v6.inp_hidden.validateHidden(placeholder='Основная картинка' name='product_main_img' class='validate[required]' value= product.main_img || '')
+                                                        label.gl_link.inner_link
+                                                            input.inp_hidden.uploadInput(type='file' data-context='products' data-target='product_main_img')
+                                                            span Загрузить основную картинку
+                                                        ul.upload_preview.uploadPreview
+                                                            - if (product.main_img && product.main_img.length)
                                                                 li.prodPreviewItem
                                                                     .prod_preview
-                                                                        img(src= checkSlash(img))
+                                                                        img(src= checkSlash(product.main_img))
                                                                     span.prod_rm_btn.rmProdPreview
-
-                                                .form_cell
-                                                    input.f_input.input_v6(placeholder='Старая цена' data-inputmask="'alias': 'numeric', 'rightAlign': 'false'" name='product_old_price' value= product.old_price || '')
-                                                    
-                                                .form_cell
-                                                    input.f_input.input_v6(placeholder='Цена' data-inputmask="'alias': 'numeric', 'rightAlign': 'false'" name='product_price' class='validate[required,custom[onlyNumberSp]]' value= product.price || '')
-                                                    
-                                                .form_cell
-                                                    input.f_input.input_v6(placeholder='Размер' name='product_sizes' class='validate[required]' value= product.sizes || '')
-                                                    
-                                                .form_cell
-                                                    #color_picker_1.colorPicker
-                                                .form_cell
-                                                    input.f_input.input_v6.inp_hidden.validateHidden(placeholder='Цвета' name='product_colors' class='validate[required]' value= product.colors ? product.colors.replace(/ /ig, '') : '')
-                                                    a.gl_link.inner_link.addColor(href='#color_picker_1') Добавить цвет
-                                                    label.gl_link.inner_link
-                                                        input.inp_hidden.uploadInput(type='file' data-context='colors' data-target='product_colors' multiple)
-                                                        span Загрузить образец цвета
-                                                    ul.upload_preview.uploadPreview._rounded
-                                                        - if (product.colors && product.colors.length)
-                                                            -  var arr = product.colors.split(',')
-                                                            for clr in arr
-                                                                li.prodColorItem
-                                                                    - if (isHex(clr))
-                                                                        .prod_preview(style='background-color:' + clr)
-                                                                    - else
+                                                            
+                                                    .form_cell
+                                                        input.f_input.input_v6.inp_hidden.validateHidden(placeholder='Ховер картинка' name='product_hover_img' class='validate[required]' value= product.hover_img || '')
+                                                        label.gl_link.inner_link
+                                                            input.inp_hidden.uploadInput(type='file' data-context='products' data-target='product_hover_img')
+                                                            span Загрузить ховер картинку
+                                                        ul.upload_preview.uploadPreview
+                                                            - if (product.hover_img && product.hover_img.length)
+                                                                li.prodPreviewItem
+                                                                    .prod_preview
+                                                                        img(src= checkSlash(product.hover_img))
+                                                                    span.prod_rm_btn.rmProdPreview
+                                                        
+                                                    .form_cell
+                                                        input.f_input.input_v6.inp_hidden.validateHidden(placeholder='Галерея картинок' name='product_img_list' value= product.img_list ? product.img_list.replace(/ /ig, '') : '')
+                                                        label.gl_link.inner_link
+                                                            input.inp_hidden.uploadInput(type='file' data-context='products' data-target='product_img_list' multiple)
+                                                            span Загрузить картинки для галереи
+                                                        ul.upload_preview.uploadPreview
+                                                            - if (product.img_list && product.img_list.length)
+                                                                - var arr = product.img_list.split(',')
+                                                                for img in arr
+                                                                    li.prodPreviewItem
                                                                         .prod_preview
-                                                                            img(src= checkSlash(clr))
-                                                                    span.prod_rm_btn.rmProdColor
-                                                    
-                                                .form_cell
-                                                    input.f_input.input_v6(placeholder='Категория' name='product_category' class='validate[required]' value= product.category || '')
-                                                    
-                                                .form_cell
-                                                    input.f_input.input_v6(placeholder='Артикул' name='product_code' class='validate[required]' value= product.product_code || '')
-                                                    
-                                                .form_row
-                                                    .form_cell
-                                                        label.check_v3.check_emul
-                                                            input.inp_hidden(type='radio' name='product_adult' value='a' checked= product.adult == 'a' ? 'checked' : null)
-                                                            span.check_text
-                                                                span.check_icon.i-car-baby-toy-outline
-                                                                span Взрослый
+                                                                            img(src= checkSlash(img))
+                                                                        span.prod_rm_btn.rmProdPreview
     
                                                     .form_cell
-                                                        label.check_v3.check_emul
-                                                            input.inp_hidden(type='radio' name='product_adult' value='c' checked= product.adult == 'c' ? 'checked' : null)
-                                                            span.check_text
-                                                                span.check_icon.i-skate-with-handle-side-view
-                                                                span Десткий
-    
-                                                .form_cell
-                                                    .select_box_v2
-                                                        select.select2(name='product_gender')
-                                                            option(value='m' selected= product.gender == 'm' ? 'selected' : null) М
-                                                            option(value='f' selected= product.gender == 'f' ? 'selected' : null) Ж
-                                                    
-                                                .form_row
+                                                        input.f_input.input_v6(placeholder='Старая цена' data-inputmask="'alias': 'numeric', 'rightAlign': 'false'" name='product_old_price' value= product.old_price || '')
+                                                        
                                                     .form_cell
-                                                        label.check_v3.check_emul
-                                                            input.inp_hidden(type='radio' name='product_season' value='w' checked= product.season == 'w' ? 'checked' : null)
-                                                            span.check_text
-                                                                span.check_icon.i-car-baby-toy-outline
-                                                                span Зима
-    
+                                                        input.f_input.input_v6(placeholder='Цена' data-inputmask="'alias': 'numeric', 'rightAlign': 'false'" name='product_price' class='validate[required,custom[onlyNumberSp]]' value= product.price || '')
+                                                        
                                                     .form_cell
-                                                        label.check_v3.check_emul
-                                                            input.inp_hidden(type='radio' name='product_season' value='s' checked= product.season == 's' ? 'checked' : null)
-                                                            span.check_text
-                                                                span.check_icon.i-skate-with-handle-side-view
-                                                                span Лето
-                                                                
+                                                        input.f_input.input_v6(placeholder='Размер' name='product_sizes' class='validate[required]' value= product.sizes || '')
+                                                        
                                                     .form_cell
-                                                        label.check_v3.check_emul
-                                                            input.inp_hidden(type='radio' name='product_season' value='d' checked= product.season == 'd' ? 'checked' : null)
-                                                            span.check_text
-                                                                span.check_icon.i-duck-side-view-outline
-                                                                span Демисезон
-                                                                
+                                                        #color_picker_1.colorPicker
                                                     .form_cell
-                                                        label.check_emul.check_v1
-                                                            input.inp_hidden(type='checkbox' checked= (product.in_stock ? 'checked' : null) name='in_stock')
-                                                            span.check_text В наличии
-                                                                
+                                                        input.f_input.input_v6.inp_hidden.validateHidden(placeholder='Цвета' name='product_colors' class='validate[required]' value= product.colors ? product.colors.replace(/ /ig, '') : '')
+                                                        a.gl_link.inner_link.addColor(href='#color_picker_1') Добавить цвет
+                                                        label.gl_link.inner_link
+                                                            input.inp_hidden.uploadInput(type='file' data-context='colors' data-target='product_colors' multiple)
+                                                            span Загрузить образец цвета
+                                                        ul.upload_preview.uploadPreview._rounded
+                                                            - if (product.colors && product.colors.length)
+                                                                -  var arr = product.colors.split(',')
+                                                                for clr in arr
+                                                                    li.prodColorItem
+                                                                        - if (isHex(clr))
+                                                                            .prod_preview(style='background-color:' + clr)
+                                                                        - else
+                                                                            .prod_preview
+                                                                                img(src= checkSlash(clr))
+                                                                        span.prod_rm_btn.rmProdColor
+                                                        
                                                     .form_cell
-                                                        label.check_emul.check_v1
-                                                            input.inp_hidden(type='checkbox' checked= (product.is_hit ? 'checked' : null) name='is_hit')
-                                                            span.check_text Хит продаж
-                                                                
-                                            button.btn_v3.blue_btn.order_confirm_btn.saveBtn Сохранить
-                        
-                        
+                                                        input.f_input.input_v6(placeholder='Категория' name='product_category' class='validate[required]' value= product.category || '')
+                                                        
+                                                    .form_cell
+                                                        input.f_input.input_v6(placeholder='Артикул' name='product_code' class='validate[required]' value= product.product_code || '')
+                                                        
+                                                    .form_row
+                                                        .form_cell
+                                                            label.check_v3.check_emul
+                                                                input.inp_hidden(type='radio' name='product_adult' value='a' checked= product.adult == 'a' ? 'checked' : null)
+                                                                span.check_text
+                                                                    span.check_icon.i-car-baby-toy-outline
+                                                                    span Взрослый
+        
+                                                        .form_cell
+                                                            label.check_v3.check_emul
+                                                                input.inp_hidden(type='radio' name='product_adult' value='c' checked= product.adult == 'c' ? 'checked' : null)
+                                                                span.check_text
+                                                                    span.check_icon.i-skate-with-handle-side-view
+                                                                    span Десткий
+        
+                                                    .form_cell
+                                                        .select_box_v2
+                                                            select.select2(name='product_gender')
+                                                                option(value='m' selected= product.gender == 'm' ? 'selected' : null) М
+                                                                option(value='f' selected= product.gender == 'f' ? 'selected' : null) Ж
+                                                        
+                                                    .form_row
+                                                        .form_cell
+                                                            label.check_v3.check_emul
+                                                                input.inp_hidden(type='radio' name='product_season' value='w' checked= product.season == 'w' ? 'checked' : null)
+                                                                span.check_text
+                                                                    span.check_icon.i-car-baby-toy-outline
+                                                                    span Зима
+        
+                                                        .form_cell
+                                                            label.check_v3.check_emul
+                                                                input.inp_hidden(type='radio' name='product_season' value='s' checked= product.season == 's' ? 'checked' : null)
+                                                                span.check_text
+                                                                    span.check_icon.i-skate-with-handle-side-view
+                                                                    span Лето
+                                                                    
+                                                        .form_cell
+                                                            label.check_v3.check_emul
+                                                                input.inp_hidden(type='radio' name='product_season' value='d' checked= product.season == 'd' ? 'checked' : null)
+                                                                span.check_text
+                                                                    span.check_icon.i-duck-side-view-outline
+                                                                    span Демисезон
+                                                                    
+                                                        .form_cell
+                                                            label.check_emul.check_v1
+                                                                input.inp_hidden(type='checkbox' checked= (product.in_stock ? 'checked' : null) name='in_stock')
+                                                                span.check_text В наличии
+                                                                    
+                                                        .form_cell
+                                                            label.check_emul.check_v1
+                                                                input.inp_hidden(type='checkbox' checked= (product.is_hit ? 'checked' : null) name='is_hit')
+                                                                span.check_text Хит продаж
+                                                                    
+                                                button.btn_v3.blue_btn.order_confirm_btn.saveBtn Сохранить
+                            
+                            
             +footer()
             
         +aside_left()
