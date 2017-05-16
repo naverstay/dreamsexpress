@@ -36,7 +36,8 @@ gulp.task('jade', function () {
             locals: {
                 dev: true,
                 user: {email: '123@321', data: []},
-                all_products: []
+                all_products: [],
+                breadcrumbs: [['Главная', 'Каталог'], ['/', '/catalog']]
             }
         }))
         .pipe(gulp.dest('app/'))

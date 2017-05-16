@@ -18,7 +18,9 @@ html(lang='ru')
                 
                 div.main_content
                     .section_inner
-                        +breadcrumbs(['Главная', 'Каталог', 'Детская одежда'])
+                        - var bc = breadcrumbs ? breadcrumbs : [['Главная', 'Каталог', 'Детская одежда']];
+
+                        +breadcrumbs(bc)
                         h1.page_title.fw_700
                             span Детская одежда
 

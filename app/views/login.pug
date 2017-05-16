@@ -10,7 +10,9 @@ html(lang='ru')
                 
                 div.main_content
                     .section_inner
-                        +breadcrumbs(['Главная', 'login'])
+                        - var bc = breadcrumbs ? breadcrumbs : [['Главная', 'login']];
+
+                        +breadcrumbs(bc)
                         h1.page_title.fw_700
                             - if (email)
                                 span E-mail подтвержден

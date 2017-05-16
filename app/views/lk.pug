@@ -10,7 +10,9 @@ html(lang='ru')
                 
                 div.main_content
                     .section_inner
-                        +breadcrumbs(['Главная', 'Личный кабинет'])
+                        - var bc = breadcrumbs ? breadcrumbs : [['Главная', 'Личный кабинет']];
+
+                        +breadcrumbs(bc)
                         h1.page_title.fw_700
                             span Личный кабинет
 

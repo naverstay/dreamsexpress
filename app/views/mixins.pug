@@ -5,7 +5,7 @@ block variables
 - var no_min = true;
 - var scripts_in_head = true;
 - var year = new Date();
-- no_min = false; // false for node production
+//- no_min = false; // false for node production
 
 - var all_products = locals ? locals['all_products'] : all_products;
 - var user = locals ? locals['user'] : user;
@@ -67,11 +67,11 @@ mixin dev_head(page_title, index, news, search, product, lk, cart, add)
                 | <!--build:js js/main.min.js -->
                 script(src= use_slash + 'js/lib/jquery-1.12.1.min.js')
                 script(src= use_slash + 'js/lib/jquery-ui-1.11.4.js')
+                script(src= use_slash + 'js/lib/jquery.mousewheel.min.js')
                 script(src= use_slash + 'js/lib/slick.js')
                 script(src= use_slash + 'js/lib/jquery.validationEngine.js')
                 script(src= use_slash + 'js/lib/jquery.validationEngine-ru.js')
                 script(src= use_slash + 'js/lib/select2.js')
-                //-script(src= use_slash 'js/lib/jquery.mousewheel.min.js')
                 script(src= use_slash + 'js/lib/jquery.mCustomScrollbar.min.js')
                 script(src= use_slash + 'js/lib/jquery.inputmask.bundle.js')
                     
@@ -108,12 +108,13 @@ mixin dev_head(page_title, index, news, search, product, lk, cart, add)
                     script(src= use_slash + 'js/news.min.js')
         
             - if (search)
-                link(href='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css' rel="stylesheet")
-                script(src='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js')
+                //-link(href='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css' rel="stylesheet")
+                //-script(src='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js')
                 - if (no_min)
                     | 
                     | <!--build:js js/search.min.js -->
                     script(src= use_slash + 'js/lib/nouislider.min.js')
+                    script(src= use_slash + 'js/lib/fotorama.js')
                     script(src= use_slash + 'js/search.js')
                     | 
                     | <!--endbuild-->
@@ -600,14 +601,27 @@ mixin pop_slider()
         .slide_prev
         .slide_next
         
-mixin breadcrumbs(list)
-    ul.breadcrumbs
-        for item, i in list
-            li.breadcrumb_item
-                - if (i == list.length - 1)
-                    span= item
-                - else
-                    a.gl_link(href= use_slash + (item == 'Главная' ? (dev ? 'index.html' : '') : (item == 'Каталог' ? 'catalog' + (dev ? '.html' : '') : 'products' + (dev ? '.html' : ''))))= item
+mixin breadcrumbs(bc)
+    - if (bc && bc.length == 1)
+        ul.breadcrumbs
+            - var list= bc[0]
+            for item, i in list
+                li.breadcrumb_item
+                    - if (i == list.length - 1)
+                        span= item
+                    - else
+                        a.gl_link(href= use_slash + (item == 'Главная' ? (dev ? 'index.html' : '') : (item == 'Каталог' ? 'catalog' + (dev ? '.html' : '') : 'products' + (dev ? '.html' : ''))))= item
+            
+    - if (bc && bc.length == 2)
+        ul.breadcrumbs
+            - var list= bc[0]
+            - var link= bc[1]
+            for item, i in list
+                li.breadcrumb_item
+                    - if (i == list.length - 1)
+                        span= item
+                    - else
+                        a.gl_link(href= link[i])= item
             
 mixin dropdown_w(caption)
     .dropdown_w
@@ -1288,12 +1302,13 @@ mixin scripts(page_title, index, news, search, product, lk, cart, add)
                 script(src= use_slash + 'js/news.min.js')
     
         - if (search)
-            link(href='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css' rel="stylesheet")
-            script(src='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js')
+            //-link(href='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css' rel="stylesheet")
+            //-script(src='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js')
             - if (no_min)
                 | 
                 | <!--build:js js/search.min.js -->
                 script(src= use_slash + 'js/lib/nouislider.min.js')
+                script(src= use_slash + 'js/lib/fotorama.js')
                 script(src= use_slash + 'js/search.js')
                 | 
                 | <!--endbuild-->

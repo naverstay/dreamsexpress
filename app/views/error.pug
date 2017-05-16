@@ -10,7 +10,9 @@ html(lang='ru')
                 
                 div.main_content
                     .section_inner
-                        +breadcrumbs(['Главная', 'Что-то пошло не так (('])
+                        - var bc = breadcrumbs ? breadcrumbs : [['Главная', 'Что-то пошло не так ((']];
+
+                        +breadcrumbs(bc)
                         h1.page_title.fw_700
                             span= 'Ошибка' + (error ? ', ' + error : '') + (message ? '. ' + message : '')
 

@@ -18,7 +18,9 @@ html(lang='ru')
                 
                 div.main_content
                     .section_inner
-                        +breadcrumbs(['Главная', 'Расширенный поиск'])
+                        - var bc = breadcrumbs ? breadcrumbs : [['Главная', 'Расширенный поиск']];
+
+                        +breadcrumbs(bc)
                         h1.page_title.fw_700
                             span Расширенный Поиск
 

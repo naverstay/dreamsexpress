@@ -11,7 +11,9 @@ html(lang='ru')
                 
                 div.main_content
                     .section_inner
-                        +breadcrumbs(['Главная', 'Каталог'])
+                        - var bc = breadcrumbs ? breadcrumbs : [['Главная', 'Каталог']];
+
+                        +breadcrumbs(bc)
                         h1.page_title.fw_700
                             span Каталог
 

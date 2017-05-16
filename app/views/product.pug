@@ -18,7 +18,9 @@ html(lang='ru')
                 
                 div.main_content
                     .section_inner
-                        +breadcrumbs(['Главная', 'Каталог', 'Детская одежда', 'Верхняя одежда', 'Нейлоновая куртка-бомбер'])
+                        - var bc = breadcrumbs ? breadcrumbs : [['Главная', 'Каталог', 'Детская одежда', 'Верхняя одежда', 'Нейлоновая куртка-бомбер']];
+
+                        +breadcrumbs(bc)
 
                         - if (product)
                             .product_block

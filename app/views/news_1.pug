@@ -10,7 +10,9 @@ html(lang='ru')
                 
                 div.main_content
                     .section_inner
-                        +breadcrumbs(['Главная', 'Новости', 'Платье со спущеными плечами'])
+                        - var bc = breadcrumbs ? breadcrumbs : [['Главная', 'Новости', 'Платье со спущеными плечами']];
+
+                        +breadcrumbs(bc)
                         h1.page_title.fw_700
                             span Платье со спущенными плечами:
                             span.mob_hidden <br>  

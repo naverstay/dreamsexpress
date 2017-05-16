@@ -1,6 +1,8 @@
 // app/routes.js
+
+var shared = require('../shared.js');
+
 module.exports = function (app, passport) {
-    var shared = require('../shared.js');
 
     var productsController = require('../controllers/products');
     var clientsController = require('../controllers/clients');
@@ -121,6 +123,7 @@ module.exports = function (app, passport) {
         res.render('index', {
             user: req.client_info,
             all_products: req.all_products,
+            breadcrumbs: [],
             fav_html: req.fav_html,
             title: 'express index'
         });
@@ -133,6 +136,7 @@ module.exports = function (app, passport) {
             res.render('login', {
                 user: req.client_info,
                 all_products: req.all_products,
+                breadcrumbs: [['Главная', 'Авторизация'], ['/', '']],
                 fav_html: req.fav_html,
                 title: 'login'
             });
@@ -146,6 +150,7 @@ module.exports = function (app, passport) {
             res.render('login', {
                 user: req.client_info,
                 all_products: req.all_products,
+                breadcrumbs: [['Главная', 'Активация аккаунта'], ['/', '']],
                 fav_html: req.fav_html,
                 email: req.params[0],
                 title: 'email confirmed'
@@ -153,14 +158,14 @@ module.exports = function (app, passport) {
         }
     });
 
-    app.get('/product', function (req, res) {
-        res.render('product', {
-            user: req.client_info,
-            all_products: req.all_products,
-            fav_html: req.fav_html,
-            title: 'product'
-        });
-    });
+    // app.get('/product', function (req, res) {
+    //     res.render('product', {
+    //         user: req.client_info,
+    //         all_products: req.all_products,
+    //         fav_html: req.fav_html,
+    //         title: 'product'
+    //     });
+    // });
 
     app.get('/products', function (req, res) {
         res.render('products', {
@@ -258,7 +263,7 @@ module.exports = function (app, passport) {
             if (results.length) {
                 res.render('product', {
                     user: req.client_info,
-                    // all_products: req.all_products,
+                    breadcrumbs: [['Главная', 'Каталог', results[0].name], ['/', '/catalog', '']],
                     product: results[0],
                     fav_html: req.fav_html,
                     title: 'product page',
@@ -368,6 +373,7 @@ module.exports = function (app, passport) {
         res.render('catalog', {
             user: req.client_info,
             all_products: req.all_products,
+            breadcrumbs: [['Главная', 'Каталог'], ['/', '']],
             fav_html: req.fav_html,
             title: 'catalog'
         });
@@ -377,6 +383,7 @@ module.exports = function (app, passport) {
         res.render('cart', {
             user: req.client_info,
             all_products: req.all_products,
+            breadcrumbs: [['Главная', 'Корзина'], ['/', '']],
             fav_html: req.fav_html,
             title: 'cart'
         });
@@ -417,6 +424,7 @@ module.exports = function (app, passport) {
         res.render('search', {
             user: req.client_info,
             all_products: req.all_products,
+            breadcrumbs: [['Главная', 'Расширенный поиск'], ['/', '']],
             fav_html: req.fav_html,
             title: 'search'
         });

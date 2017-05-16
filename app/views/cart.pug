@@ -10,7 +10,9 @@ html(lang='ru')
                 
                 div.main_content
                     .section_inner
-                        +breadcrumbs(['Главная', 'Корзина'])
+                        - var bc = breadcrumbs ? breadcrumbs : [['Главная', 'Корзина']];
+
+                        +breadcrumbs(bc)
                         h1.page_title.fw_700
                             span Корзина
                             
