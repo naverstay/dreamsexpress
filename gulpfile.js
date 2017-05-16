@@ -34,7 +34,9 @@ gulp.task('jade', function () {
         .pipe(pug({
             pretty: true,
             locals: {
-                'dev': true
+                dev: true,
+                user: {email: '123@321', data: []},
+                all_products: []
             }
         }))
         .pipe(gulp.dest('app/'))
@@ -135,11 +137,11 @@ gulp.task('build', function (callback) {
         'jade',
         [
             'useref',
-            'copy_min_css',
-            'copy_min_js',
             // 'images',
             // 'fonts'
         ],
+        'copy_min_css',
+        'copy_min_js',
         callback
     )
 })

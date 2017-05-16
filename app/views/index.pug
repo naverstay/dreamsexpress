@@ -3,7 +3,7 @@ doctype html
 html(lang='ru')
     +dev_head("DREAMSEXPRESS Главная", true)
 
-    body.mCSB.wide_menu
+    body.mCSB.wide_menu(data-dev= dev ? 'dev' : 'prod')
         .wrapper
             .base
                 +header(1)
@@ -60,7 +60,7 @@ html(lang='ru')
                             .prod_info.slider_controls
                                 .hit_caption.subcaption
                                     span Хиты продаж
-                                    span.hit_counter= all_products ? all_products.length || '' : ''
+                                    span.hit_counter= all_products ? all_products.length || '#' : '@'
                                 p В нашем интернет-магазине представлены только тщательно отобранные модели, исключительные диваны хиты продаж в Москве и по России. Каждая модель дивана из нашего интернет каталога – это воплощение отличного дизайна, легенда мебельной отрасли.
                             
                             +hit_slider(all_products)

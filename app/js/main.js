@@ -959,7 +959,6 @@ function updateFav(data) {
     for (var i = 0; i < data.items.length; i++) {
         $('.favBtn[data-id="' + data.items[i] + '"]').addClass('favorite')
     }
-
 }
 
 function all_dialog_close() {

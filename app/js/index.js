@@ -7,7 +7,7 @@ $(function ($) {
     initHitSlider();
 
     initPopSlider();
-    
+
 });
 
 function initMainSlider() {
@@ -28,7 +28,6 @@ function initMainSlider() {
         //appendDots: sld.parent().find('.slider_dots'),
         slidesToShow: 1,
         touchThreshold: 10
-
     });
 }
 
@@ -39,6 +38,8 @@ function initHitSlider() {
         mobileFirst: true,
         infinite: false,
         arrows: true,
+        autoplay: true,
+        autoplaySpeed: 3000,
         //centerMode: true,
         //variableWidth: true,
         speed: 600,
@@ -95,7 +96,6 @@ function initHitSlider() {
                 }
             }
         ]
-
     });
 }
 
@@ -121,4 +121,3 @@ function initPopSlider() {
 
     });
 }
-

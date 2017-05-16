@@ -15,8 +15,6 @@ $(function ($) {
 
     initToddler();
 
-    // initMask();
-
     initReviewPopup();
 
     initFilter();
@@ -28,11 +26,6 @@ function initFilter() {
         var filter = $(this);
 
         clearTimeout(filter_delay);
-
-        // if (!filter.length) {
-        //     searchResults.html('');
-        //     return;
-        // }
 
         filter_delay = setTimeout(function () {
             filter.closest('form').trigger('submit');
@@ -55,13 +48,7 @@ function initFilter() {
         return false;
 
     }).each(function (ind) {
-        /*var form = $(this), filter = form.find('.filterInput');
 
-        form.find('input, select').on('keyup keydown change paste cut', function () {
-            var el = $(this);
-
-            el.closest('form').trigger('submit');
-        });*/
     });
 }
 
@@ -111,7 +98,6 @@ function renderFilterResult(data, form) {
         form.find('.filterCounterTxt').text(plural(counter, 'Найден ', 'Найдено ', 'Найдено '));
         form.find('.filterCounter').text(plural(counter, 'товар', 'товара', 'товаров', true));
     }
-
 
     form.find('.filterResults').html(data.items);
 }
@@ -333,6 +319,4 @@ function initCatDropDown() {
             $('.catParameter').removeClass('opened');
         }
     });
-
 }
-

@@ -1,18 +1,21 @@
 block variables
 
 - var use_slash = '/'; // '' for gulp build, '/' for node 
-- var dev = !!locals['dev']; // true for gulp, false for node
+- var dev = locals ? !!locals['dev'] : false; // true for gulp, false for node
 - var no_min = true;
 - var scripts_in_head = true;
 - var year = new Date();
+- no_min = false; // false for node production
+
+- var all_products = locals ? locals['all_products'] : all_products;
+- var user = locals ? locals['user'] : user;
     
 //- dev = true; // true for gulp, false for node
     
 - if (dev)
-    //- no_min = false; // false for gulp build, true for node 
     - use_slash = '';
-    - var all_products = [];
-    - var user = {email: '123@321', data : []};
+//    - var all_products = [];
+//    - var user = {email: '123@321', data : []};
 
 - function checkSlash(url) {return url.slice(0,1) == '/' ? url : '/' + url}
 - function isHex(h) {return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(h.trim())}
@@ -526,7 +529,7 @@ mixin main_slider()
         .slide_next.mob_hidden
                             
 mixin hit_slider(items)
-    .hitSlider.hit_slider_holder
+    .hitSlider.hit_slider_holder(data-all= all_products ? all_products.length : 0)
         .hit_slider
             - if (items && items.length)
                 for item, i in items
