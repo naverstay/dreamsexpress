@@ -29,7 +29,7 @@ var userSchema = mongoose.Schema({
         name: String
     }
 
-});
+}, {versionKey: false});
 
 // methods ======================
 // generating a hash

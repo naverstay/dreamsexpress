@@ -5,23 +5,6 @@ var slug = require('slug');
 var ObjectID = require('mongodb').ObjectID;
 var fs = require('fs');
 
-var fieldTypes = {
-    name: 'rx',
-    info: 'rx',
-    main_img: 'str',
-    hover_img: 'str',
-    img_list: 'str',
-    price: 'range',
-    sizes: 'rx',
-    colors: 'rx',
-    adult: 'str',
-    gender: 'str',
-    season: 'str',
-    category: 'str',
-    product_code: 'exact',
-    in_stock: 'bool'
-};
-
 exports.all = function (req, res) {
     Products.all(function (err, docs) {
         if (err) {

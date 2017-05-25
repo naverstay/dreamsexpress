@@ -9,7 +9,7 @@ include mixins
 
 doctype html
 html(lang='ru')
-    +dev_head("DREAMSEXPRESS Товар " + id || '', false, false, true)
+    +dev_head("DREAMSEXPRESS Товар " + (product ? product._id : '') || '', false, false, true)
 
     body.mCSB
         .wrapper
@@ -29,7 +29,7 @@ html(lang='ru')
                                         span= product.name || 'product.name'
                                         
                                 .product_cart
-                                    .product_soc
+                                    //.product_soc
                                         
                             .product_block
                                 .product_photos
@@ -47,8 +47,8 @@ html(lang='ru')
                                                     img(src= checkSlash(img))
                                         
                                 .product_cart
-                                    .product_soc
-                                        +prod_review_info(true)
+                                    //.product_soc
+                                    +prod_review_info(true)
                                 
                     .section_inner
                         ul#features_switcher.tab_holder.tab_v4
@@ -98,5 +98,5 @@ html(lang='ru')
         +aside_left()
         +aside_right()
         +popups()
-        +scripts("DREAMSEXPRESS Товар " + id || '', false, false, true)
+        +scripts("DREAMSEXPRESS Товар " + (product ? product._id : '') || '', false, false, true)
         

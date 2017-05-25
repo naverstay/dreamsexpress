@@ -51,13 +51,13 @@ mixin dev_head(page_title, index, news, search, product, lk, cart, add)
         - if (no_min)
             | 
             | <!--build:css css/styles.min.css-->
-            link(rel='stylesheet', href= use_slash + (dev ? 'css/main_global.css' : 'css/styles.min.css'), media='all')
+            link(rel='stylesheet', href= use_slash + (!dev ? 'css/main_global.css' : 'css/styles.min.css'), media='all')
             | 
             | <!--endbuild-->
         - else
             //-link(rel='stylesheet', href= use_slash + 'css/styles.min.css', media='all')
             
-            link(rel='stylesheet', href= use_slash + (dev ? 'css/main_global.css' : 'css/styles.min.css'), media='all')
+            link(rel='stylesheet', href= use_slash + (!dev ? 'css/main_global.css' : 'css/styles.min.css'), media='all')
             
         link(href='//fonts.googleapis.com/css?family=Rubik:300,400,500,700', rel='stylesheet', type='text/css')
         
@@ -392,7 +392,7 @@ mixin aside_right()
                                     
             a.btn_v1.fav_btn.light_blue_btn.clearFavBtn(href='#') Очистить список
         
-mixin aside_left()
+mixin aside_left(no_auth)
     .aside_left.mCSBaside
         .aside_menu_holder
             //-ul.aside_menu.search_menu
@@ -437,16 +437,17 @@ mixin aside_left()
                     - else
                         a.menu_link(href=head_menu_link[i]): span=item
 
-        ul.auth_menu
-            - if (user)
-                li#user_lk
-                    a.menu_link(href='/lk')
-                        span= user.email
+        - if (!no_auth)
+            ul.auth_menu
+                - if (user)
+                    li#user_lk
+                        a.menu_link(href='/lk')
+                            span= user.email
             
-            li
-                a.menu_link.authBtn.text_upper(href='#' class= ((user && user.email) ? 'user' : ''))
-                    span.un_authenticated Войти
-                    span.authenticated Выйти
+                li
+                    a.menu_link.authBtn.text_upper(href='#' class= ((user && user.email) ? 'user' : ''))
+                        span.un_authenticated Войти
+                        span.authenticated Выйти
                 
     .logo_block.header_logo: a.logo(href= (dev ? 'index.html' : '/'))
         img(src= use_slash + 'images/logo.svg')
@@ -652,7 +653,7 @@ mixin cart_unit_controls()
             a.gl_link(href='#') Удалить
 
 mixin prod_review_info(product_page)
-    .prod_review_info
+    .prod_review_info: form.validateMe.qBuyForm(action='/one_click_buy' method='POST')
         .product_share_holder: .product_share - 30%
         .prod_review_cart
             - if (product)
@@ -670,22 +671,26 @@ mixin prod_review_info(product_page)
                     li
                         a.btn_v1.violette_btn_transp.cart_btn.toggleOneClick(href='#') Купить в 1 клик
                     li.product_fav
-                        a.prod_fav.favBtn(href='#' data-id= ('' + id).replace(/"/g, '') class=(user && user.fav && user.fav.indexOf(id) > -1 ? ' favorite' : ''))
+                        - is_fav = false
+                        - if (user && user.fav && user.fav.length)
+                            each item in user.fav
+                                - is_fav = is_fav || (product ? product._id == item : false)
+                        a.prod_fav.favBtn(href='#' data-id= (product ? product._id : '') class=(is_fav ? ' favorite' : ''))
 
                 .prod_review_1_click.oneClickForm
-                    form.validateMe(action='/one_click_buy')
-                        .form_cell
-                            input.f_input.input_v5(placeholder='Имя')
-                        .form_cell
-                            input.f_input.input_v5(placeholder='телефон' data-inputmask="'mask': '[+38] (099)-999-99-99', 'clearIncomplete' : true" class='validate[required]')
+                    .form_cell
+                        input.f_input.input_v5(placeholder='Имя' name='q_name')
+                    .form_cell
+                        input.f_input.input_v5(placeholder='телефон' data-inputmask="'mask': '[+38] (099)-999-99-99', 'clearIncomplete' : true" class='validate[required]' name='q_phone')
 
-                        ul.dropdown_controls
-                            li
-                                a.btn_v1.blue_btn.apply_btn(href='#') Купить
-                            li
-                                a.gl_link.white_link.toggleOneClick(href='#') Отменить
+                    ul.dropdown_controls
+                        li
+                            button.btn_v1.blue_btn.apply_btn() Купить
+                        li
+                            a.gl_link.white_link.toggleOneClick(href='#') Отменить
             
-        .prod_review_options
+        .prod_review_options(class= product_page ? 'prodReviewOptions' : '')
+            input.inp_hidden.prodID(value= (product ? product._id : '') name='prod_id')
             //- if (product_page)  // stars
                 ul.prod_rating_list
                     +loop_while(3)
@@ -710,11 +715,11 @@ mixin prod_review_info(product_page)
     
                     - var arr = product.colors.split(',');
                     for item, i in arr
+                        - var clr = item.trim();
                         li
                             label.option_switch.round
-                                input.inp_hidden(type='radio' name='prod_color')
+                                input.inp_hidden(type='radio' value= clr name='prod_color')
                                 span.check_text
-                                    - var clr = item.trim();
                                     - if (isHex(clr))
                                         span.check_color(style='background:' + clr)
                                     - else
@@ -730,7 +735,7 @@ mixin prod_review_info(product_page)
                     for item, i in arr
                         li
                             label.option_switch
-                                input.inp_hidden(type='radio' name='prod_size')
+                                input.inp_hidden(type='radio' value= item name='prod_size')
                                 span.check_text
                                     span= item
 
@@ -1201,12 +1206,12 @@ mixin filter_form(search)
             
 mixin auth_forms(suffix, email)
     .popup_inner
-        ul#auth_switcher.tab_holder.tab_v2
-            li.ui-state-active: a.tab_link(href='#auth_tab_1'): span Вход
-            li: a.tab_link(href='#auth_tab_2'): span Регистрация
+        ul.tab_holder.tab_v2(id= 'auth_switcher' + suffix || '')
+            li.ui-state-active: a.tab_link(href='#auth_tab_1' + suffix || ''): span Вход
+            li: a.tab_link(href='#auth_tab_2' + suffix || ''): span Регистрация
 
-        .tabBlock(data-tab-context='#auth_switcher')
-            #auth_tab_1
+        .tabBlock(data-tab-context='#auth_switcher' + suffix || '')
+            .tabUnit(id= 'auth_tab_1' + suffix || '')
                 .tab_content
                     form.authForm.validateMe(action='/login' method='POST')
                         .form_cell
@@ -1246,7 +1251,7 @@ mixin auth_forms(suffix, email)
                                     a.about_link(href='/auth/google')
                                         span.i-g
 
-            #auth_tab_2(style='display:none')
+            .tabUnit(id= 'auth_tab_2' + suffix || '' style='display:none')
                 .tab_content
                     form.regForm.validateMe(action='/signup' method='POST')
                         .form_cell
@@ -1346,7 +1351,7 @@ mixin scripts(page_title, index, news, search, product, lk, cart, add)
             - else
                 script(src= use_slash + 'js/add.min.js')
 
-mixin popups()
+mixin popups(no_auth)
     form.logoutForm.hide(action='/logout' method='POST')
 
     .popup_close_btn.popupClose
@@ -1360,7 +1365,7 @@ mixin popups()
                     a.gl_link(href= use_slash + 'search' + (dev ? '.html' : '')) Перейти к расширенному поиску
         
         .q_search_results_holder.mCSB: ul.searchResults.q_search_results
-            +loop_while(7)
+            //-+loop_while(7)
                 li
                     .product_item
                         a.product_img(href= use_slash + 'product_58e95666d4a12e2c21c3d587' + (dev ? '.html' : ''))
@@ -1401,27 +1406,27 @@ mixin popups()
             .tabBlock(data-tab-context='#callback_switcher')
                 #callback_tab_1
                     .tab_content
-                        form(action='#')
+                        form.callbackForm.validateMe(action='/question' method='POST')
                             .form_cell
-                                input.f_input.input_v2(placeholder='Имя')
+                                input.f_input.input_v2(placeholder='Имя' name='name')
                                 
                             .form_cell
-                                input.f_input.input_v2(placeholder='Телефон' data-inputmask="'mask': '[+38] (099)-999-99-99', 'clearIncomplete' : true")
+                                input.f_input.input_v2(placeholder='Телефон' data-inputmask="'mask': '[+38] (099)-999-99-99', 'clearIncomplete' : true" class='validate[required]' name='phone')
                                 
                             .form_cell
                                 button.btn_v1.blue_btn.order_btn Отправить заявку
                                 
                 #callback_tab_2(style='display:none')
                     .tab_content
-                        form(action='#')
+                        form.questionForm.validateMe(action='/question' method='POST')
                             .form_cell
-                                input.f_input.input_v2(placeholder='Имя')
+                                input.f_input.input_v2(placeholder='Имя' name='name')
                                 
                             .form_cell
-                                input.f_input.input_v2(placeholder='Телефон' data-inputmask="'mask': '[+38] (099)-999-99-99', 'clearIncomplete' : true")
+                                input.f_input.input_v2(placeholder='Телефон' data-inputmask="'mask': '[+38] (099)-999-99-99', 'clearIncomplete' : true" class='validate[required]' name='phone')
                                 
                             .form_cell
-                                textarea.f_input.input_v2(placeholder='Вопрос')
+                                textarea.f_input.input_v2(placeholder='Вопрос' class='validate[required, minSize[10]]' name='question')
                                 
                             .form_cell
                                 button.btn_v1.blue_btn.order_btn Отправить вопрос
@@ -1460,13 +1465,14 @@ mixin popups()
                     input.f_input.input_v2(placeholder='Email' name='email' class='validate[required, custom[email]]')
                 .form_row
                     .form_cell
-                        button.btn_v1.blue_btn.order_btn.mod_2 Выслать новый пароль
+                        button.btn_v1.blue_btn.order_btn.mod_2 Восстановить пароль
                         
                     .remember_check.form_cell
                         a.gl_link.cool_text.fz_13.fw_500.popupClose(href='#') Отмена
 
-    #auth_popup.popup.popup_v3
-        +auth_forms()
+    - if (!no_auth)
+        #auth_popup.popup.popup_v3
+            +auth_forms('_p')
         
     #add2cart_popup.popup.popup_v5
         .popup_cart_title

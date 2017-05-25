@@ -1,4 +1,6 @@
-var db_url = 'mongodb://localhost:27017/rags';
+var config = require('./config.json');
+
+var db_url = config.mongoose.db;
 
 var compression = require('compression');
 var express = require('express');
@@ -121,7 +123,7 @@ db.connect(db_url, function (err) {
     if (err) {
         return console.log(err);
     }
-    app.listen(3012, function () {
+    app.listen(config.express.port, function () {
         console.log('Mongo connected. Listning on 3012.');
 
         var chars = slug.charmap;

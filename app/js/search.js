@@ -93,7 +93,7 @@ function renderFilterResult(data, form) {
 
     if (counter == -1) {
         form.find('.filterCounterTxt').text('Ничего не найдено. ');
-        form.find('.filterCounter').text('Уточните параметры фильтра.');
+        form.find('.filterCounter').text('Уточните параметры поиска.');
     } else {
         form.find('.filterCounterTxt').text(plural(counter, 'Найден ', 'Найдено ', 'Найдено '));
         form.find('.filterCounter').text(plural(counter, 'товар', 'товара', 'товаров', true));

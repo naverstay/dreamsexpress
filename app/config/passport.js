@@ -150,7 +150,7 @@ module.exports = function (passport) {
 
             // check to see if theres already a user with that email
             if (user) {
-                return done(null, false, req.flash('signupMessage', 'Email ' + user.local.email + ' занят.'));
+                return done(null, false, req.flash('signupMessage', 'Email ' + user.local.email + ' занят'));
             } else {
 
                 // if there is no user with that email
@@ -168,7 +168,6 @@ module.exports = function (passport) {
                     return done(null, newUser);
                 });
             }
-
         });
 
     }));
@@ -185,6 +184,8 @@ module.exports = function (passport) {
         passwordField: 'password',
         passReqToCallback: true // allows us to pass back the entire request to the callback
     }, function (req, email, password, done) { // callback with email and password from our form
+
+        console.log(req, email);
 
         // find a user whose email is the same as the forms email
         // we are checking to see if the user trying to login already exists
@@ -213,5 +214,4 @@ module.exports = function (passport) {
             });
         });
     }));
-
 };

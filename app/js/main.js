@@ -2,6 +2,7 @@ var body, html, doc, wnd, search_delay,
     closeMenuTimer,
     searchResults,
     qSearchForm,
+    qBuyForm,
     cart_info_timeout,
     last_search = '',
     searching = false,
@@ -36,6 +37,7 @@ $(function ($) {
     body = $('body');
     searchResults = $('.searchResults');
     qSearchForm = $('.qSearchForm');
+    qBuyForm = $('.qBuyForm');
 
     body
         .delegate('.openMobMenu', 'click', function () {
@@ -238,6 +240,14 @@ $(function ($) {
         return false;
     });
 
+    qBuyForm.on('submit', function () {
+        var form = $(this);
+
+        if (form.validationEngine('validate')) qBuyFunc(form);
+
+        return false;
+    });
+
     initMask();
 
     initValidation();
@@ -255,7 +265,7 @@ $(function ($) {
     initFailPopup();
 
     initSuccessPopup();
-    
+
     initConfirmationPopup();
 
     initAddToCartPopup();
@@ -314,6 +324,40 @@ function initQSearch() {
                 qSearchForm.trigger('submit');
             }
         }, 1000);
+    });
+}
+
+function qBuyFunc(form) {
+    var data = form.serialize(); // пoдгoтaвливaeм дaнныe
+
+    $.ajax({ // инициaлизируeм ajax зaпрoс
+        type: form.attr('method'), // oтпрaвляeм в POST фoрмaтe, мoжнo GET
+        url: form.attr('action'), // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
+        dataType: 'json', // oтвeт ждeм в json фoрмaтe
+        data: data, // дaнныe для oтпрaвки
+        beforeSend: function (data) { // сoбытиe дo oтпрaвки
+
+        },
+        success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
+
+            console.log(data);
+
+            /*if (data['error']) { // eсли oбрaбoтчик вeрнул oшибку
+                alert(data['error']); // пoкaжeм eё тeкст
+            } else { // eсли всe прoшлo oк
+                alert('Письмo oтврaвлeнo! Чeкaйтe пoчту! =)'); // пишeм чтo всe oк
+            }*/
+        },
+        error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
+
+            console.log(xhr, ajaxOptions, thrownError);
+
+            // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
+            // alert(thrownError); // и тeкст oшибки
+        },
+        complete: function (data) { // сoбытиe пoслe любoгo исхoдa
+
+        }
     });
 }
 
@@ -672,26 +716,33 @@ function initAuthPopup() {
         return false;
     });
 
-    $('.authForm, .regForm, .logoutForm, .userUpdate').on('submit', function () {
+    $('.authForm, .regForm, .logoutForm, .userUpdate, .userReset, .callbackForm, .questionForm, .recoveryForm').on('submit', function (e) {
+        e.preventDefault();
+
         var form = $(this);
 
-        if (form.validationEngine('validate')) {
-            sendForm($(this), function () {
+        if (form.hasClass('validateMe')) {
+            if (form.validationEngine('validate')) {
+                sendForm(form, function () {
+
+                });
+            }
+        } else {
+            sendForm(form, function () {
 
             });
         }
 
         return false;
     });
-
 }
 
 function sendForm(form, cb) {
     var data = form.serialize(); // пoдгoтaвливaeм дaнныe
 
-    data += '&pathname=' + window.location.pathname;
+    // data += '&pathname=' + window.location.pathname;
 
-    // console.log(data);
+    console.log(data);
 
     $.ajax({ // инициaлизируeм ajax зaпрoс
         type: form.attr('method'), // oтпрaвляeм в POST фoрмaтe, мoжнo GET
@@ -702,7 +753,7 @@ function sendForm(form, cb) {
 
         },
         success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
-            // console.log(data);
+            console.log(data);
 
             $('.auth_msg').remove();
 
@@ -716,33 +767,37 @@ function sendForm(form, cb) {
                     redirectTo(data.redirectTo);
                 }, 1);
             } else if (data.user_created) {
-                $('#auth_tab_1 .tab_content').prepend('<p class="auth_msg">Подтвердите e-mail ' + data.email + '</p>');
+                $('.successText').html(data.success_text);
+                success_popup.dialog('open');
+                form.closest('.ui-dialog-content').dialog('close');
+
                 $('#auth_email').val(data.email);
-                $('a[href="#auth_tab_1"]').click();
+                form.closest('.popup_inner').find('a[href="#auth_tab_1*"]').first().click();
+
             } else if (data.logout_done) {
                 $('#user_lk').remove();
                 $('.authBtn').removeClass('user');
-            } else if (data.user_updated) {
-                setTimeout(function () {
-                    $('.successText').text('Данные сохранены.');
-                    success_popup.dialog('open');
-                }, 50);
+            } else if (data.user_updated || data.recovery_success || data.password_reset) {
+                $('.successText').html(data.success_text);
+                success_popup.dialog('open');
             } else if (data.user_authenticated) {
                 $('.auth_menu').prepend(data.user);
                 $('.authBtn').addClass('user');
                 auth_popup.dialog('close');
             } else if (data.login_failed) {
-                $('#auth_tab_1 .tab_content').prepend('<p class="auth_msg">' + data.message[0] + '</p>');
+                form.closest('.tabUnit').first().find('.tab_content').prepend('<p class="auth_msg">' + data.fail_text + '</p>');
+                $('#auth_pass').val('');
+            }else if (data.signup_failed) {
+                form.closest('.tabUnit').first().find('.tab_content').prepend('<p class="auth_msg">' + data.fail_text + '</p>');
                 $('#auth_pass').val('');
             } else if (data.recovery_failed) {
-                $('#auth_tab_1 .tab_content').prepend('<p class="auth_msg">E-mail' + data.message[0] + ' не зарегистрирован</p>');
-            } else if (data.recovery_success) {
-                $('.successText').text('Инструкции отправлены на e-mail ' + data.message[0]);
-
+                form.closest('.tabUnit').first().find('.tab_content').prepend('<p class="auth_msg">' + data.fail_text + '</p>');
+            } else if (data.question_sent) {
+                $('.successText').html(data.success_text);
                 success_popup.dialog('open');
-
+                form.closest('.ui-dialog-content').dialog('close');
             } else {
-                $('#auth_tab_2 .tab_content').prepend('<p class="auth_msg">' + data.message[0] + '</p>');
+                form.closest('#auth_tab_2*').first().find('.tab_content').prepend('<p class="auth_msg">' + data.message[0] + '</p>');
             }
 
             setTimeout(function () {

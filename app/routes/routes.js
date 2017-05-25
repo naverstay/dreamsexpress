@@ -1,6 +1,7 @@
 // app/routes.js
 
 var shared = require('../shared.js');
+var config = require('../config.json');
 
 module.exports = function (app, passport) {
 
@@ -9,7 +10,9 @@ module.exports = function (app, passport) {
     var ObjectID = require('mongodb').ObjectID;
     var fs = require('fs');
 
-    var user = require('../models/user');
+    // var user = require('../models/user');
+    // var User = require('../models/user');
+
     var client = require('../models/clients');
 
     // var products = require('../models/products');
@@ -17,10 +20,30 @@ module.exports = function (app, passport) {
 
     var slug = require('slug');
 
+    var crypto = require('crypto'),
+        algorithm = config.encrypt.algorithm,
+        password = config.encrypt.password;
+
     var prod_upload_dir = '/upload/';
 
+    function encrypt(text) {
+        var cipher = crypto.createCipher(algorithm, password);
+        var crypted = cipher.update(text, 'utf8', 'hex');
+        crypted += cipher.final('hex');
+        return crypted;
+    }
+
+    function decrypt(text) {
+        var decipher = crypto.createDecipher(algorithm, password);
+        var dec = decipher.update(text, 'hex', 'utf8');
+        dec += decipher.final('utf8');
+        return dec;
+    }
+
     function restrict(req, res, next) {
-        req.session.prevPage = req.body.pathname || '/';
+        console.log('restrict', req.body);
+
+        req.session.prevPage = /^\/recovery\//i.test(req.body.pathname) ? '/' : req.body.pathname || '/';
         next();
     }
 
@@ -219,10 +242,15 @@ module.exports = function (app, passport) {
     //     });
     // });
 
-    app.get('/activate_*', function (req, res, next) {
-        var activation_id = req.params[0];
+    app.get('/activate/:id', function (req, res, next) {
+        var activation_id = decrypt(req.params.id);
 
         console.log('activate', activation_id);
+
+        if (req.user) {
+            console.log(req.user);
+            req.logout();
+        }
 
         db.get().collection('users').findOne({_id: ObjectID(activation_id)}, function (err, doc) {
 
@@ -266,8 +294,7 @@ module.exports = function (app, passport) {
                     breadcrumbs: [['Главная', 'Каталог', results[0].name], ['/', '/catalog', '']],
                     product: results[0],
                     fav_html: req.fav_html,
-                    title: 'product page',
-                    id: results[0]._id
+                    title: 'product page'
                 });
             } else {
                 res.status(404);
@@ -328,7 +355,8 @@ module.exports = function (app, passport) {
                     '</div>';
 
                 var prod_review_options = 
-                    '<div class="prod_review_options">' +
+                    '<div class="prod_review_options prodReviewOptions">' +
+                        '<input class="inp_hidden prodID" value="' + item._id + '" name="prod_id">'+
                         '<dl class="prod_options">' +
                             '<dt>Цвет: </dt>' +
                             '<dd></dd>' +
@@ -501,48 +529,123 @@ module.exports = function (app, passport) {
     });
 
     app.get('/recovery_success', function (req, res, next) {
-        res.send({email: 'email', recovery_success: true});
+        // console.log(message);
+
+        res.send({email: 'email', recovery_success: true, success_text: 'Инструкции отправлены на e-mail '});
     });
 
-    /*  app.get('/recovery_*', function (req, res, next) {
-          var activation_id = req.params[0];
-  
-          console.log('recovery_', activation_id);
-  
-          db.get().collection('users').findOne({_id: ObjectID(activation_id)}, function (err, doc) {
-  
-              console.log(doc);
-  
-              // db.get().collection('clients').save({
-              //     _id: ObjectID(activation_id),
-              //     first_name: '',
-              //     last_name: '',
-              //     phone: '',
-              //     address: '',
-              //     role: 'customer',
-              //     fav: []
-              // }, function (err, numberAffected, rawResponse) {
-              //     console.log(err, numberAffected, rawResponse);
-              //
-              //     if (err)
-              //         return done(err, numberAffected, rawResponse);
-              //
-              //     res.redirect('/login&email=' + doc.local.email);
-              // });
-          });
-      });*/
 
-    function passRecovery(req, res, options, callback) {
-        if (typeof options == 'function') {
-            callback = options;
-            options = {};
+    // reset user password
+    app.post('/user', function (req, res) {
+        var hash = req.body.pathname.replace(/.*\//ig, ''),
+            dcr = decrypt(hash).split(' '),
+            id = dcr[0],
+            pass = dcr[1],
+            time = dcr[2];
+
+        db.get().collection('users').findOne({_id: ObjectID(id)}, function (err, doc) {
+
+            if (doc && doc._id != '') {
+                var newUser = new User();
+
+                // console.log('new hash', newUser.generateHash(req.body.new_password));
+
+                db.get().collection('users').updateOne(
+                    {_id: ObjectID(id)},
+                    {
+                        local: {
+                            password: newUser.generateHash(req.body.new_password),
+                            email: doc.local.email
+                        }
+                    },
+                    function (err, result) {
+                        if (err) {
+                            // handle error 
+                            console.log(err);
+                            res.send('There was an error updating user');
+                            return;
+                        }
+
+                        res.send({password_reset: true, success_text: 'Пароль изменен'});
+
+                    }
+                );
+
+            } else {
+                res.sendStatus(404);
+            }
+        });
+    });
+
+    app.get('/recovery/:id', function (req, res, next) {
+        var hash = req.params.id,
+            dcr = decrypt(hash).split(' '),
+            id = dcr[0],
+            pass = dcr[1],
+            time = dcr[2];
+
+        // console.log('recovery/', id, time, new Date() - (new Date(time * 1)));
+
+        if (new Date() - (new Date(time * 1)) > 1000 * 60 * 60 * 24) {
+
+            res.render('pass_reset', {
+                title: 'pass reset expired',
+                link_expired: true
+            });
+
+        } else {
+            db.get().collection('users').findOne({_id: ObjectID(id)}, function (err, doc) {
+
+                // console.log(doc);
+
+                if (pass != doc.local.password) {
+                    res.render('pass_reset', {
+                        title: 'pass reset expired',
+                        link_expired: true
+                    });
+                } else if (doc && doc._id != '') {
+                    res.render('pass_reset', {
+                        title: 'pass reset',
+                        user_email: doc.local.email
+                    });
+                } else {
+                    res.render('pass_reset', {
+                        title: 'pass reset failed',
+                        error: true
+                    });
+                }
+            });
         }
-        options = options || {};
+    });
 
+    app.post('/question', function (req, res) {
 
+        // console.log(req.body, req.protocol + '://', req.get('host'), req.originalUrl);
+
+        app.mailer.send('email_question', {
+            to: 'dreamsexpress.biz@gmail.com', // REQUIRED. This can be a comma delimited string just like a normal email to field.  
+            subject: 'Вопрос на dreamsexpress', // REQUIRED. 
+            name: req.body.name || '<пусто>',
+            pathname: req.protocol + '://' + req.get('host') + (req.body.pathname || '<пусто>'),
+            phone: req.body.phone || '<пусто>',
+            question: req.body.question || '<пусто>'
+        }, function (err) {
+            if (err) {
+                // handle error 
+                console.log(err);
+                res.send('There was an error sending the email');
+                return;
+            }
+
+            res.send({question_sent: true, success_text: 'Письмо отправлено'});
+
+        });
+    });
+
+    app.post('/recovery', function (req, res) {
         var restore_email = req.body.email;
 
-        // console.log(req.params);
+        console.log(req.body);
 
         db.get().collection('users').findOne({'local.email': restore_email}, function (err, doc) {
             if (err) {
@@ -555,8 +658,8 @@ module.exports = function (app, passport) {
             if (doc && doc._id != '') {
                 app.mailer.send('email_restore', {
                     to: restore_email, // REQUIRED. This can be a comma delimited string just like a normal email to field.  
-                    subject: 'dreamsexpress восстановление доступа', // REQUIRED. 
-                    confirmation_url: 'http://localhost:3012/recovery_' + doc._id
+                    subject: 'Восстановление доступа на dreamsexpress', // REQUIRED. 
+                    confirmation_url: req.protocol + '://' + req.get('host') + '/recovery/' + encrypt(doc._id + ' ' + doc.local.password + ' ' + (new Date().getTime()))
                 }, function (err) {
                     if (err) {
                         // handle error 
@@ -569,9 +672,9 @@ module.exports = function (app, passport) {
 
                     console.log('email sent');
 
-                    res.setHeader(200, {'Content-Type': 'text/html'});
+                    // res.setHeader(200, {'Content-Type': 'text/html'});
 
-                    res.end();
+                    // res.end();
 
 
                     // res.send({success: "Updated Successfully", status: 200});
@@ -590,19 +693,22 @@ module.exports = function (app, passport) {
 
                     // res.send({redirectTo: '/recovery_success'});
 
-                    // res.end(JSON.stringify({email: restore_email, recovery_success: true}));
+                    res.send({
+                        recovery_success: true,
+                        success_text: 'Инструкции отправлены на e-mail ' + restore_email
+                    });
 
                 });
             } else {
                 // res.send({redirectTo: '/recovery_failed'});
 
-                // res.end(JSON.stringify({email: restore_email, recovery_failed: true}));
+                res.send({recovery_failed: true, fail_text: 'E-mail' + restore_email + ' не зарегистрирован'});
 
                 // res.send({success: "Update Failed", status: 200});
 
-                res.setHeader(200, {'Content-Type': 'text/html'});
-
-                res.end();
+                // res.setHeader(200, {'Content-Type': 'text/html'});
+                //
+                // res.end();
 
                 // if (options.failureRedirect) {
                 //     res.statusCode = 302;
@@ -616,13 +722,70 @@ module.exports = function (app, passport) {
 
             }
         });
-    }
+    });
 
-    app.post('/recovery', function (req, res) {
-        passRecovery(req, res, {
-            successRedirect: '/recovery_success',
-            failureRedirect: '/recovery_failed'
-        })
+    app.post('/one_click_buy', function (req, res) {
+
+        console.log(req, req.body);
+
+        var orders = [], order = {};
+
+        for (var k in req.body) {
+            if (req.body.hasOwnProperty(k)) {
+                if (/^prod_/i.test(k)) {
+                    order[k] = req.body[k];
+                }
+            }
+        }
+
+        orders.push(order);
+
+        db.get().collection('orders').save({
+            client: req.user ? ObjectID(req.user._id) : 'anon',
+            name: req.body.q_name || '',
+            phone: req.body.q_phone || '',
+            products: orders
+        }, function (err, numberAffected, rawResponse) {
+            console.log(err, numberAffected, rawResponse);
+
+            if (err)
+                return done(err, numberAffected, rawResponse);
+
+            res.status(200).send({done: true});
+
+        });
+    });
+
+    app.post('/cart', function (req, res) {
+
+        console.log(req, req.body);
+
+        var orders = [], order = {};
+
+        for (var k in req.body) {
+            if (req.body.hasOwnProperty(k)) {
+                if (/^prod_/i.test(k)) {
+                    order[k] = req.body[k];
+                }
+            }
+        }
+
+        orders.push(order);
+
+        db.get().collection('orders').save({
+            client: req.user ? ObjectID(req.user._id) : 'anon',
+            name: req.body.q_name || '',
+            phone: req.body.q_phone || '',
+            products: orders
+        }, function (err, numberAffected, rawResponse) {
+            console.log(err, numberAffected, rawResponse);
+
+            if (err)
+                return done(err, numberAffected, rawResponse);
+
+            res.send({done: true});
+
+        });
     });
 
     // quick search
@@ -676,7 +839,7 @@ module.exports = function (app, passport) {
                 sort['price_desc'] = (param == 'desc') || false;
             }
 
-            if ((/name/ig).test(field)) {
+            if ((/name/ig).test(field) && param.length) {
                 filter['name'] = shared.RXify(param.replace(/[!@#%&=`~\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '').trim());
             } else if ((/info/ig).test(field)) {
                 filter['info'] = shared.RXify(param.trim());
@@ -733,7 +896,7 @@ module.exports = function (app, passport) {
 
         // console.log('start', req.body, filter, count);
 
-        if (count > 2) {
+        if (count > 1) {
             // var products_collection = db.get().collection('products');
 
             // products_collection.find(filter).toArray(function (err, results) {
@@ -837,14 +1000,12 @@ module.exports = function (app, passport) {
             if (err)
                 return done(err, numberAffected, rawResponse);
 
-            res.send({user_updated: true});
+            res.send({user_updated: true, success_text: 'Данные сохранены'});
             // res.end();
         });
-
     });
 
     // file remove
-
     app.post('/remove', function (req, res) {
         var target = '.' + shared.checkSlash(req.body.remove);
 
@@ -1054,7 +1215,7 @@ module.exports = function (app, passport) {
     // process the login form
     app.post('/login_lk', passport.authenticate('local-login', {
         successRedirect: '/login_success_lk', // redirect to the secure profile section
-        failureRedirect: '/login_failed', // redirect back to the signup page if there is an error
+        failureRedirect: '/login_failed_lk', // redirect back to the signup page if there is an error
         failureFlash: true // allow flash messages
     }));
 
@@ -1069,8 +1230,17 @@ module.exports = function (app, passport) {
     // =====================================
     // show the signup form
     app.get('/login_failed', function (req, res) {
+        var msg = req.flash('loginMessage'), ret = '';
 
-        res.send({message: req.flash('loginMessage'), login_failed: true});
+        for (var k in msg) {
+            if (msg.hasOwnProperty(k)) {
+                ret += ',' + msg[k];
+            }
+        }
+
+        console.log('login_failed', req.flash(), req.flash('loginMessage'));
+
+        res.send({login_failed: true, fail_text: ret.slice(1)});
 
         // render the page and pass in any flash data if it exists
         // res.render('signup', { message: req.flash('signupMessage') });
@@ -1117,8 +1287,15 @@ module.exports = function (app, passport) {
     }));
 
     app.get('/signup_failed', function (req, res) {
+        var msg = req.flash('signupMessage'), ret = '';
 
-        res.send({message: req.flash('signupMessage')});
+        for (var k in msg) {
+            if (msg.hasOwnProperty(k)) {
+                ret += ',' + msg[k];
+            }
+        }
+
+        res.send({signup_failed: true, fail_text: ret.slice(1)});
 
         // render the page and pass in any flash data if it exists
         // res.render('signup', { message: req.flash('signupMessage') });
@@ -1131,9 +1308,15 @@ module.exports = function (app, passport) {
     // we will use route middleware to verify this (the isLoggedIn function)
     app.get('/signup_success', function (req, res) {
 
+        console.log(req.user);
+
         // var user_info = db.get().collection('products').findOne();
 
-        db.get().collection('users').findOne({'local.email': req.user.local.email}, function (err, doc) {
+        var email = req.user.local.email;
+
+        req.logout();
+
+        db.get().collection('users').findOne({'local.email': email}, function (err, doc) {
 
             if (err) {
                 // handle error 
@@ -1142,10 +1325,12 @@ module.exports = function (app, passport) {
                 return;
             }
 
+            console.log('/signup_success', doc);
+
             app.mailer.send('email_confirm', {
-                to: req.user.local.email, // REQUIRED. This can be a comma delimited string just like a normal email to field.  
-                subject: 'dreamsexpress подтверждение e-mail', // REQUIRED. 
-                confirmation_url: 'http://localhost:3012/activate_' + doc._id
+                to: email, // REQUIRED. This can be a comma delimited string just like a normal email to field.  
+                subject: 'Подтверждение e-mail на dreamsexpress', // REQUIRED. 
+                confirmation_url: req.protocol + '://' + req.get('host') + '/activate/' + encrypt((doc._id).toString())
             }, function (err) {
                 if (err) {
                     // handle error 
@@ -1154,7 +1339,11 @@ module.exports = function (app, passport) {
                     return;
                 }
 
-                res.send({email: req.user.local.email, user_created: true});
+                res.send({
+                    user_created: true,
+                    success_text: 'Подтвердите аккаунт. <br>Инструкции отправлены на e-mail: ' + email
+                });
+
             });
         });
 

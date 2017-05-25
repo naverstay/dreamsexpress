@@ -50,6 +50,11 @@
     @at-root textarea#{&} {
       height: 60px;
     }
+
+    &:-webkit-autofill {
+      -webkit-box-shadow: inset 0 0 0 50px $gl_inp_gray;
+      -webkit-text-fill-color: #000;
+    }
   }
 
   &.input_v3 {

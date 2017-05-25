@@ -1,0 +1,47 @@
+include mixins
+doctype html
+html(lang='ru')
+    +dev_head("DREAMSEXPRESS Кабинет", false, false, false, false, true)
+
+    body.mCSB
+        .wrapper
+            .base
+                +header(1)
+                
+                div.main_content
+                    .section_inner
+                        - var bc = breadcrumbs ? breadcrumbs : [['Главная', 'Личный кабинет']];
+
+                        +breadcrumbs(bc)
+                        - if (error)
+                            h1.page_title.fw_700
+                                span Пользователь не найден
+                        - else
+                            h1.page_title.fw_700
+                                - if (link_expired)
+                                    span Ссылка для изменения пароля устарела
+                                - else
+                                    span Изменение пароля для 
+                                    span= user_email 
+    
+                            .cabinet_block
+                                .tab_content.clearfix
+                                    .cabinet_form_col
+                                        - if (link_expired)
+                                            p
+                                                a.gl_link.cool_text.fz_13.fw_500.passRecoveryBtn(href='#') Восстановить пароль?
+                                        - else
+                                            form.userReset.validateMe(action='/user' method='POST')
+                                                .form_cell
+                                                    input.f_input.input_v2(placeholder='Новый пароль' name='new_password' class='validate[required, minSize[6]]')
+                                                        
+                                                .form_cell
+                                                    button.btn_v1.blue_btn.order_btn.mod_4 Сохранить
+                                
+            +footer()
+            
+        +aside_left()
+        +aside_right()
+        +popups()
+        +scripts("DREAMSEXPRESS Кабинет", false, false, false, false, true)
+        
