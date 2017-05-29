@@ -1,0 +1,236 @@
+include mixins
+doctype html
+html(lang='ru')
+  +dev_head("DREAMSEXPRESS Заказы", false, false, false, false, false, false, true)
+
+  body.mCSB
+    .wrapper
+      .base
+        +header(1)
+        
+        div.main_content
+          .section_inner
+            h1.page_title.fw_700
+              span Заказы
+            
+            .cabinet_block
+              ul#order_switcher.tab_holder.tab_v3
+                li.tab_cell: a.tab_link(href='#order_tab_1'): span Все заказы
+                //li.tab_cell: a.tab_link(href='#order_tab_2'): span Добавить товар
+
+              .tabBlock(data-tab-context='#order_switcher')
+                //-#order_tab_2(style='display:none')
+                  .tab_content: .cart_block
+                    .cart_col
+                      .cart_unit.checkout_block(style='margin:0')
+                        form.validateMe.addForm(action='/add' method="POST")
+                          .cart_unit_info
+                            .checkout_caption Заполните поля
+                            .form_cell
+                              input.f_input.input_v6(placeholder='Название' name='product_name' class='validate[required]')
+                              
+                            .form_cell
+                              textarea.f_input.input_v6(placeholder='Короткое писание' name='product_info' class='validate[required]') какое-то короткое описание
+
+                            .form_cell
+                              textarea.f_input.input_v6(placeholder='Длинное описание' name='product_description') какое-то длинное описание для страницы товара
+
+                            .form_cell
+                              input.f_input.input_v6.inp_hidden.validateHidden(placeholder='Основная картинка' name='product_main_img' class='validate[required]')
+                              label.gl_link.inner_link
+                                input.inp_hidden.uploadInput(type='file' data-context='products' data-target='product_main_img')
+                                span Загрузить основную картинку
+                              ul.upload_preview.uploadPreview
+                                
+                            .form_cell
+                              input.f_input.input_v6.inp_hidden.validateHidden(placeholder='Ховер картинка' name='product_hover_img' class='validate[required]')
+                              label.gl_link.inner_link
+                                input.inp_hidden.uploadInput(type='file' data-context='products' data-target='product_hover_img')
+                                span Загрузить ховер картинку
+                              ul.upload_preview.uploadPreview
+                              
+                            .form_cell
+                              input.f_input.input_v6.inp_hidden.validateHidden(placeholder='Галерея картинок' name='product_img_list')
+                              label.gl_link.inner_link
+                                input.inp_hidden.uploadInput(type='file' data-context='products' data-target='product_img_list' multiple)
+                                span Загрузить картинки для галереи
+                              ul.upload_preview.uploadPreview
+
+                            .form_cell
+                              input.f_input.input_v6(placeholder='Старая цена' data-inputmask="'alias': 'numeric', 'rightAlign': 'false'" name='product_old_price')
+                              
+                            .form_cell
+                              input.f_input.input_v6(placeholder='Цена' data-inputmask="'alias': 'numeric', 'rightAlign': 'false'" name='product_price' class='validate[required,custom[onlyNumberSp]]')
+                              
+                            .form_cell
+                              input.f_input.input_v6(placeholder='Размер' name='product_sizes' class='validate[required]')
+                              
+                            .form_cell
+                              #color_picker_1.colorPicker
+                            .form_cell
+                              input.f_input.input_v6.inp_hidden.validateHidden(placeholder='Цвета' name='product_colors' class='validate[required]')
+                              a.gl_link.inner_link.addColor(href='#color_picker_1') Добавить цвет
+                              label.gl_link.inner_link
+                                input.inp_hidden.uploadInput(type='file' data-context='colors' data-target='product_colors' multiple)
+                                span Загрузить образец цвета
+                              ul.upload_preview.uploadPreview._rounded
+                              
+                            .form_cell
+                              input.f_input.input_v6(placeholder='Категория' name='product_category' class='validate[required]')
+                              
+                            .form_cell
+                              input.f_input.input_v6(placeholder='Артикул' name='product_code' class='validate[required]')
+                              
+                            .form_row
+                              .form_cell
+                                label.check_v3.check_emul
+                                  input.inp_hidden(type='radio' name='product_adult' value='a')
+                                  span.check_text
+                                    span.check_icon.i-car-baby-toy-outline
+                                    span Взрослый
+      
+                              .form_cell
+                                label.check_v3.check_emul
+                                  input.inp_hidden(type='radio' name='product_adult' value='c' checked)
+                                  span.check_text
+                                    span.check_icon.i-skate-with-handle-side-view
+                                    span Десткий
+      
+                            .form_cell
+                              .select_box_v2
+                                select.select2(name='product_gender')
+                                  option(value='m') М
+                                  option(value='f') Ж
+                              
+                            .form_row
+                              .form_cell
+                                label.check_v3.check_emul
+                                  input.inp_hidden(type='radio' name='product_season' value='w')
+                                  span.check_text
+                                    span.check_icon.i-car-baby-toy-outline
+                                    span Зима
+      
+                              .form_cell
+                                label.check_v3.check_emul
+                                  input.inp_hidden(type='radio' name='product_season' value='s')
+                                  span.check_text
+                                    span.check_icon.i-skate-with-handle-side-view
+                                    span Лето
+                                    
+                              .form_cell
+                                label.check_v3.check_emul
+                                  input.inp_hidden(type='radio' name='product_season' value='d')
+                                  span.check_text
+                                    span.check_icon.i-duck-side-view-outline
+                                    span Демисезон
+                                    
+                              .form_cell
+                                label.check_emul.check_v1
+                                  input.inp_hidden(type='checkbox' checked name='in_stock')
+                                  span.check_text В наличии
+                                    
+                              .form_cell
+                                label.check_emul.check_v1
+                                  input.inp_hidden(type='checkbox' checked name='is_hit')
+                                  span.check_text Хит продаж
+                                    
+                          button.btn_v3.blue_btn.order_confirm_btn.saveBtn Сохранить
+                
+                #order_tab_1
+                  .tab_content
+                    - if (all_orders && all_orders.length)
+                      #orders_table.orders_table
+                        .order_row.caption_row
+                          .order_cell.col_1
+                            span.cell_val Название
+                          .order_cell.col_2
+                            span.cell_val Наличие/Цена
+                          .order_cell.col_3
+                            span.cell_val Хит/Категория
+                          .order_cell.col_4
+                            span.cell_val Инфо
+                            
+                        //- if (all_orders.length)
+                          
+                        for prod in all_orders
+                          .order_row.orderRow
+                            .order_expand_btn.orderExpandBtn
+                            .order_cell.col_1
+                              - if (prod.main_img)
+                                a.order_img(href='/product/' + prod.url + (dev ? '.html' : '') target='_blank')
+                                  img(src= prod.main_img)
+                              span.cell_val= prod.name
+                            .order_cell.col_2
+                              span.cell_val
+                                span.prod_f_icon(class = prod.in_stock ? 'in_stock' : 'expected')
+                                span= formatPrice(prod.price) + ' грн.'
+                                - if (prod.old_price)
+                                  span= ', старая цена ' + formatPrice(prod.old_price) + ' грн.'
+
+                            .order_cell.col_3
+                              span.cell_val
+                                //-.prod_f_inf
+                                span.prod_f_icon(class = prod.is_hit ? 'in_stock' : 'canceled')
+                                span= prod.category
+
+                            .order_cell.col_4
+                              span.cell_val.fw_500._link_controls
+                                a.black_link(href='/edit/' + prod.url target = '_blank') Редактировать
+                                a.black_link.rmProdBtn(href='#' data-id= prod.url data-name= prod.name) Удалить
+  
+                          .orderExpandRow(style='display:none;')
+                            .order_row.collapsed
+                              .order_cell.col_1_w
+                                .order_product
+                                  - if (prod.hover_img)
+                                    a.order_img(href='/product/' + prod.url + (dev ? '.html' : '') target='_blank')
+                                      img(src= prod.hover_img)
+                                  - if (prod.img_list && prod.img_list.length)
+                                    - var arr = prod.img_list.split(',');
+                                    for img in arr
+                                      a.order_img(href='/product/' + prod.url + (dev ? '.html' : '') target='_blank')
+                                        img(src= img.trim())
+                                
+                                - if (prod.info && prod.info.length)
+                                  p= prod.info
+                                  
+                                - if (prod.description && prod.description.length)
+                                  p= prod.description
+
+                              //-.order_cell.col_2_w
+                                .cell_val()
+                                  - var arr = prod.colors.split(',');
+                                  ul.prod_colors
+                                    for item, i in arr
+                                      li
+                                        - var clr = item.trim();
+                                        - if (isHex(clr))
+                                          .prod_color(style='background:' + clr)
+                                        - else
+                                          .prod_color
+                                            img(src= clr)
+                                        
+                                  p 
+                                    | Пол: 
+                                    span= prod.gender
+                                    
+                                  p 
+                                    | Сезон: 
+                                    span= prod.season
+                                    
+                                    
+                              //-.order_cell.col_3_w
+                                .cell_val
+                                  p Размеры: #{prod.sizes}
+
+                                  p Для #{prod.adult ? 'взрослых' : 'детей'}
+
+                                  p Артикул: #{prod.product_code}
+
+      +footer()
+      
+    +aside_left()
+    +aside_right()
+    +popups()
+    +scripts("DREAMSEXPRESS Добавление товара", false, false, false, false, false, false, true)
+    

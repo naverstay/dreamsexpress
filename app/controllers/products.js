@@ -5,146 +5,147 @@ var slug = require('slug');
 var ObjectID = require('mongodb').ObjectID;
 var fs = require('fs');
 
-exports.all = function (req, res) {
-    Products.all(function (err, docs) {
-        if (err) {
-            // console.log(err);
-            return res.sendStatus(500);
-        }
-        // console.log(docs);
-        res.send(docs);
-    });
+exports.all = function (params, cb) {
+  Products.all(function (err, docs) {
+    if (err) {
+      // console.log(err);
+      return res.sendStatus(500);
+    }
+    // console.log(docs);
+
+    return docs;
+  });
 };
 
-exports.findById = function (req, res) {
-    Products.findById(req.params.id, function (err, doc) {
-        if (err) {
-            // console.log(err);
-            return res.sendStatus(500);
-        }
+exports.findById = function (id, cb) {
+  Products.findById(shared.isObjectID(id) ? id : ObjectID(id), function (err, doc) {
+    if (err) {
+      // console.log(err);
+      return cb.sendStatus(500);
+    }
 
-        if (typeof res == 'function') {
-            res(doc);
-        } else {
-            res.send(doc);
-        }
-    });
+    if (typeof cb == 'function') {
+      cb(doc);
+    } else {
+      return doc;
+    }
+  });
 };
 
 exports.findByName = function (req, res) {
-    // console.log(req);
+  // console.log(req);
 
-    Products.findByName(req.params.name, function (err, doc) {
-        if (err) {
-            // console.log(err);
-            return res.sendStatus(500);
-        }
-        res.send(doc);
-    });
+  Products.findByName(req.params.name, function (err, doc) {
+    if (err) {
+      // console.log(err);
+      return res.sendStatus(500);
+    }
+    res.send(doc);
+  });
 };
 
 exports.filter = function (params, cb) {
-    Products.filter(params, function (err, result) {
-        if (err) {
-            console.log(err);
-            return res.sendStatus(500);
-        }
-        cb(err, result);
-    });
+  Products.filter(params, function (err, result) {
+    if (err) {
+      console.log(err);
+      return res.sendStatus(500);
+    }
+    cb(err, result);
+  });
 };
 
 exports.create = function (req, res) {
 
-    // console.log(req.body);
+  // console.log(req.body);
 
-    if (req.body._id && shared.isObjectID(req.body._id)) {
+  if (req.body._id && shared.isObjectID(req.body._id)) {
 
-        // Products.filter({name: req.body.product_name}, function (err, results) {
-        //     if (err) {
-        //         console.log(err);
-        //         return res.sendStatus(500);
-        //     }
-        //
-        //     if (results.length) {
-        //         res.send({update_failed: true, fail_text : 'Имя <b>' + req.body.product_name + '</b> уже занято.'});
-        //
-        //     } else {
+    // Products.filter({name: req.body.product_name}, function (err, results) {
+    //     if (err) {
+    //         console.log(err);
+    //         return res.sendStatus(500);
+    //     }
+    //
+    //     if (results.length) {
+    //         res.send({update_failed: true, fail_text : 'Имя <b>' + req.body.product_name + '</b> уже занято.'});
+    //
+    //     } else {
 
 
-        Products.findById(req.body._id, function (err, doc) {
-            var product = {
-                name: req.body.product_name,
-                url: doc['url'],
-                info: req.body.product_info,
-                description: req.body.product_description,
-                main_img: req.body.product_main_img,
-                hover_img: req.body.product_hover_img,
-                img_list: req.body.product_img_list,
-                price: 1 * (req.body.product_price),
-                old_price: 1 * (req.body.product_old_price || 0),
-                sizes: req.body.product_sizes,
-                colors: req.body.product_colors,
-                adult: req.body.product_adult ? true : false,
-                gender: req.body.product_gender,
-                season: req.body.product_season,
-                category: req.body.product_category,
-                product_code: 1 * (req.body.product_code),
-                in_stock: req.body.in_stock ? true : false,
-                is_hit: req.body.is_hit ? true : false
-            };
+    Products.findById(req.body._id, function (err, doc) {
+      var product = {
+        name: req.body.product_name,
+        url: doc['url'],
+        info: req.body.product_info,
+        description: req.body.product_description,
+        main_img: req.body.product_main_img,
+        hover_img: req.body.product_hover_img,
+        img_list: req.body.product_img_list,
+        price: 1 * (req.body.product_price),
+        old_price: 1 * (req.body.product_old_price || 0),
+        sizes: req.body.product_sizes,
+        colors: req.body.product_colors,
+        adult: req.body.product_adult ? true : false,
+        gender: req.body.product_gender,
+        season: req.body.product_season,
+        category: req.body.product_category,
+        product_code: 1 * (req.body.product_code),
+        in_stock: req.body.in_stock ? true : false,
+        is_hit: req.body.is_hit ? true : false
+      };
 
-            Products.update(ObjectID(req.body._id), product, function (err, result) {
-                if (err) {
-                    console.log(err);
-                    return res.sendStatus(500);
-                }
+      Products.update(ObjectID(req.body._id), product, function (err, result) {
+        if (err) {
+          console.log(err);
+          return res.sendStatus(500);
+        }
 
-                if (result.modifiedCount) res.send({'redirectTo': true});
-            });
-        });
+        if (result.modifiedCount) res.send({'redirectTo': true});
+      });
+    });
 
-        // }
+    // }
 
-        // });
+    // });
 
-    } else {
+  } else {
 
-        var new_url = slug(req.body.product_name);
+    var new_url = slug(req.body.product_name);
 
-        function urlMaker(new_url, counter) {
-            // console.log(new_url);
+    function urlMaker(new_url, counter) {
+      // console.log(new_url);
 
-            Products.filter({url: new_url + (counter > 1 ? '-' + counter : '')}, function (err, results) {
-                if (results.length) {
-                    urlMaker(new_url, counter + 1);
-                } else {
-                    var product = {
-                        name: req.body.product_name,
-                        url: new_url + (counter > 1 ? '-' + counter : ''),
-                        info: req.body.product_info,
-                        description: req.body.product_description,
-                        main_img: req.body.product_main_img,
-                        hover_img: req.body.product_hover_img,
-                        img_list: req.body.product_img_list,
-                        price: 1 * (req.body.product_price),
-                        old_price: 1 * (req.body.product_old_price || 0),
-                        sizes: req.body.product_sizes,
-                        colors: req.body.product_colors,
-                        adult: req.body.product_adult ? true : false,
-                        gender: req.body.product_gender,
-                        season: req.body.product_season,
-                        category: req.body.product_category,
-                        product_code: 1 * (req.body.product_code),
-                        in_stock: req.body.in_stock ? true : false,
-                        is_hit: req.body.is_hit ? true : false
-                    };
+      Products.filter({url: new_url + (counter > 1 ? '-' + counter : '')}, function (err, results) {
+        if (results.length) {
+          urlMaker(new_url, counter + 1);
+        } else {
+          var product = {
+            name: req.body.product_name,
+            url: new_url + (counter > 1 ? '-' + counter : ''),
+            info: req.body.product_info,
+            description: req.body.product_description,
+            main_img: req.body.product_main_img,
+            hover_img: req.body.product_hover_img,
+            img_list: req.body.product_img_list,
+            price: 1 * (req.body.product_price),
+            old_price: 1 * (req.body.product_old_price || 0),
+            sizes: req.body.product_sizes,
+            colors: req.body.product_colors,
+            adult: req.body.product_adult ? true : false,
+            gender: req.body.product_gender,
+            season: req.body.product_season,
+            category: req.body.product_category,
+            product_code: 1 * (req.body.product_code),
+            in_stock: req.body.in_stock ? true : false,
+            is_hit: req.body.is_hit ? true : false
+          };
 
-                    Products.create(product, function (err, result) {
-                        var ret = {};
-                        if (err) {
-                            console.log(err);
-                            return res.sendStatus(500);
-                        }
+          Products.create(product, function (err, result) {
+            var ret = {};
+            if (err) {
+              console.log(err);
+              return res.sendStatus(500);
+            }
 // @formatter:off
                     if (result.insertedCount) {
                         var prod_title =
@@ -211,139 +212,139 @@ exports.create = function (req, res) {
                         ret['product_added'] = false;
                     }
 // @formatter:on
-                        res.send(ret);
-                    });
-                }
-            });
+            res.send(ret);
+          });
         }
-
-        urlMaker(new_url, 1);
+      });
     }
+
+    urlMaker(new_url, 1);
+  }
 };
 
 exports.update = function (req, res) {
-    Products.update(
-        req.id,
-        {url: req.url},
-        function (err, result) {
-            if (err) {
-                console.log(err);
-                if (res)
-                    return res.sendStatus(500);
-            }
-            if (res)
-                res.sendStatus(200);
-        }
-    );
+  Products.update(
+    req.id,
+    {url: req.url},
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        if (res)
+          return res.sendStatus(500);
+      }
+      if (res)
+        res.sendStatus(200);
+    }
+  );
 };
 
 exports.delete = function (req, res) {
-    console.log(req.params);
+  console.log(req.params);
 
-    var filter = [{url: req.params.id}];
+  var filter = [{url: req.params.id}];
 
-    if (shared.isObjectID(req.params.id)) {
-        filter.push({_id: ObjectID('' + req.params.id)});
-    }
+  if (shared.isObjectID(req.params.id)) {
+    filter.push({_id: ObjectID('' + req.params.id)});
+  }
 
-    Products.filter({$or: filter}, function (err, results) {
-        var product = results[0];
+  Products.filter({$or: filter}, function (err, results) {
+    var product = results[0];
 
-        if (err)
+    if (err)
+      return res.sendStatus(500);
+    console.log(results, product._id);
+
+    if (results.length) {
+      Products.delete(
+        results[0]._id,
+        function (err, result) {
+          if (err) {
+            console.log(err);
             return res.sendStatus(500);
-        console.log(results, product._id);
+          }
 
-        if (results.length) {
-            Products.delete(
-                results[0]._id,
-                function (err, result) {
-                    if (err) {
-                        console.log(err);
-                        return res.sendStatus(500);
-                    }
+          cleanUp(product.main_img);
 
-                    cleanUp(product.main_img);
+          cleanUp(product.hover_img);
 
-                    cleanUp(product.hover_img);
+          var img_arr = product.img_list.split(',');
 
-                    var img_arr = product.img_list.split(',');
+          for (var i = 0; i < img_arr.length; i++) {
+            cleanUp(img_arr[i]);
+          }
 
-                    for (var i = 0; i < img_arr.length; i++) {
-                        cleanUp(img_arr[i]);
-                    }
+          var colors = product.colors.split(',');
 
-                    var colors = product.colors.split(',');
+          for (var i = 0; i < colors.length; i++) {
+            var clr = colors[i];
 
-                    for (var i = 0; i < colors.length; i++) {
-                        var clr = colors[i];
+            if (!shared.isHex(clr)) {
+              cleanUp(clr);
+            }
+          }
 
-                        if (!shared.isHex(clr)) {
-                            cleanUp(clr);
-                        }
-                    }
-
-                    res.status(200).send({remove_done: true});
-                }
-            );
-        } else {
-            res.status(200).send({remove_failed: true});
+          res.status(200).send({remove_done: true});
         }
-    });
+      );
+    } else {
+      res.status(200).send({remove_failed: true});
+    }
+  });
 };
 
 function cleanUp(file) {
-    if (file && file.length) {
+  if (file && file.length) {
 
-        var target = '.' + shared.checkSlash(file);
+    var target = '.' + shared.checkSlash(file);
 
-        fs.stat(target, function (err, stats) {
-            // console.log(stats);
+    fs.stat(target, function (err, stats) {
+      // console.log(stats);
 
-            if (err) {
-                return console.error(err);
-            }
+      if (err) {
+        return console.error(err);
+      }
 
-            if (/^\.\/uploads/i.test(target) && stats.isFile()) {
-                fs.unlink(target, function (err) {
-                    if (err) return console.log(err);
-                    console.log('file "' + target + '" deleted successfully');
-                });
-            } else {
-                res.status(200).send({remove_done: false, fail_msg: 'Удаление запрещено.'});
-            }
+      if (/^\.\/uploads/i.test(target) && stats.isFile()) {
+        fs.unlink(target, function (err) {
+          if (err) return console.log(err);
+          console.log('file "' + target + '" deleted successfully');
         });
-    }
+      } else {
+        res.status(200).send({remove_done: false, fail_msg: 'Удаление запрещено.'});
+      }
+    });
+  }
 }
 
 function previewBuilder(hover_img, img_arr, href) {
-    var ret = previewLink(hover_img, href), arr = img_arr.split(',');
+  var ret = previewLink(hover_img, href), arr = img_arr.split(',');
 
-    for (var i = 0; i < arr.length; i++) {
-        ret += previewLink(arr[i], href);
-    }
+  for (var i = 0; i < arr.length; i++) {
+    ret += previewLink(arr[i], href);
+  }
 
-    return ret;
+  return ret;
 }
 
 function previewLink(img, url) {
-    return (img && img.length ?
-    '<a class="order_img" href="/product/"' + url + ' target="_blank">' +
-    '<img src="' + img + '">' +
-    '</a>' : '');
+  return (img && img.length ?
+  '<a class="order_img" href="/product/"' + url + ' target="_blank">' +
+  '<img src="' + img + '">' +
+  '</a>' : '');
 }
 
 function colorBuilder(colors) {
-    var ret = '', arr = colors.split(',');
+  var ret = '', arr = colors.split(',');
 
-    for (var i = 0; i < arr.length; i++) {
-        var clr = (arr[i]).trim();
+  for (var i = 0; i < arr.length; i++) {
+    var clr = (arr[i]).trim();
 
-        if (shared.isHex(clr)) {
-            ret += '<li><div class="prod_color" style="background:' + clr + ';"></div></li>';
-        } else if (clr.length > 10) {
-            ret += '<li><div class="prod_color"><img src="' + shared.checkSlash(clr) + '"></div></li>';
-        }
+    if (shared.isHex(clr)) {
+      ret += '<li><div class="prod_color" style="background:' + clr + ';"></div></li>';
+    } else if (clr.length > 10) {
+      ret += '<li><div class="prod_color"><img src="' + shared.checkSlash(clr) + '"></div></li>';
     }
+  }
 
-    return ret;
+  return ret;
 }

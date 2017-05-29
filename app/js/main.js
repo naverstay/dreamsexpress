@@ -1,430 +1,433 @@
 var body, html, doc, wnd, search_delay,
-    closeMenuTimer,
-    searchResults,
-    qSearchForm,
-    qBuyForm,
-    cart_info_timeout,
-    last_search = '',
-    searching = false,
-    favoriting = false,
-    callback_popup,
-    auth_popup,
-    fail_popup,
-    confirmation_popup,
-    success_popup,
-    quick_search_popup,
-    add2cart_popup,
-    recovery_popup,
-    inputMaskEvents = {
-        "oncomplete": function (ev) {
-            // console.log(ev, this);
-            $(this).addClass('_complete').removeClass('_incomplete');
+  closeMenuTimer,
+  searchResults,
+  qSearchForm,
+  qBuyForm,
+  cart_info_timeout,
+  last_search = '',
+  searching = false,
+  favoriting = false,
+  callback_popup,
+  auth_popup,
+  fail_popup,
+  confirmation_popup,
+  success_popup,
+  quick_search_popup,
+  add2cart_popup,
+  recovery_popup,
+  inputMaskEvents = {
+    "oncomplete": function (ev) {
+      // console.log(ev, this);
+      $(this).addClass('_complete').removeClass('_incomplete');
 
-        },
-        "onincomplete": function (ev) {
-            // console.log(ev, this);
-            $(this).addClass('_incomplete').removeClass('_complete');
-        },
-        "oncleared": function (ev) {
-            // console.log(ev, this);
-            $(this).removeClass('_complete');
-        }
-    };
+    },
+    "onincomplete": function (ev) {
+      // console.log(ev, this);
+      $(this).addClass('_incomplete').removeClass('_complete');
+    },
+    "oncleared": function (ev) {
+      // console.log(ev, this);
+      $(this).removeClass('_complete');
+    }
+  };
 
 $(function ($) {
 
-    html = $('html');
-    body = $('body');
-    searchResults = $('.searchResults');
-    qSearchForm = $('.qSearchForm');
-    qBuyForm = $('.qBuyForm');
+  html = $('html');
+  body = $('body');
+  searchResults = $('.searchResults');
+  qSearchForm = $('.qSearchForm');
+  qBuyForm = $('.qBuyForm');
 
-    body
-        .delegate('.openMobMenu', 'click', function () {
-            clearTimeout(closeMenuTimer);
+  body
+    .delegate('.openMobMenu', 'click', function () {
+      clearTimeout(closeMenuTimer);
 
-            if (body.hasClass('menu_opened')) {
-                closeMenuTimer = setTimeout(function () {
-                    body.removeClass('icon_close');
-                }, 250);
+      if (body.hasClass('menu_opened')) {
+        closeMenuTimer = setTimeout(function () {
+          body.removeClass('icon_close');
+        }, 250);
+      }
+
+      body.addClass('icon_close').toggleClass('menu_opened');
+      return false;
+
+    })
+    .delegate('.openFav', 'click', function () {
+
+      body.toggleClass('fav_opened');
+      html.toggleClass('no_scroll');
+      return false;
+
+    })
+    .delegate('.sortBtn', 'click', function () {
+      var firedEl = $(this), inp = $(firedEl.addClass('active').attr('data-target'));
+
+      if (inp.val() == 'desc') {
+        firedEl.find('.sort_icon').addClass('i-sort-asc').removeClass('i-sort-desc');
+        $(firedEl.addClass('active').attr('data-target')).val('asc');
+      } else {
+        firedEl.find('.sort_icon').addClass('i-sort-desc').removeClass('i-sort-asc');
+        $(firedEl.addClass('active').attr('data-target')).val('desc');
+      }
+
+      $(this).closest('form').trigger('submit');
+
+      return false;
+
+    })
+    .delegate('.orderExpandBtn', 'click', function () {
+      $(this).closest('.orderRow').toggleClass('opened').next('.orderExpandRow').slideToggle(500).find('.order_row').toggleClass('opened');
+
+      return false;
+
+    })
+    .delegate('.rmFavBtn', 'click', function () {
+      var firedEl = $(this);
+
+      if (!favoriting) {
+        favoriting = true;
+
+        $.ajax({ // инициaлизируeм ajax зaпрoс
+          type: "POST", // oтпрaвляeм в POST фoрмaтe, мoжнo GET
+          url: "/fav_rm", // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
+          dataType: 'json', // oтвeт ждeм в json фoрмaтe
+          data: {id: firedEl.attr('data-id')}, // дaнныe для oтпрaвки
+          beforeSend: function (data) { // сoбытиe дo oтпрaвки
+
+          },
+          success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
+
+            if (data.needAuth) {
+              setTimeout(function () {
+                all_dialog_close_gl();
+                auth_popup.dialog('open');
+              }, 1);
             }
 
-            body.addClass('icon_close').toggleClass('menu_opened');
-            return false;
-
-        })
-        .delegate('.openFav', 'click', function () {
-
-            body.toggleClass('fav_opened');
-            html.toggleClass('no_scroll');
-            return false;
-
-        })
-        .delegate('.sortBtn', 'click', function () {
-            var firedEl = $(this), inp = $(firedEl.addClass('active').attr('data-target'));
-
-            if (inp.val() == 'desc') {
-                firedEl.find('.sort_icon').addClass('i-sort-asc').removeClass('i-sort-desc');
-                $(firedEl.addClass('active').attr('data-target')).val('asc');
-            } else {
-                firedEl.find('.sort_icon').addClass('i-sort-desc').removeClass('i-sort-asc');
-                $(firedEl.addClass('active').attr('data-target')).val('desc');
+            if (data.redirectTo) {
+              redirectTo(data.redirectTo);
+              return;
             }
 
-            $(this).closest('form').trigger('submit');
+            // console.log(data);
 
-            return false;
+            updateFav(data);
 
-        })
-        .delegate('.orderExpandBtn', 'click', function () {
-            $(this).closest('.orderRow').toggleClass('opened').next('.orderExpandRow').slideToggle(500).find('.order_row').toggleClass('opened');
+          },
+          error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
 
-            return false;
+            console.log(xhr, ajaxOptions, thrownError);
 
-        })
-        .delegate('.rmFavBtn', 'click', function () {
-            var firedEl = $(this);
-
-            if (!favoriting) {
-                favoriting = true;
-
-                $.ajax({ // инициaлизируeм ajax зaпрoс
-                    type: "POST", // oтпрaвляeм в POST фoрмaтe, мoжнo GET
-                    url: "/fav_rm", // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
-                    dataType: 'json', // oтвeт ждeм в json фoрмaтe
-                    data: {id: firedEl.attr('data-id')}, // дaнныe для oтпрaвки
-                    beforeSend: function (data) { // сoбытиe дo oтпрaвки
-
-                    },
-                    success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
-
-                        if (data.needAuth) {
-                            setTimeout(function () {
-                                all_dialog_close_gl();
-                                auth_popup.dialog('open');
-                            }, 1);
-                        }
-
-                        if (data.redirectTo) {
-                            redirectTo(data.redirectTo);
-                            return;
-                        }
-
-                        // console.log(data);
-
-                        updateFav(data);
-
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
-
-                        console.log(xhr, ajaxOptions, thrownError);
-
-                        // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
-                        // alert(thrownError); // и тeкст oшибки
-                    },
-                    complete: function (data) { // сoбытиe пoслe любoгo исхoдa
-                        favoriting = false;
-                    }
-                });
-            }
-
-            return false;
-
-        })
-        .delegate('.clearFavBtn', 'click', function () {
-
-            if (!favoriting) {
-                favoriting = true;
-
-                $.ajax({ // инициaлизируeм ajax зaпрoс
-                    type: "POST", // oтпрaвляeм в POST фoрмaтe, мoжнo GET
-                    url: "/fav_clear", // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
-                    dataType: 'json', // oтвeт ждeм в json фoрмaтe
-                    data: {id: ''}, // дaнныe для oтпрaвки
-                    beforeSend: function (data) { // сoбытиe дo oтпрaвки
-
-                    },
-                    success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
-
-                        // console.log(data);
-
-                        if (data.needAuth) {
-                            setTimeout(function () {
-                                all_dialog_close_gl();
-                                auth_popup.dialog('open');
-                            }, 1);
-                        }
-
-                        if (data.redirectTo) {
-                            redirectTo(data.redirectTo);
-                            return;
-                        }
-
-                        $('.favUnit').remove();
-
-                        updateFav(data);
-
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
-
-                        console.log(xhr, ajaxOptions, thrownError);
-
-                        // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
-                        // alert(thrownError); // и тeкст oшибки
-                    },
-                    complete: function (data) { // сoбытиe пoслe любoгo исхoдa
-                        favoriting = false;
-                    }
-                });
-            }
-
-            return false;
-
-        })
-        .delegate('.favBtn', 'click', function () {
-            var firedEl = $(this);
-
-            if (!favoriting) {
-                favoriting = true;
-
-                $.ajax({ // инициaлизируeм ajax зaпрoс
-                    type: "POST", // oтпрaвляeм в POST фoрмaтe, мoжнo GET
-                    url: "/fav", // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
-                    dataType: 'json', // oтвeт ждeм в json фoрмaтe
-                    data: {id: firedEl.attr('data-id')}, // дaнныe для oтпрaвки
-                    beforeSend: function (data) { // сoбытиe дo oтпрaвки
-
-                    },
-                    success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
-
-                        // console.log(data);
-
-                        if (data.needAuth) {
-                            setTimeout(function () {
-                                all_dialog_close_gl();
-                                auth_popup.dialog('open');
-                            }, 1);
-                        } else if (data.redirectTo) {
-                            redirectTo(data.redirectTo);
-                        } else {
-                            updateFav(data);
-                        }
-
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
-
-                        console.log(xhr, ajaxOptions, thrownError);
-
-                        // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
-                        // alert(thrownError); // и тeкст oшибки
-                    },
-                    complete: function (data) { // сoбытиe пoслe любoгo исхoдa
-                        favoriting = false;
-                    }
-                });
-            }
-
-            return false;
-
-        })
-        .delegate('.toggleOneClick', 'click', function () {
-
-            $(this).closest('.prod_review_controls_w').find('.oneClickForm').toggle();
-
-            return false;
+            // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
+            // alert(thrownError); // и тeкст oшибки
+          },
+          complete: function (data) { // сoбытиe пoслe любoгo исхoдa
+            favoriting = false;
+          }
         });
+      }
 
-    qSearchForm.on('submit', function () {
-        qSearchFunc();
+      return false;
 
-        return false;
+    })
+    .delegate('.clearFavBtn', 'click', function () {
+
+      if (!favoriting) {
+        favoriting = true;
+
+        $.ajax({ // инициaлизируeм ajax зaпрoс
+          type: "POST", // oтпрaвляeм в POST фoрмaтe, мoжнo GET
+          url: "/fav_clear", // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
+          dataType: 'json', // oтвeт ждeм в json фoрмaтe
+          data: {id: ''}, // дaнныe для oтпрaвки
+          beforeSend: function (data) { // сoбытиe дo oтпрaвки
+
+          },
+          success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
+
+            // console.log(data);
+
+            if (data.needAuth) {
+              setTimeout(function () {
+                all_dialog_close_gl();
+                auth_popup.dialog('open');
+              }, 1);
+            }
+
+            if (data.redirectTo) {
+              redirectTo(data.redirectTo);
+              return;
+            }
+
+            $('.favUnit').remove();
+
+            updateFav(data);
+
+          },
+          error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
+
+            console.log(xhr, ajaxOptions, thrownError);
+
+            // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
+            // alert(thrownError); // и тeкст oшибки
+          },
+          complete: function (data) { // сoбытиe пoслe любoгo исхoдa
+            favoriting = false;
+          }
+        });
+      }
+
+      return false;
+
+    })
+    .delegate('.favBtn', 'click', function () {
+      var firedEl = $(this);
+
+      if (!favoriting) {
+        favoriting = true;
+
+        $.ajax({ // инициaлизируeм ajax зaпрoс
+          type: "POST", // oтпрaвляeм в POST фoрмaтe, мoжнo GET
+          url: "/fav", // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
+          dataType: 'json', // oтвeт ждeм в json фoрмaтe
+          data: {id: firedEl.attr('data-id')}, // дaнныe для oтпрaвки
+          beforeSend: function (data) { // сoбытиe дo oтпрaвки
+
+          },
+          success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
+
+            // console.log(data);
+
+            if (data.needAuth) {
+              setTimeout(function () {
+                all_dialog_close_gl();
+                auth_popup.dialog('open');
+              }, 1);
+            } else if (data.redirectTo) {
+              redirectTo(data.redirectTo);
+            } else {
+              updateFav(data);
+            }
+
+          },
+          error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
+
+            console.log(xhr, ajaxOptions, thrownError);
+
+            // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
+            // alert(thrownError); // и тeкст oшибки
+          },
+          complete: function (data) { // сoбытиe пoслe любoгo исхoдa
+            favoriting = false;
+          }
+        });
+      }
+
+      return false;
+
+    })
+    .delegate('.toggleOneClick', 'click', function () {
+
+      $(this).closest('.prod_review_controls_w').find('.oneClickForm').toggle();
+
+      return false;
     });
 
-    qBuyForm.on('submit', function () {
-        var form = $(this);
+  qSearchForm.on('submit', function () {
+    qSearchFunc();
 
-        if (form.validationEngine('validate')) qBuyFunc(form);
+    return false;
+  });
 
-        return false;
-    });
+  qBuyForm.on('submit', function () {
+    var form = $(this);
 
-    initMask();
+    if (form.validationEngine('validate')) qBuyFunc(form);
 
-    initValidation();
+    return false;
+  });
 
-    addNoscrollStyle();
+  initMask();
 
-    initInputFillChecker();
+  initValidation();
 
-    initCallbackPopup();
+  addNoscrollStyle();
 
-    initAuthPopup();
+  initInputFillChecker();
 
-    initRecoveryPopup();
+  initCallbackPopup();
 
-    initFailPopup();
+  initAuthPopup();
 
-    initSuccessPopup();
+  initRecoveryPopup();
 
-    initConfirmationPopup();
+  initFailPopup();
 
-    initAddToCartPopup();
+  initSuccessPopup();
 
-    initQuickSearchPopup();
+  initConfirmationPopup();
 
-    initTabs();
+  initAddToCartPopup();
 
-    initAsideSubmenu();
+  initQuickSearchPopup();
 
-    initSelect2();
+  initTabs();
 
-    initQSearch();
+  initAsideSubmenu();
 
-    all_dialog_close();
+  initSelect2();
+
+  initQSearch();
+
+  all_dialog_close();
 
 });
 
 $(window).resize(function () {
-    // console.log($(window).width());
-    //
-    // if ($(window).width() < 670) {
-    //     $('.mCSBaside').mCustomScrollbar('destroy');
-    // } else {
-    //     $('.mCSBaside').mCustomScrollbar({
-    //         documentTouchScroll: true,
-    //         theme: "dark",
-    //         scrollEasing: "linear"
-    //     });
-    // }
+  // console.log($(window).width());
+  //
+  // if ($(window).width() < 670) {
+  //     $('.mCSBaside').mCustomScrollbar('destroy');
+  // } else {
+  //     $('.mCSBaside').mCustomScrollbar({
+  //         documentTouchScroll: true,
+  //         theme: "dark",
+  //         scrollEasing: "linear"
+  //     });
+  // }
 
 });
 
 function animateOnce(el, addClass, removeClass) {
-    el.addClass(addClass + ' animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
-        $(this).removeClass(addClass + ' ' + removeClass);
-    });
+  el.addClass(addClass + ' animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+    $(this).removeClass(addClass + ' ' + removeClass);
+  });
 }
 
 function initQSearch() {
-    $('.qSearchInput').on('keyup keydown change paste cut', function () {
-        var search = $(this).val();
+  $('.qSearchInput').on('keyup keydown change paste cut', function () {
+    var search = $(this).val();
 
-        clearTimeout(search_delay);
+    clearTimeout(search_delay);
 
-        if (!search.length) {
-            searchResults.html('');
-            return;
-        }
+    if (!search.length) {
+      searchResults.html('');
+      return;
+    }
 
-        search_delay = setTimeout(function () {
+    search_delay = setTimeout(function () {
 
-            if (!searching && search != last_search) {
-                searching = true;
-                last_search = search;
-                qSearchForm.trigger('submit');
-            }
-        }, 1000);
-    });
+      if (!searching && search != last_search) {
+        searching = true;
+        last_search = search;
+        qSearchForm.trigger('submit');
+      }
+    }, 1000);
+  });
 }
 
 function qBuyFunc(form) {
-    var data = form.serialize(); // пoдгoтaвливaeм дaнныe
+  var data = form.serialize(); // пoдгoтaвливaeм дaнныe
 
-    $.ajax({ // инициaлизируeм ajax зaпрoс
-        type: form.attr('method'), // oтпрaвляeм в POST фoрмaтe, мoжнo GET
-        url: form.attr('action'), // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
-        dataType: 'json', // oтвeт ждeм в json фoрмaтe
-        data: data, // дaнныe для oтпрaвки
-        beforeSend: function (data) { // сoбытиe дo oтпрaвки
+  $.ajax({ // инициaлизируeм ajax зaпрoс
+    type: form.attr('method'), // oтпрaвляeм в POST фoрмaтe, мoжнo GET
+    url: form.attr('action'), // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
+    dataType: 'json', // oтвeт ждeм в json фoрмaтe
+    data: data, // дaнныe для oтпрaвки
+    beforeSend: function (data) { // сoбытиe дo oтпрaвки
 
-        },
-        success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
+    },
+    success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
 
-            console.log(data);
+      if (data.order_sent) {
+        $('.successText').html(data.success_text);
+        success_popup.dialog('open');
+      }
 
-            /*if (data['error']) { // eсли oбрaбoтчик вeрнул oшибку
-                alert(data['error']); // пoкaжeм eё тeкст
-            } else { // eсли всe прoшлo oк
-                alert('Письмo oтврaвлeнo! Чeкaйтe пoчту! =)'); // пишeм чтo всe oк
-            }*/
-        },
-        error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
+      /*if (data['error']) { // eсли oбрaбoтчик вeрнул oшибку
+          alert(data['error']); // пoкaжeм eё тeкст
+      } else { // eсли всe прoшлo oк
+          alert('Письмo oтврaвлeнo! Чeкaйтe пoчту! =)'); // пишeм чтo всe oк
+      }*/
+    },
+    error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
 
-            console.log(xhr, ajaxOptions, thrownError);
+      console.log(xhr, ajaxOptions, thrownError);
 
-            // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
-            // alert(thrownError); // и тeкст oшибки
-        },
-        complete: function (data) { // сoбытиe пoслe любoгo исхoдa
+      // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
+      // alert(thrownError); // и тeкст oшибки
+    },
+    complete: function (data) { // сoбытиe пoслe любoгo исхoдa
 
-        }
-    });
+    }
+  });
 }
 
 function qSearchFunc() {
-    var data = qSearchForm.serialize(); // пoдгoтaвливaeм дaнныe
+  var data = qSearchForm.serialize(); // пoдгoтaвливaeм дaнныe
 
-    console.log(data);
+  console.log(data);
 
-    $.ajax({ // инициaлизируeм ajax зaпрoс
-        type: qSearchForm.attr('method'), // oтпрaвляeм в POST фoрмaтe, мoжнo GET
-        url: qSearchForm.attr('action'), // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
-        dataType: 'json', // oтвeт ждeм в json фoрмaтe
-        data: data, // дaнныe для oтпрaвки
-        beforeSend: function (data) { // сoбытиe дo oтпрaвки
+  $.ajax({ // инициaлизируeм ajax зaпрoс
+    type: qSearchForm.attr('method'), // oтпрaвляeм в POST фoрмaтe, мoжнo GET
+    url: qSearchForm.attr('action'), // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
+    dataType: 'json', // oтвeт ждeм в json фoрмaтe
+    data: data, // дaнныe для oтпрaвки
+    beforeSend: function (data) { // сoбытиe дo oтпрaвки
 
-        },
-        success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
+    },
+    success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
 
-            searchResults.html(data.items);
+      searchResults.html(data.items);
 
-            /*if (data['error']) { // eсли oбрaбoтчик вeрнул oшибку
-                alert(data['error']); // пoкaжeм eё тeкст
-            } else { // eсли всe прoшлo oк
-                alert('Письмo oтврaвлeнo! Чeкaйтe пoчту! =)'); // пишeм чтo всe oк
-            }*/
-        },
-        error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
+      /*if (data['error']) { // eсли oбрaбoтчик вeрнул oшибку
+          alert(data['error']); // пoкaжeм eё тeкст
+      } else { // eсли всe прoшлo oк
+          alert('Письмo oтврaвлeнo! Чeкaйтe пoчту! =)'); // пишeм чтo всe oк
+      }*/
+    },
+    error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
 
-            console.log(xhr, ajaxOptions, thrownError);
+      console.log(xhr, ajaxOptions, thrownError);
 
-            // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
-            // alert(thrownError); // и тeкст oшибки
-        },
-        complete: function (data) { // сoбытиe пoслe любoгo исхoдa
-            searching = false;
-        }
-    });
+      // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
+      // alert(thrownError); // и тeкст oшибки
+    },
+    complete: function (data) { // сoбытиe пoслe любoгo исхoдa
+      searching = false;
+    }
+  });
 
 }
 
 function renderQSearchResult(data) {
-    var items = '';
+  var items = '';
 
-    $.each(data, function (index, item) {
-        console.log(item);
+  $.each(data, function (index, item) {
+    console.log(item);
 
-        items +=
-            '<li>' +
-            '<div class="product_item">' +
-            '<a href="product_' + item._id + '" class="product_img">' +
-            '<img src="' + item.main_img + '">' +
-            '<div class="product_hit">Хит продаж</div>' +
-            '<div class="product_share_holder">' +
-            '<div class="product_share">- 30%</div>' +
-            '</div>' +
-            '</a>' +
-            '<h3 class="product_caption">' + item.name + '</h3>' +
-            '<div class="product_price">' +
-            (item.old_price ? '<span class="old_price">' + formatPrice(item.old_price) + '<span> грн.</span></span>' : '') +
-            '<span class="new_price">' + formatPrice(item.price) + '<span> грн.</span></span>' +
-            '</div>' +
-            '</div>' +
-            '</li>';
+    items +=
+      '<li>' +
+      '<div class="product_item">' +
+      '<a href="product_' + item._id + '" class="product_img">' +
+      '<img src="' + item.main_img + '">' +
+      '<div class="product_hit">Хит продаж</div>' +
+      '<div class="product_share_holder">' +
+      '<div class="product_share">- 30%</div>' +
+      '</div>' +
+      '</a>' +
+      '<h3 class="product_caption">' + item.name + '</h3>' +
+      '<div class="product_price">' +
+      (item.old_price ? '<span class="old_price">' + formatPrice(item.old_price) + '<span> грн.</span></span>' : '') +
+      '<span class="new_price">' + formatPrice(item.price) + '<span> грн.</span></span>' +
+      '</div>' +
+      '</div>' +
+      '</li>';
 
-    });
+  });
 
-    searchResults.html(items);
+  searchResults.html(items);
 }
 
 // function colorRender(colors) {
@@ -444,587 +447,587 @@ function renderQSearchResult(data) {
 // }
 
 function plural(n, str1, str2, str5, num) {
-    return (num ? n + ' ' : '') + ((((n % 10) == 1) && ((n % 100) != 11)) ? (str1) : (((((n % 10) >= 2) && ((n % 10) <= 4)) && (((n % 100) < 10) || ((n % 100) >= 20))) ? (str2) : (str5)));
+  return (num ? n + ' ' : '') + ((((n % 10) == 1) && ((n % 100) != 11)) ? (str1) : (((((n % 10) >= 2) && ((n % 10) <= 4)) && (((n % 100) < 10) || ((n % 100) >= 20))) ? (str2) : (str5)));
 }
 
 function isHex(h) {
-    return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(h.trim());
+  return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(h.trim());
 }
 
 function formatPrice(s) {
-    return ('' + s).replace(/(?!^)(?=(\d{3})+(?=\.|$))/gm, ' ');
+  return ('' + s).replace(/(?!^)(?=(\d{3})+(?=\.|$))/gm, ' ');
 }
 
 function addNoscrollStyle() {
 
-    $('.mCSB').each(function (ind) {
-        $(this).mCustomScrollbar({
-            documentTouchScroll: true,
-            theme: "dark",
-            scrollEasing: "linear",
-            mouseWheel: {preventDefault: true}
-        });
+  $('.mCSB').each(function (ind) {
+    $(this).mCustomScrollbar({
+      documentTouchScroll: true,
+      theme: "dark",
+      scrollEasing: "linear",
+      mouseWheel: {preventDefault: true}
     });
+  });
 
-    $('.mCSBaside').mCustomScrollbar({
-        documentTouchScroll: true,
-        theme: "dark",
-        scrollEasing: "linear",
-        mouseWheel: {preventDefault: true}
-    });
+  $('.mCSBaside').mCustomScrollbar({
+    documentTouchScroll: true,
+    theme: "dark",
+    scrollEasing: "linear",
+    mouseWheel: {preventDefault: true}
+  });
 
-    /*    return;
-    
-        html.css('overflow-y', 'hidden');
-    
-        var testWidth = html.width();
-    
-        html.attr('style', null);
-    
-        var scrollW = testWidth - html.width();
-    
-        $('<style type="text/css">').html('.no_scroll body, .no_scroll .auth_menu, .no_scroll .aside_right { margin-right: ' + (scrollW) + 'px; }.no_scroll .q_search_results_holder { margin-right: ' + (-scrollW) + 'px; }').appendTo('head');*/
+  /*    return;
+  
+      html.css('overflow-y', 'hidden');
+  
+      var testWidth = html.width();
+  
+      html.attr('style', null);
+  
+      var scrollW = testWidth - html.width();
+  
+      $('<style type="text/css">').html('.no_scroll body, .no_scroll .auth_menu, .no_scroll .aside_right { margin-right: ' + (scrollW) + 'px; }.no_scroll .q_search_results_holder { margin-right: ' + (-scrollW) + 'px; }').appendTo('head');*/
 }
 
 function initValidation() {
-    $('.validateMe').each(function (ind) {
-        var f = $(this);
+  $('.validateMe').each(function (ind) {
+    var f = $(this);
 
-        f.validationEngine({
-            //binded                   : false,
-            scroll: false,
-            showPrompts: true,
-            showArrow: false,
-            addSuccessCssClassToField: 'success',
-            addFailureCssClassToField: 'error',
-            // parentFieldClass: '.form_cell',
-            // parentFormClass: '.order_block',
-            promptPosition: "centerRight",
-            //doNotShowAllErrosOnSubmit: true,
-            //focusFirstField          : false,
-            autoHidePrompt: true,
-            autoHideDelay: 3000,
-            autoPositionUpdate: false,
-            prettySelect: true,
-            //useSuffix                : "_VE_field",
-            addPromptClass: 'relative_mode one_msg',
-            showOneMessage: false
-        });
+    f.validationEngine({
+      //binded                   : false,
+      scroll: false,
+      showPrompts: true,
+      showArrow: false,
+      addSuccessCssClassToField: 'success',
+      addFailureCssClassToField: 'error',
+      // parentFieldClass: '.form_cell',
+      // parentFormClass: '.order_block',
+      promptPosition: "centerRight",
+      //doNotShowAllErrosOnSubmit: true,
+      //focusFirstField          : false,
+      autoHidePrompt: true,
+      autoHideDelay: 3000,
+      autoPositionUpdate: false,
+      prettySelect: true,
+      //useSuffix                : "_VE_field",
+      addPromptClass: 'relative_mode one_msg',
+      showOneMessage: false
     });
+  });
 }
 
 function initMask(target) {
-    var inp;
+  var inp;
 
-    if (target) {
-        inp = $(target);
-    } else {
-        inp = $("input");
+  if (target) {
+    inp = $(target);
+  } else {
+    inp = $("input");
+  }
+
+  if (!inp.length) return;
+
+  inp.each(function (i, el) {
+    var inp = $(el), param = inputMaskEvents;
+
+    if (inp.attr('data-inputmask-custom') != void 0) {
+      inp.inputmask(JSON.parse('{' + inp.attr('data-inputmask-custom').replace(/'/g, '"') + '}'));
     }
 
-    if (!inp.length) return;
+    // if (inp.attr('data-inputmask-phone') != void 0) {
+    //     inp.mask(inp.attr('data-inputmask-phone'), {placeholder: inp.attr('data-mask-placeholder')});
+    // }
 
-    inp.each(function (i, el) {
-        var inp = $(el), param = inputMaskEvents;
+    // if (inp.attr('data-inputmask-regex') != void 0) {
+    //     param.regex = inp.attr('data-inputmask-regex');
+    //
+    //     inp.inputmask('Regex', param);
+    // }
 
-        if (inp.attr('data-inputmask-custom') != void 0) {
-            inp.inputmask(JSON.parse('{' + inp.attr('data-inputmask-custom').replace(/'/g, '"') + '}'));
-        }
+    if (inp.attr('data-inputmask') != void 0) {
+      inp.inputmask();
+    }
 
-        // if (inp.attr('data-inputmask-phone') != void 0) {
-        //     inp.mask(inp.attr('data-inputmask-phone'), {placeholder: inp.attr('data-mask-placeholder')});
-        // }
+    if (inp.attr('data-inputmask-email') != void 0) {
+      param.regex = inp.attr('data-inputmask-email');
+      param.placeholder = '_';
 
-        // if (inp.attr('data-inputmask-regex') != void 0) {
-        //     param.regex = inp.attr('data-inputmask-regex');
-        //
-        //     inp.inputmask('Regex', param);
-        // }
+      inp.inputmask('Regex', param);
+    }
 
-        if (inp.attr('data-inputmask') != void 0) {
-            inp.inputmask();
-        }
-
-        if (inp.attr('data-inputmask-email') != void 0) {
-            param.regex = inp.attr('data-inputmask-email');
-            param.placeholder = '_';
-
-            inp.inputmask('Regex', param);
-        }
-
-        if (inp.attr('data-inputmask-regex') != void 0) {
-            inp.inputmask('Regex', inputMaskEvents);
-        }
-    });
+    if (inp.attr('data-inputmask-regex') != void 0) {
+      inp.inputmask('Regex', inputMaskEvents);
+    }
+  });
 }
 
 function initInputFillChecker() {
-    $('input').on('change keyup blur', function () {
-        var inp = $(this);
+  $('input').on('change keyup blur', function () {
+    var inp = $(this);
 
-        if ('text' == inp[0].type && 'required' == inp.attr('required')) {
-            inp.toggleClass('empty', inp.val() == 0);
-        }
-    });
+    if ('text' == inp[0].type && 'required' == inp.attr('required')) {
+      inp.toggleClass('empty', inp.val() == 0);
+    }
+  });
 }
 
 function initQuickSearchPopup() {
 
-    quick_search_popup = $('#quick_search_popup').dialog({
-        autoOpen: false,
-        modal: true,
-        closeOnEscape: true,
-        closeText: '',
-        dialogClass: 'no_close_mod no_title dialog_fixed',
-        //appendTo: '.wrapper',
-        width: '100%',
-        draggable: true,
-        collision: "fit",
-        position: {my: "top center", at: "top center", of: window},
-        open: function (event, ui) {
-            body.addClass('modal_opened overlay_v2');
-            html.addClass('no_scroll');
-        },
-        close: function (event, ui) {
-            body.removeClass('modal_opened overlay_v2');
-            html.removeClass('no_scroll');
-        }
-    });
+  quick_search_popup = $('#quick_search_popup').dialog({
+    autoOpen: false,
+    modal: true,
+    closeOnEscape: true,
+    closeText: '',
+    dialogClass: 'no_close_mod no_title dialog_fixed',
+    //appendTo: '.wrapper',
+    width: '100%',
+    draggable: true,
+    collision: "fit",
+    position: {my: "top center", at: "top center", of: window},
+    open: function (event, ui) {
+      body.addClass('modal_opened overlay_v2');
+      html.addClass('no_scroll');
+    },
+    close: function (event, ui) {
+      body.removeClass('modal_opened overlay_v2');
+      html.removeClass('no_scroll');
+    }
+  });
 
-    $('.quickSearchBtn').on('click', function () {
+  $('.quickSearchBtn').on('click', function () {
 
-        quick_search_popup.dialog('open');
+    quick_search_popup.dialog('open');
 
-        return false;
-    });
+    return false;
+  });
 
 }
 
 function initAddToCartPopup() {
 
-    add2cart_popup = $('#add2cart_popup')
-        .on('mouseenter', function () {
-            clearTimeout(cart_info_timeout);
-        })
-        .on('mouseleave', function () {
-            cart_info_timeout = setTimeout(function () {
-                add2cart_popup.dialog('close');
-            }, 3000);
-        })
-        .dialog({
-            autoOpen: false,
-            modal: false,
-            closeOnEscape: true,
-            closeText: '',
-            dialogClass: 'no_close_on_dt dialog_close_butt_mod_1 dialog_g_size_3 mob_dialog_fixed',
-            //appendTo: '.wrapper',
-            width: 430,
-            draggable: true,
-            collision: "fit",
-            position: {
-                my: "right-5 top+15",
-                at: "right bottom",
-                of: $('.cartLink')
-            },
-            open: function (event, ui) {
-                //body.addClass('modal_opened overlay_v2');
+  add2cart_popup = $('#add2cart_popup')
+    .on('mouseenter', function () {
+      clearTimeout(cart_info_timeout);
+    })
+    .on('mouseleave', function () {
+      cart_info_timeout = setTimeout(function () {
+        add2cart_popup.dialog('close');
+      }, 3000);
+    })
+    .dialog({
+      autoOpen: false,
+      modal: false,
+      closeOnEscape: true,
+      closeText: '',
+      dialogClass: 'no_close_on_dt dialog_close_butt_mod_1 dialog_g_size_3 mob_dialog_fixed',
+      //appendTo: '.wrapper',
+      width: 430,
+      draggable: true,
+      collision: "fit",
+      position: {
+        my: "right-5 top+15",
+        at: "right bottom",
+        of: $('.cartLink')
+      },
+      open: function (event, ui) {
+        //body.addClass('modal_opened overlay_v2');
 
 
-                // html.addClass('no_scroll');
-            },
-            close: function (event, ui) {
-                //body.removeClass('modal_opened overlay_v2');
-                // html.removeClass('no_scroll');
-            }
-        });
-
-    $('.addToCart').on('click', function () {
-
-        add2cart_popup.dialog('open');
-
-        cart_info_timeout = setTimeout(function () {
-            add2cart_popup.dialog('close');
-        }, 3000);
-
-        return false;
+        // html.addClass('no_scroll');
+      },
+      close: function (event, ui) {
+        //body.removeClass('modal_opened overlay_v2');
+        // html.removeClass('no_scroll');
+      }
     });
+
+  $('.addToCart').on('click', function () {
+
+    add2cart_popup.dialog('open');
+
+    cart_info_timeout = setTimeout(function () {
+      add2cart_popup.dialog('close');
+    }, 3000);
+
+    return false;
+  });
 
 }
 
 function initCallbackPopup() {
 
-    callback_popup = $('#callback_popup').dialog({
-        autoOpen: false,
-        modal: true,
-        closeOnEscape: true,
-        closeText: '',
-        dialogClass: 'no_close_mod dialog_g_size_1',
-        //appendTo: '.wrapper',
-        width: 300,
-        draggable: true,
-        collision: "fit",
-        position: {my: "top center", at: "top center", of: window},
-        open: function (event, ui) {
-            body.addClass('modal_opened overlay_v2');
-            html.addClass('no_scroll');
-        },
-        close: function (event, ui) {
-            body.removeClass('modal_opened overlay_v2');
-            html.removeClass('no_scroll');
-        }
-    });
+  callback_popup = $('#callback_popup').dialog({
+    autoOpen: false,
+    modal: true,
+    closeOnEscape: true,
+    closeText: '',
+    dialogClass: 'no_close_mod dialog_g_size_1',
+    //appendTo: '.wrapper',
+    width: 300,
+    draggable: true,
+    collision: "fit",
+    position: {my: "top center", at: "top center", of: window},
+    open: function (event, ui) {
+      body.addClass('modal_opened overlay_v2');
+      html.addClass('no_scroll');
+    },
+    close: function (event, ui) {
+      body.removeClass('modal_opened overlay_v2');
+      html.removeClass('no_scroll');
+    }
+  });
 
-    $('.callbackBtn').on('click', function () {
+  $('.callbackBtn').on('click', function () {
 
-        callback_popup.dialog('open');
+    callback_popup.dialog('open');
 
-        return false;
-    });
+    return false;
+  });
 
 }
 
 function initAuthPopup() {
 
-    auth_popup = $('#auth_popup').dialog({
-        autoOpen: false,
-        modal: true,
-        closeOnEscape: true,
-        closeText: '',
-        dialogClass: 'no_close_mod dialog_g_size_1',
-        //appendTo: '.wrapper',
-        width: 462,
-        draggable: true,
-        collision: "fit",
-        position: {my: "top center", at: "top center", of: window},
-        open: function (event, ui) {
-            body.addClass('modal_opened overlay_v2');
-            html.addClass('no_scroll');
-        },
-        close: function (event, ui) {
-            body.removeClass('modal_opened overlay_v2');
-            html.removeClass('no_scroll');
-        }
-    });
+  auth_popup = $('#auth_popup').dialog({
+    autoOpen: false,
+    modal: true,
+    closeOnEscape: true,
+    closeText: '',
+    dialogClass: 'no_close_mod dialog_g_size_1',
+    //appendTo: '.wrapper',
+    width: 462,
+    draggable: true,
+    collision: "fit",
+    position: {my: "top center", at: "top center", of: window},
+    open: function (event, ui) {
+      body.addClass('modal_opened overlay_v2');
+      html.addClass('no_scroll');
+    },
+    close: function (event, ui) {
+      body.removeClass('modal_opened overlay_v2');
+      html.removeClass('no_scroll');
+    }
+  });
 
-    $('.authBtn').on('click', function () {
-        if ($(this).hasClass('user')) {
-            $('.logoutForm').trigger('submit');
-        } else {
-            auth_popup.dialog('open');
-        }
+  $('.authBtn').on('click', function () {
+    if ($(this).hasClass('user')) {
+      $('.logoutForm').trigger('submit');
+    } else {
+      auth_popup.dialog('open');
+    }
 
-        return false;
-    });
+    return false;
+  });
 
-    $('.authForm, .regForm, .logoutForm, .userUpdate, .userReset, .callbackForm, .questionForm, .recoveryForm').on('submit', function (e) {
-        e.preventDefault();
+  $('.authForm, .regForm, .logoutForm, .userUpdate, .userReset, .callbackForm, .questionForm, .recoveryForm').on('submit', function (e) {
+    e.preventDefault();
 
-        var form = $(this);
+    var form = $(this);
 
-        if (form.hasClass('validateMe')) {
-            if (form.validationEngine('validate')) {
-                sendForm(form, function () {
+    if (form.hasClass('validateMe')) {
+      if (form.validationEngine('validate')) {
+        sendForm(form, function () {
 
-                });
-            }
-        } else {
-            sendForm(form, function () {
+        });
+      }
+    } else {
+      sendForm(form, function () {
 
-            });
-        }
+      });
+    }
 
-        return false;
-    });
+    return false;
+  });
 }
 
 function sendForm(form, cb) {
-    var data = form.serialize(); // пoдгoтaвливaeм дaнныe
+  var data = form.serialize(); // пoдгoтaвливaeм дaнныe
 
-    // data += '&pathname=' + window.location.pathname;
+  // data += '&pathname=' + window.location.pathname;
 
-    console.log(data);
+  console.log(data);
 
-    $.ajax({ // инициaлизируeм ajax зaпрoс
-        type: form.attr('method'), // oтпрaвляeм в POST фoрмaтe, мoжнo GET
-        url: form.attr('action'), // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
-        dataType: 'json', // oтвeт ждeм в json фoрмaтe
-        data: data, // дaнныe для oтпрaвки
-        beforeSend: function (data) { // сoбытиe дo oтпрaвки
+  $.ajax({ // инициaлизируeм ajax зaпрoс
+    type: form.attr('method'), // oтпрaвляeм в POST фoрмaтe, мoжнo GET
+    url: form.attr('action'), // путь дo oбрaбoтчикa, у нaс oн лeжит в тoй жe пaпкe
+    dataType: 'json', // oтвeт ждeм в json фoрмaтe
+    data: data, // дaнныe для oтпрaвки
+    beforeSend: function (data) { // сoбытиe дo oтпрaвки
 
-        },
-        success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
-            console.log(data);
+    },
+    success: function (data) { // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
+      console.log(data);
 
-            $('.auth_msg').remove();
+      $('.auth_msg').remove();
 
-            if (data.needAuth) {
-                setTimeout(function () {
-                    all_dialog_close_gl();
-                    auth_popup.dialog('open');
-                }, 1);
-            } else if (data.redirectTo) {
-                setTimeout(function () {
-                    redirectTo(data.redirectTo);
-                }, 1);
-            } else if (data.user_created) {
-                $('.successText').html(data.success_text);
-                success_popup.dialog('open');
-                form.closest('.ui-dialog-content').dialog('close');
+      if (data.needAuth) {
+        setTimeout(function () {
+          all_dialog_close_gl();
+          auth_popup.dialog('open');
+        }, 1);
+      } else if (data.redirectTo) {
+        setTimeout(function () {
+          redirectTo(data.redirectTo);
+        }, 1);
+      } else if (data.user_created) {
+        $('.successText').html(data.success_text);
+        success_popup.dialog('open');
+        form.closest('.ui-dialog-content').dialog('close');
 
-                $('#auth_email').val(data.email);
-                form.closest('.popup_inner').find('a[href="#auth_tab_1*"]').first().click();
+        $('#auth_email').val(data.email);
+        form.closest('.popup_inner').find('a[href="#auth_tab_1*"]').first().click();
 
-            } else if (data.logout_done) {
-                $('#user_lk').remove();
-                $('.authBtn').removeClass('user');
-            } else if (data.user_updated || data.recovery_success || data.password_reset) {
-                $('.successText').html(data.success_text);
-                success_popup.dialog('open');
-            } else if (data.user_authenticated) {
-                $('.auth_menu').prepend(data.user);
-                $('.authBtn').addClass('user');
-                auth_popup.dialog('close');
-            } else if (data.login_failed) {
-                form.closest('.tabUnit').first().find('.tab_content').prepend('<p class="auth_msg">' + data.fail_text + '</p>');
-                $('#auth_pass').val('');
-            }else if (data.signup_failed) {
-                form.closest('.tabUnit').first().find('.tab_content').prepend('<p class="auth_msg">' + data.fail_text + '</p>');
-                $('#auth_pass').val('');
-            } else if (data.recovery_failed) {
-                form.closest('.tabUnit').first().find('.tab_content').prepend('<p class="auth_msg">' + data.fail_text + '</p>');
-            } else if (data.question_sent) {
-                $('.successText').html(data.success_text);
-                success_popup.dialog('open');
-                form.closest('.ui-dialog-content').dialog('close');
-            } else {
-                form.closest('#auth_tab_2*').first().find('.tab_content').prepend('<p class="auth_msg">' + data.message[0] + '</p>');
-            }
+      } else if (data.logout_done) {
+        $('#user_lk').remove();
+        $('.authBtn').removeClass('user');
+      } else if (data.user_updated || data.recovery_success || data.password_reset) {
+        $('.successText').html(data.success_text);
+        success_popup.dialog('open');
+      } else if (data.user_authenticated) {
+        $('.auth_menu').prepend(data.user);
+        $('.authBtn').addClass('user');
+        auth_popup.dialog('close');
+      } else if (data.login_failed) {
+        form.closest('.tabUnit').first().find('.tab_content').prepend('<p class="auth_msg">' + data.fail_text + '</p>');
+        $('#auth_pass').val('');
+      } else if (data.signup_failed) {
+        form.closest('.tabUnit').first().find('.tab_content').prepend('<p class="auth_msg">' + data.fail_text + '</p>');
+        $('#auth_pass').val('');
+      } else if (data.recovery_failed) {
+        form.closest('.tabUnit').first().find('.tab_content').prepend('<p class="auth_msg">' + data.fail_text + '</p>');
+      } else if (data.question_sent) {
+        $('.successText').html(data.success_text);
+        success_popup.dialog('open');
+        form.closest('.ui-dialog-content').dialog('close');
+      } else {
+        form.closest('#auth_tab_2*').first().find('.tab_content').prepend('<p class="auth_msg">' + data.message[0] + '</p>');
+      }
 
-            setTimeout(function () {
-                $('.auth_msg').remove();
-            }, 3000);
-        },
-        error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
+      setTimeout(function () {
+        $('.auth_msg').remove();
+      }, 3000);
+    },
+    error: function (xhr, ajaxOptions, thrownError) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
 
-            console.log(xhr, ajaxOptions, thrownError);
+      console.log(xhr, ajaxOptions, thrownError);
 
-            // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
-            // alert(thrownError); // и тeкст oшибки
-        },
-        complete: function (data) { // сoбытиe пoслe любoгo исхoдa
-            if (typeof cb === 'function') {
-                cb(data);
-            }
-        }
-    });
+      // alert(xhr.status); // пoкaжeм oтвeт сeрвeрa
+      // alert(thrownError); // и тeкст oшибки
+    },
+    complete: function (data) { // сoбытиe пoслe любoгo исхoдa
+      if (typeof cb === 'function') {
+        cb(data);
+      }
+    }
+  });
 }
 
 function redirectTo(url) {
-    setTimeout(function () {
-        if (url == true) {
-            location.reload(true);
-        } else {
-            window.location = url;
-        }
-    }, 1);
+  setTimeout(function () {
+    if (url == true) {
+      location.reload(true);
+    } else {
+      window.location = url;
+    }
+  }, 1);
 }
 
 function initFailPopup() {
 
-    fail_popup = $('#fail_popup').dialog({
-        autoOpen: false,
-        modal: true,
-        closeOnEscape: true,
-        closeText: '',
-        dialogClass: 'no_close_mod dialog_g_size_1',
-        //appendTo: '.wrapper',
-        width: 462,
-        draggable: true,
-        collision: "fit",
-        position: {my: "top center", at: "top center", of: window},
-        open: function (event, ui) {
-            body.addClass('modal_opened overlay_v2');
-            html.addClass('no_scroll');
-        },
-        close: function (event, ui) {
-            body.removeClass('modal_opened overlay_v2');
-            html.removeClass('no_scroll');
-        }
-    });
+  fail_popup = $('#fail_popup').dialog({
+    autoOpen: false,
+    modal: true,
+    closeOnEscape: true,
+    closeText: '',
+    dialogClass: 'no_close_mod dialog_g_size_1',
+    //appendTo: '.wrapper',
+    width: 462,
+    draggable: true,
+    collision: "fit",
+    position: {my: "top center", at: "top center", of: window},
+    open: function (event, ui) {
+      body.addClass('modal_opened overlay_v2');
+      html.addClass('no_scroll');
+    },
+    close: function (event, ui) {
+      body.removeClass('modal_opened overlay_v2');
+      html.removeClass('no_scroll');
+    }
+  });
 
-    $('.openFailPopup').on('click', function () {
+  $('.openFailPopup').on('click', function () {
 
-        fail_popup.dialog('open');
+    fail_popup.dialog('open');
 
-        return false;
-    });
+    return false;
+  });
 
 }
 
 function initConfirmationPopup() {
 
-    confirmation_popup = $('#confirmation_popup').dialog({
-        autoOpen: false,
-        modal: true,
-        closeOnEscape: true,
-        closeText: '',
-        dialogClass: 'no_close_mod dialog_g_size_1',
-        //appendTo: '.wrapper',
-        width: 462,
-        draggable: true,
-        collision: "fit",
-        position: {my: "top center", at: "top center", of: window},
-        open: function (event, ui) {
-            body.addClass('modal_opened overlay_v2');
-            html.addClass('no_scroll');
-        },
-        close: function (event, ui) {
-            body.removeClass('modal_opened overlay_v2');
-            html.removeClass('no_scroll');
-        }
-    });
+  confirmation_popup = $('#confirmation_popup').dialog({
+    autoOpen: false,
+    modal: true,
+    closeOnEscape: true,
+    closeText: '',
+    dialogClass: 'no_close_mod dialog_g_size_1',
+    //appendTo: '.wrapper',
+    width: 462,
+    draggable: true,
+    collision: "fit",
+    position: {my: "top center", at: "top center", of: window},
+    open: function (event, ui) {
+      body.addClass('modal_opened overlay_v2');
+      html.addClass('no_scroll');
+    },
+    close: function (event, ui) {
+      body.removeClass('modal_opened overlay_v2');
+      html.removeClass('no_scroll');
+    }
+  });
 
 }
 
 function initSuccessPopup() {
 
-    success_popup = $('#success_popup').dialog({
-        autoOpen: false,
-        modal: true,
-        closeOnEscape: true,
-        closeText: '',
-        dialogClass: 'no_close_mod dialog_g_size_1',
-        //appendTo: '.wrapper',
-        width: 462,
-        draggable: true,
-        collision: "fit",
-        position: {my: "top center", at: "top center", of: window},
-        open: function (event, ui) {
-            body.addClass('modal_opened overlay_v2');
-            html.addClass('no_scroll');
-        },
-        close: function (event, ui) {
-            body.removeClass('modal_opened overlay_v2');
-            html.removeClass('no_scroll');
-        }
-    });
+  success_popup = $('#success_popup').dialog({
+    autoOpen: false,
+    modal: true,
+    closeOnEscape: true,
+    closeText: '',
+    dialogClass: 'no_close_mod dialog_g_size_1',
+    //appendTo: '.wrapper',
+    width: 462,
+    draggable: true,
+    collision: "fit",
+    position: {my: "top center", at: "top center", of: window},
+    open: function (event, ui) {
+      body.addClass('modal_opened overlay_v2');
+      html.addClass('no_scroll');
+    },
+    close: function (event, ui) {
+      body.removeClass('modal_opened overlay_v2');
+      html.removeClass('no_scroll');
+    }
+  });
 
-    $('.openSuccessPopup').on('click', function () {
+  $('.openSuccessPopup').on('click', function () {
 
-        success_popup.dialog('open');
+    success_popup.dialog('open');
 
-        return false;
-    });
+    return false;
+  });
 
 }
 
 function initRecoveryPopup() {
 
-    recovery_popup = $('#recovery_popup').dialog({
-        autoOpen: false,
-        modal: true,
-        closeOnEscape: true,
-        closeText: '',
-        dialogClass: 'no_close_mod dialog_g_size_1',
-        //appendTo: '.wrapper',
-        width: 462,
-        draggable: true,
-        collision: "fit",
-        position: {my: "top center", at: "top center", of: window},
-        open: function (event, ui) {
-            body.addClass('modal_opened overlay_v2');
-            html.addClass('no_scroll');
-        },
-        close: function (event, ui) {
-            body.removeClass('modal_opened overlay_v2');
-            html.removeClass('no_scroll');
-        }
-    });
+  recovery_popup = $('#recovery_popup').dialog({
+    autoOpen: false,
+    modal: true,
+    closeOnEscape: true,
+    closeText: '',
+    dialogClass: 'no_close_mod dialog_g_size_1',
+    //appendTo: '.wrapper',
+    width: 462,
+    draggable: true,
+    collision: "fit",
+    position: {my: "top center", at: "top center", of: window},
+    open: function (event, ui) {
+      body.addClass('modal_opened overlay_v2');
+      html.addClass('no_scroll');
+    },
+    close: function (event, ui) {
+      body.removeClass('modal_opened overlay_v2');
+      html.removeClass('no_scroll');
+    }
+  });
 
-    $('.passRecoveryBtn').on('click', function () {
-        auth_popup.dialog('close');
+  $('.passRecoveryBtn').on('click', function () {
+    auth_popup.dialog('close');
 
-        recovery_popup.dialog('open');
+    recovery_popup.dialog('open');
 
-        return false;
-    });
+    return false;
+  });
 
 }
 
 function initAsideSubmenu() {
 
-    $('body')
-        .delegate('.menuItem', 'mouseenter ', function (e) {
-            $(this).addClass('hovered just_hovered');
-        })
-        .delegate('.menuItem', 'mouseleave', function (e) {
-            $(this).removeClass('hovered just_hovered');
-        })
-        .delegate('.menuItem', 'click', function (e) {
+  $('body')
+    .delegate('.menuItem', 'mouseenter ', function (e) {
+      $(this).addClass('hovered just_hovered');
+    })
+    .delegate('.menuItem', 'mouseleave', function (e) {
+      $(this).removeClass('hovered just_hovered');
+    })
+    .delegate('.menuItem', 'click', function (e) {
 
-            var el = $(this);
+      var el = $(this);
 
-            if (el.hasClass('just_hovered')) {
-                el.removeClass('just_hovered');
-            } else {
-                el.toggleClass('hovered');
-            }
-        });
+      if (el.hasClass('just_hovered')) {
+        el.removeClass('just_hovered');
+      } else {
+        el.toggleClass('hovered');
+      }
+    });
 
 }
 
 function initTabs() {
 
-    $('.tabBlock').each(function (ind) {
-        var tab = $(this);
+  $('.tabBlock').each(function (ind) {
+    var tab = $(this);
 
-        tab.tabs({
-            active: 0,
-            tabContext: tab.attr('data-tab-context'),
-            activate: function (e, u) {
-                $('.tabActive').prop('checked', null);
-                $(u.newPanel).find('.tabActive').click();
-            }
-        });
+    tab.tabs({
+      active: 0,
+      tabContext: tab.attr('data-tab-context'),
+      activate: function (e, u) {
+        $('.tabActive').prop('checked', null);
+        $(u.newPanel).find('.tabActive').click();
+      }
     });
+  });
 }
 
 function initSelect2() {
 
-    $('.select2').each(function (ind) {
-        var slct = $(this);
+  $('.select2').each(function (ind) {
+    var slct = $(this);
 
-        slct.select2({
-            minimumResultsForSearch: Infinity,
-            dropdownParent: slct.parent(),
-            width: '100%'
-        });
+    slct.select2({
+      minimumResultsForSearch: Infinity,
+      dropdownParent: slct.parent(),
+      width: '100%'
     });
+  });
 }
 
 function updateFav(data) {
-    var favBtn = $('.favBtn').removeClass('favorite');
+  var favBtn = $('.favBtn').removeClass('favorite');
 
-    animateOnce($('.favCounter').text(data.items.length), 'bounceIn');
+  animateOnce($('.favCounter').text(data.items.length), 'bounceIn');
 
-    $('.favUnitMarker').parent().html(data.items_html);
+  $('.favUnitMarker').parent().html(data.items_html);
 
-    $('.favContainer').toggleClass('_empty', !data.items.length);
+  $('.favContainer').toggleClass('_empty', !data.items.length);
 
-    for (var i = 0; i < data.items.length; i++) {
-        $('.favBtn[data-id="' + data.items[i] + '"]').addClass('favorite')
-    }
+  for (var i = 0; i < data.items.length; i++) {
+    $('.favBtn[data-id="' + data.items[i] + '"]').addClass('favorite')
+  }
 }
 
 function all_dialog_close() {
-    body.on('click', '.ui-widget-overlay, .popupClose', all_dialog_close_gl);
+  body.on('click', '.ui-widget-overlay, .popupClose', all_dialog_close_gl);
 }
 
 function all_dialog_close_gl() {
-    $(".ui-dialog-content").each(function () {
-        var $this = $(this);
-        if (!$this.parent().hasClass('always_open')) {
-            $this.dialog("close");
-        }
-    });
+  $(".ui-dialog-content").each(function () {
+    var $this = $(this);
+    if (!$this.parent().hasClass('always_open')) {
+      $this.dialog("close");
+    }
+  });
 }

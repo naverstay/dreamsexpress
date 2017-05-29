@@ -1,17 +1,15 @@
-var shared = require('../shared.js');
-
 var ObjectID = require('mongodb').ObjectID;
 var db = require('../config/db');
 
 exports.all = function (cb) {
-  db.get().collection('products').find().toArray(function (err, docs) {
+  db.get().collection('orders').find({last_order: {$exists: false}}).toArray(function (err, docs) {
     // console.log(docs);
     cb(err, docs);
   });
 };
 
 exports.findById = function (id, cb) {
-  db.get().collection('products').findOne({_id: shared.isObjectID(id) ? id : ObjectID(id)}, function (err, doc) {
+  db.get().collection('orders').findOne({_id: ObjectID(id)}, function (err, doc) {
     cb(err, doc);
   });
 };
@@ -23,31 +21,37 @@ exports.findList = function (ids, cb) {
     return ObjectID(item);
   });
 
-  db.get().collection('products').find({_id: {$in: obj_ids}}).toArray(function (err, doc) {
+  db.get().collection('orders').find({_id: {$in: obj_ids}}).toArray(function (err, doc) {
     cb(err, doc);
   });
 };
 
 exports.findByName = function (name, cb) {
-  db.get().collection('products').find({name: name}).toArray(function (err, doc) {
+  db.get().collection('orders').find({name: name}).toArray(function (err, doc) {
+    cb(err, doc);
+  });
+};
+
+exports.getLastOrder = function (cb) {
+  db.get().collection('orders').findOne({last_order: 'info'}, function (err, doc) {
     cb(err, doc);
   });
 };
 
 exports.filter = function (params, cb) {
-  db.get().collection('products').find(params).toArray(function (err, doc) {
+  db.get().collection('orders').find(params).toArray(function (err, doc) {
     cb(err, doc);
   });
 };
 
-exports.create = function (product, cb) {
-  db.get().collection('products').insert(product, function (err, result) {
+exports.create = function (order, cb) {
+  db.get().collection('orders').insert(order, function (err, result) {
     cb(err, result);
   });
 };
 
 exports.update = function (id, newData, cb) {
-  db.get().collection('products').updateOne(
+  db.get().collection('orders').updateOne(
     {_id: ObjectID(id)},
     newData,
     function (err, result) {
@@ -57,7 +61,7 @@ exports.update = function (id, newData, cb) {
 };
 
 exports.delete = function (id, cb) {
-  db.get().collection('products').deleteOne(
+  db.get().collection('orders').deleteOne(
     {_id: ObjectID(id)},
     function (err, result) {
       cb(err, result);

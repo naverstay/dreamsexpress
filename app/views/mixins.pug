@@ -428,7 +428,10 @@ mixin aside_left(no_auth)
         ul.main_menu
             - if (user && (user.role == 'admin' || user.role == 'admin_g'))
                 li
-                    a.menu_link(href='/add_product' + (dev ? '.html' : '')): span Добавить товар
+                    a.menu_link(href='/orders' + (dev ? '.html' : '')): span Заказы
+                
+                li
+                    a.menu_link(href='/add_product' + (dev ? '.html' : '')): span Товары
                 
             for item, i in head_menu
                 li
@@ -679,9 +682,9 @@ mixin prod_review_info(product_page)
 
                 .prod_review_1_click.oneClickForm
                     .form_cell
-                        input.f_input.input_v5(placeholder='Имя' name='q_name')
+                        input.f_input.input_v5(placeholder='Имя' name='q_name' value= (user ? user.first_name || '' : ''))
                     .form_cell
-                        input.f_input.input_v5(placeholder='телефон' data-inputmask="'mask': '[+38] (099)-999-99-99', 'clearIncomplete' : true" class='validate[required]' name='q_phone')
+                        input.f_input.input_v5(placeholder='телефон' data-inputmask="'mask': '[+38] (099)-999-99-99', 'clearIncomplete' : true" class='validate[required]' name='q_phone' value= (user ? user.phone || '' : ''))
 
                     ul.dropdown_controls
                         li

@@ -38,20 +38,20 @@ mongoose.connect(db_url); // connect to our database
 require('./config/passport')(passport); // pass passport for configuration
 
 var ageTable = {
-    1: 86,
-    2: 92,
-    3: 98,
-    4: 104,
-    5: 110,
-    6: 116,
-    7: 122,
-    8: 128,
-    9: 134,
-    10: 140,
-    11: 146,
-    12: 152,
-    13: 158,
-    14: 164
+  1: 86,
+  2: 92,
+  3: 98,
+  4: 104,
+  5: 110,
+  6: 116,
+  7: 122,
+  8: 128,
+  9: 134,
+  10: 140,
+  11: 146,
+  12: 152,
+  13: 158,
+  14: 164
 };
 
 // view engine setup
@@ -68,26 +68,26 @@ app.set('case sensitive routing', false);
 app.use(compression());
 
 app.use(fileUpload({
-    // safeFileNames: true,
-    limits: {fileSize: 50 * 1024 * 1024}
+  // safeFileNames: true,
+  limits: {fileSize: 50 * 1024 * 1024}
 }));
 
 // required for passport
 app.use(session({
-    store: new RedisStore(
-        {
-            host: '127.0.0.1',       //where redis store is
-            port: 6379,              //default redis port
-            prefix: 'sess',          //prefix for sessions name is store
-            pass: 'passwordtoredis'  //password to redis db
-        }
-    ),
-    secret: 'megasecretfordreamSEXpress', // session secret
-    name: 'dreamsexpress',
-    proxy: true,
-    resave: true,
-    saveUninitialized: true,
-    cookie: {maxAge: 60000000}
+  store: new RedisStore(
+    {
+      host: '127.0.0.1',       //where redis store is
+      port: 6379,              //default redis port
+      prefix: 'sess',          //prefix for sessions name is store
+      pass: config.redis.pass  //password to redis db
+    }
+  ),
+  secret: config.express.session.secret, // session secret
+  name: config.express.session.name,
+  proxy: true,
+  resave: true,
+  saveUninitialized: true,
+  cookie: {maxAge: 60000000}
 }));
 
 app.use(passport.initialize());
@@ -106,95 +106,95 @@ app.use(clientErrorHandler);
 app.use(errorHandler);
 
 mailer.extend(app, {
-    from: 'dreamsexpress.biz@gmail.com',
-    host: 'smtp.gmail.com', // hostname 
-    secureConnection: true, // use SSL 
-    port: 465, // port for secure SMTP 
-    transportMethod: 'SMTP', // default is SMTP. Accepts anything that nodemailer accepts 
-    auth: {
-        user: 'dreamsexpress.biz@gmail.com',
-        pass: '3a4f044785DSP6472'
-    }
+  from: config.email.user,
+  host: config.email.host, // hostname 
+  secureConnection: true, // use SSL 
+  port: config.email.port, // port for secure SMTP 
+  transportMethod: 'SMTP', // default is SMTP. Accepts anything that nodemailer accepts 
+  auth: {
+    user: config.email.user,
+    pass: config.email.pass
+  }
 });
 
 require('./routes/routes.js')(app, passport);
 
 db.connect(db_url, function (err) {
-    if (err) {
-        return console.log(err);
-    }
-    app.listen(config.express.port, function () {
-        console.log('Mongo connected. Listning on 3012.');
+  if (err) {
+    return console.log(err);
+  }
+  app.listen(config.express.port, function () {
+    console.log('Mongo connected. Node listening on port ' + config.express.port);
 
-        var chars = slug.charmap;
+    var chars = slug.charmap;
 
-        chars['.'] = '_';
-        chars['й'] = 'y';
-        chars['Й'] = 'Y';
-        chars['щ'] = 'sch';
-        chars['Щ'] = 'Sch';
+    chars['.'] = '_';
+    chars['й'] = 'y';
+    chars['Й'] = 'Y';
+    chars['щ'] = 'sch';
+    chars['Щ'] = 'Sch';
 
-        slug.defaults.mode = 'pretty';
+    slug.defaults.mode = 'pretty';
 
-        slug.defaults.modes['pretty'] = {
-            replacement: '-',
-            symbols: true,
-            remove: '',
-            lower: true,
-            charmap: chars,
-            multicharmap: slug.multicharmap
-        };
+    slug.defaults.modes['pretty'] = {
+      replacement: '-',
+      symbols: true,
+      remove: '',
+      lower: true,
+      charmap: chars,
+      multicharmap: slug.multicharmap
+    };
 
-        print(slug('НЕЙЛОНОВАЯ КУРТКА-БОМБЕР платье плащ подъезд'));
+    print(slug('НЕЙЛОНОВАЯ КУРТКА-БОМБЕР платье плащ подъезд'));
 
-        // var products_collection = db.get().collection('products');
+    // var products_collection = db.get().collection('products');
 
-        // all_products = productsController.all();
+    // all_products = productsController.all();
 
-        // console.log('all_products', all_products, products_collection.find());
+    // console.log('all_products', all_products, products_collection.find());
 
-        // products_collection.find().toArray(function (err, results) {
-        //     global.all_products = results;
-        // });
-    });
+    // products_collection.find().toArray(function (err, results) {
+    //     global.all_products = results;
+    // });
+  });
 });
 
 function logErrors(err, req, res, next) {
-    console.error(err.stack);
-    next(err);
+  console.error(err.stack);
+  next(err);
 }
 
 function clientErrorHandler(err, req, res, next) {
-    if (req.xhr) {
-        res.status(500).send({error: 'Something failed!'});
-    } else {
-        next(err);
-    }
+  if (req.xhr) {
+    res.status(500).send({error: 'Something failed!'});
+  } else {
+    next(err);
+  }
 }
 
 function errorHandler(err, req, res, next) {
-    if (res.headersSent) {
-        return next(err);
-    }
-    res.status(500);
-    res.render('error', {error: err, user: req.client_info, title: 'errorHandler'});
+  if (res.headersSent) {
+    return next(err);
+  }
+  res.status(500);
+  res.render('error', {error: err, user: req.client_info, title: 'errorHandler'});
 }
 
 app.use(function (req, res, next) {
-    res.status(404);
+  res.status(404);
 
-    // respond with html page
-    if (req.accepts('html')) {
-        res.render('error', {url: req.url, user: req.client_info, title: 'ERROR 404'});
-        return;
-    }
+  // respond with html page
+  if (req.accepts('html')) {
+    res.render('error', {url: req.url, user: req.client_info, title: 'ERROR 404'});
+    return;
+  }
 
-    // respond with json
-    if (req.accepts('json')) {
-        res.send({error: 'Not found'});
-        return;
-    }
+  // respond with json
+  if (req.accepts('json')) {
+    res.send({error: 'Not found'});
+    return;
+  }
 
-    // default to plain-text. send()
-    res.type('txt').send('Not found');
+  // default to plain-text. send()
+  res.type('txt').send('Not found');
 });
