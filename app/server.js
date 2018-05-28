@@ -1,6 +1,7 @@
 var config = require('./config.json');
 
-var db_url = config.mongoose.db;
+//var db_url = config.mongoose.db;
+var db_url = config.mongoose.db_lab;
 
 var compression = require('compression');
 var express = require('express');
@@ -33,7 +34,7 @@ global.print = console.log.bind(console, '##>>');
 mongoose.Promise = global.Promise;
 // assert.equal(query.exec().constructor, global.Promise);
 
-mongoose.connect(db_url); // connect to our database
+mongoose.connect(db_url, {useMongoClient: true}); // connect to our database
 
 require('./config/passport')(passport); // pass passport for configuration
 
@@ -107,10 +108,10 @@ app.use(errorHandler);
 
 mailer.extend(app, {
   from: config.email.user,
-  host: config.email.host, // hostname 
-  secureConnection: true, // use SSL 
-  port: config.email.port, // port for secure SMTP 
-  transportMethod: 'SMTP', // default is SMTP. Accepts anything that nodemailer accepts 
+  host: config.email.host, // hostname
+  secureConnection: true, // use SSL
+  port: config.email.port, // port for secure SMTP
+  transportMethod: 'SMTP', // default is SMTP. Accepts anything that nodemailer accepts
   auth: {
     user: config.email.user,
     pass: config.email.pass
@@ -124,7 +125,7 @@ db.connect(db_url, function (err) {
     return console.log(err);
   }
   app.listen(config.express.port, function () {
-    console.log('Mongo connected. Node listening on port ' + config.express.port);
+    console.log('Mongo connected to "' + db_url + '" . Node listening on port ' + config.express.port);
 
     var chars = slug.charmap;
 
@@ -145,7 +146,7 @@ db.connect(db_url, function (err) {
       multicharmap: slug.multicharmap
     };
 
-    print(slug('НЕЙЛОНОВАЯ КУРТКА-БОМБЕР платье плащ подъезд'));
+    print('slug example ' + slug('НЕЙЛОНОВАЯ КУРТКА-БОМБЕР платье плащ подъезд'));
 
     // var products_collection = db.get().collection('products');
 

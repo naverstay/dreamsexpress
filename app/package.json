@@ -21,7 +21,6 @@
     "express-mailer": "^0.3.1",
     "express-redirect": "^1.2.2",
     "express-session": "^1.15.2",
-    "jade": "~1.11.0",
     "mongodb": "^2.2.25",
     "mongoose": "^4.9.4",
     "morgan": "~1.7.0",
@@ -32,6 +31,7 @@
     "passport-google-oauth2": "^0.1.6",
     "passport-local": "^1.0.0",
     "passport-twitter": "^1.0.4",
+    "pug": "^2.0.0-rc.1",
     "slug": "^0.9.1"
   }
 }

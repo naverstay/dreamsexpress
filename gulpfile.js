@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+var wt = require('gulp-wt');
 var sass = require('gulp-sass');
 var pug = require('gulp-pug');
 var htmlmin = require('gulp-htmlmin');
@@ -15,7 +16,7 @@ var cache = require('gulp-cache');
 var del = require('del');
 var runSequence = require('run-sequence');
 
-// Development Tasks 
+// Development Tasks
 // -----------------
 
 // Start browserSync server
@@ -45,6 +46,16 @@ gulp.task('jade', function () {
     ;
 })
 
+gulp.task('wt', function () {
+    gulp.src('app/scss/main_global.scss')
+        .pipe(wt({
+            css: 'app/css',
+            sass: 'scss'
+        }))
+        .pipe(cssnano())
+        .pipe(gulp.dest('app/css'));
+})
+
 gulp.task('sass', function () {
     return gulp.src('app/scss/main_global.scss') // Gets all files ending with .scss in app/scss and children dirs
         .pipe(sass()) // Passes it through a gulp-sass
@@ -59,15 +70,15 @@ gulp.task('sass', function () {
 
 // Watchers
 gulp.task('watch', function () {
-    gulp.watch('app/**/*.scss', ['sass']);
+    gulp.watch('app/**/*.scss', ['wt']);
     // gulp.watch(['app/**/*.jade', 'app/**/*.pug'], ['jade']);
     gulp.watch('app/js/**/*.js', browserSync.reload);
 })
 
-// Optimization Tasks 
+// Optimization Tasks
 // ------------------
 
-// Optimizing CSS and JavaScript 
+// Optimizing CSS and JavaScript
 gulp.task('useref', function () {
     return gulp.src('app/*.html')
         .pipe(useref())
@@ -78,7 +89,7 @@ gulp.task('useref', function () {
         .pipe(gulp.dest('app/public'));
 });
 
-// Optimizing Images 
+// Optimizing Images
 gulp.task('images', function () {
     return gulp.src('app/images/**/*.+(png|jpg|jpeg|gif|svg)')
     // Caching images that ran through imagemin
@@ -88,25 +99,25 @@ gulp.task('images', function () {
         .pipe(gulp.dest('public/images'))
 });
 
-// Copying fonts 
+// Copying fonts
 gulp.task('fonts', function () {
     return gulp.src('app/fonts/**/*')
         .pipe(gulp.dest('public/fonts'))
 })
 
-// Copying minified css files 
+// Copying minified css files
 gulp.task('copy_min_css', function () {
     return gulp.src('app/public/css/**/*')
         .pipe(gulp.dest('app/css'))
 })
 
-// Copying minified js files 
+// Copying minified js files
 gulp.task('copy_min_js', function () {
     return gulp.src('app/public/js/**/*')
         .pipe(gulp.dest('app/js'))
 })
 
-// Cleaning 
+// Cleaning
 gulp.task('clean', function () {
     return del.sync('public').then(function (cb) {
         return cache.clearAll(cb);
@@ -122,7 +133,7 @@ gulp.task('clean:public', function () {
 
 gulp.task('default', function (callback) {
     runSequence([
-            'sass',
+            'wt',
             // 'jade',
             // 'browserSync',
             'watch'
@@ -134,7 +145,7 @@ gulp.task('default', function (callback) {
 gulp.task('build', function (callback) {
     runSequence(
         'clean:public',
-        'sass',
+        'wt',
         'jade',
         [
             'useref',

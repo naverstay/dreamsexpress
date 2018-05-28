@@ -1,5 +1,33 @@
 // global functions
 
+var fs = require('fs');
+var ObjectID = require('mongodb').ObjectID;
+
+function cleanUp(file) {
+    if (file && file.length) {
+
+        var target = '.' + shared.checkSlash(file);
+
+        fs.stat(target, function (err, stats) {
+            // console.log(stats);
+
+            if (err) {
+                return console.error(err);
+            }
+
+            if (/^\.\/upload/i.test(target) && stats.isFile()) {
+                fs.unlink(target, function (err) {
+                    if (err) return console.log(err);
+                    console.log('file "' + target + '" deleted successfully');
+                });
+            } else {
+                console.log('file "' + target + '" not deleted');
+                //res.status(200).send({remove_done: false, fail_msg: 'Удаление запрещено.'});
+            }
+        });
+    }
+}
+
 function isObjectID(str) {
   var rxObjectID = new RegExp("^[0-9a-fA-F]{24}$");
   return rxObjectID.test(str);
@@ -22,7 +50,7 @@ function isArray(test) {
 }
 
 function escapeRegExp(str) {
-  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+  return ('' + str).replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 }
 
 function RXify(str) {
@@ -53,6 +81,8 @@ function isHex(h) {
 }
 
 module.exports = {
+  cleanUp: cleanUp,
+  getObjectID: ObjectID,
   isObjectID: isObjectID,
   escapeRegExp: escapeRegExp,
   RXify: RXify,

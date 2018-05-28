@@ -75,7 +75,7 @@ exports.create = function (req, res) {
     //     } else {
 
 
-    Orders.findById(req.body._id, function (err, doc) {
+    Orders.findById(shared.getObjectID(req.body._id), function (err, doc) {
       var order = {
         name: req.body.product_name,
         url: doc['url'],
@@ -97,7 +97,7 @@ exports.create = function (req, res) {
         is_hit: req.body.is_hit ? true : false
       };
 
-      Orders.update(ObjectID(req.body._id), order, function (err, result) {
+      Orders.update(shared.getObjectID(req.body._id), order, function (err, result) {
         if (err) {
           console.log(err);
           return res.sendStatus(500);
@@ -149,7 +149,7 @@ exports.create = function (req, res) {
                                         '</span>' +
                                     '</div>' +
                                 '</div>',
-                            
+
                             prod_info =
                                 '<div class="orderExpandRow" style="display:none;">' +
                                     '<div class="order_row collapsed">' +
@@ -213,7 +213,7 @@ exports.delete = function (req, res) {
   var filter = [{url: req.params.id}];
 
   if (shared.isObjectID(req.params.id)) {
-    filter.push({_id: ObjectID('' + req.params.id)});
+    filter.push({_id: shared.getObjectID('' + req.params.id)});
   }
 
   Orders.filter({$or: filter}, function (err, results) {
@@ -232,14 +232,14 @@ exports.delete = function (req, res) {
             return res.sendStatus(500);
           }
 
-          cleanUp(product.main_img);
+          shared.cleanUp(product.main_img);
 
-          cleanUp(product.hover_img);
+          shared.cleanUp(product.hover_img);
 
           var img_arr = product.img_list.split(',');
 
           for (var i = 0; i < img_arr.length; i++) {
-            cleanUp(img_arr[i]);
+            shared.cleanUp(img_arr[i]);
           }
 
           var colors = product.colors.split(',');
@@ -248,7 +248,7 @@ exports.delete = function (req, res) {
             var clr = colors[i];
 
             if (!shared.isHex(clr)) {
-              cleanUp(clr);
+              shared.cleanUp(clr);
             }
           }
 
@@ -261,29 +261,6 @@ exports.delete = function (req, res) {
   });
 };
 
-function cleanUp(file) {
-  if (file && file.length) {
-
-    var target = '.' + shared.checkSlash(file);
-
-    fs.stat(target, function (err, stats) {
-      // console.log(stats);
-
-      if (err) {
-        return console.error(err);
-      }
-
-      if (/^\.\/uploads/i.test(target) && stats.isFile()) {
-        fs.unlink(target, function (err) {
-          if (err) return console.log(err);
-          console.log('file "' + target + '" deleted successfully');
-        });
-      } else {
-        res.status(200).send({remove_done: false, fail_msg: 'Удаление запрещено.'});
-      }
-    });
-  }
-}
 
 function previewBuilder(hover_img, img_arr, href) {
   var ret = previewLink(hover_img, href), arr = img_arr.split(',');

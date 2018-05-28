@@ -1,6 +1,6 @@
 block variables
 
-- var use_slash = '/'; // '' for gulp build, '/' for node 
+- var use_slash = '/'; // '' for gulp build, '/' for node
 - var dev = locals ? !!locals['dev'] : false; // true for gulp, false for node
 - var no_min = true;
 - var scripts_in_head = true;
@@ -9,9 +9,9 @@ block variables
 
 - var all_products = locals ? locals['all_products'] : all_products;
 - var user = locals ? locals['user'] : user;
-    
+
 //- dev = true; // true for gulp, false for node
-    
+
 - if (dev)
     - use_slash = '';
 //    - var all_products = [];
@@ -27,14 +27,14 @@ block variables
 - var head_menu_link = ['/catalog','/news','/lk','/delivery','/cart']
 - var aside_menu = ['Детская одежда','Детская обувь','Игрушки','Коляски','Детские товары','Мамам','Автокресла']
 - var aside_menu_icon = ['baby-onesie-with-front-pocket-outline','baby-shoes','bear-toy','baby-transport-side-view','baby-diaper-outline','baby-onesie-outline','baby-chair']
-    
+
 - var sub_menu = ['Все категории','Платья ','Комплекты одежды','Верхняя одежда','Нижнее белье','Одежда для сна','Распродажа']
-    
+
 mixin dev_head(page_title, index, news, search, product, lk, cart, add)
     head
         meta(charset="utf-8")
         title= (title || "") + " " + page_title
-        | 
+        |
         | <!-- saved from url=(0014)about:internet -->
         - if (page_description)
             meta(name="description", content= page_description)
@@ -45,25 +45,25 @@ mixin dev_head(page_title, index, news, search, product, lk, cart, add)
         meta(name="SKYPE_TOOLBAR", content="SKYPE_TOOLBAR_PARSER_COMPATIBLE")
         meta(name="apple-mobile-web-app-capable", content="yes")
         meta(name="format-detection", content="telephone=no")
-        
+
         meta(property="og:title" content= (title || "") + " " + page_title)
-        
+
         - if (no_min)
-            | 
+            |
             | <!--build:css css/styles.min.css-->
             link(rel='stylesheet', href= use_slash + (!dev ? 'css/main_global.css' : 'css/styles.min.css'), media='all')
-            | 
+            |
             | <!--endbuild-->
         - else
             //-link(rel='stylesheet', href= use_slash + 'css/styles.min.css', media='all')
-            
+
             link(rel='stylesheet', href= use_slash + (!dev ? 'css/main_global.css' : 'css/styles.min.css'), media='all')
-            
+
         link(href='//fonts.googleapis.com/css?family=Rubik:300,400,500,700', rel='stylesheet', type='text/css')
-        
+
         - if (scripts_in_head)
             - if (no_min)
-                | 
+                |
                 | <!--build:js js/main.min.js -->
                 script(src= use_slash + 'js/lib/jquery-1.12.1.min.js')
                 script(src= use_slash + 'js/lib/jquery-ui-1.11.4.js')
@@ -74,84 +74,84 @@ mixin dev_head(page_title, index, news, search, product, lk, cart, add)
                 script(src= use_slash + 'js/lib/select2.js')
                 script(src= use_slash + 'js/lib/jquery.mCustomScrollbar.min.js')
                 script(src= use_slash + 'js/lib/jquery.inputmask.bundle.js')
-                    
+
                 script(src= use_slash + 'js/lib/colorpicker.js')
                 //-script(src= use_slash + 'js/lib/eye.js')
                 //-script(src= use_slash + 'js/lib/utils.js')
-                    
+
                 script(src= use_slash + 'js/main.js')
-                | 
+                |
                 | <!--endbuild-->
             - else
                 script(src= use_slash + 'js/main.min.js')
-            
+
             - if (index)
                 - if (no_min)
-                    | 
+                    |
                     | <!--build:js js/index.min.js -->
                     script(src= use_slash + 'js/index.js')
-                    | 
+                    |
                     | <!--endbuild-->
                 - else
                     script(src= use_slash + 'js/index.min.js')
             - if (news)
                 - if (no_min)
-                    | 
+                    |
                     | <!--build:js js/news.min.js -->
                     script(src= use_slash + 'js/lib/imagesloaded.pkgd.min.js')
                     script(src= use_slash + 'js/lib/isotope.pkgd.min.js')
                     script(src= use_slash + 'js/lib/packery-mode.pkgd.js')
                     script(src= use_slash + 'js/news.js')
-                    | 
+                    |
                     | <!--endbuild-->
                 - else
                     script(src= use_slash + 'js/news.min.js')
-        
+
             - if (search)
                 //-link(href='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css' rel="stylesheet")
                 //-script(src='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js')
                 - if (no_min)
-                    | 
+                    |
                     | <!--build:js js/search.min.js -->
                     script(src= use_slash + 'js/lib/nouislider.min.js')
                     script(src= use_slash + 'js/lib/fotorama.js')
                     script(src= use_slash + 'js/search.js')
-                    | 
+                    |
                     | <!--endbuild-->
                 - else
                     script(src= use_slash + 'js/search.min.js')
-        
+
             //- if (lk)
                  - if (no_min)
-                    | 
+                    |
                     | <!--build:js js/lk.min.js -->
                     script(src= use_slash 'js/lk.js')
-                    | 
+                    |
                     | <!--endbuild-->
                  - else
                     script(src= use_slash 'js/lk.min.js')
-        
+
             - if (cart)
                 - if (no_min)
-                    | 
+                    |
                     | <!--build:js js/cart.min.js -->
                     script(src= use_slash + 'js/lib/jquery.inputmask.bundle.js')
                     script(src= use_slash + 'js/cart.js')
-                    | 
+                    |
                     | <!--endbuild-->
                 - else
                     script(src= use_slash + 'js/cart.min.js')
-                
+
             - if (add)
                 - if (no_min)
-                    | 
+                    |
                     | <!--build:js js/add.min.js -->
                     script(src= use_slash + 'js/add.js')
-                    | 
+                    |
                     | <!--endbuild-->
                 - else
                     script(src= use_slash + 'js/add.min.js')
-        
+
 mixin loop_while(counter)
     -i=0;
     while i < counter
@@ -176,7 +176,7 @@ mixin product_item(old_price)
                     span._cur  грн.
             span.new_price 4069
                 span._cur  грн.
-        
+
         .product_item_overview.prod_hover
             p Цвета и размеры в наличии
             ul.prod_colors
@@ -193,11 +193,11 @@ mixin product_item(old_price)
                     .prod_color
                         img(src= use_slash + 'images/color_4.png')
             .prod_sizes xs, s, m, xxl, xxxl
-        
+
 mixin header(active)
     noscript
         input#js_needed.inp_hidden(type='checkbox')
-        label(for='js_needed').js_needed 
+        label(for='js_needed').js_needed
             span Включите javascript
 
     - if (!dev)
@@ -207,16 +207,16 @@ mixin header(active)
             - if (fav_html)
                 p= fav_html.length
             p= title
-            
+
             - if (user)
                 p= user
                 p= user.length || '#'
-                for item, i in user 
+                for item, i in user
                     p
                         span= i
-                        |  :  
+                        |  :
                         span= item
-        
+
     div.header
         a.mob_menu_btn.openMobMenu(href='#')
         a.mob_search_btn.quickSearchBtn(href='#')
@@ -242,13 +242,13 @@ mixin footer()
                             span.menu_link.menu_active: span=item
                         - else
                             a.menu_link(href=  head_menu_link[i] + (dev ? '.html' : '')): span=item
-                    
+
             ul.footer_info
                 li
                     .footer_info_unit
                         dl.contacts_list
                             dt Контактная информация
-                            dd (812) 505-10-41  <br> 
+                            dd (812) 505-10-41  <br>
                                 span d
                                 span r
                                 span e
@@ -276,31 +276,31 @@ mixin footer()
                                 span c
                                 span o
                                 span m
-                                
+
                         .footer_info_control
                             a.gl_link(href='#') Заказать звонок
-                            
+
                 li
                     .footer_info_unit
                         dl.contacts_list
                             dt Режим работы
-                            dd Будни с 9:00 до 22:00 <br> 
-                                | Выходные с 10:00 до 18:00 <br> 
+                            dd Будни с 9:00 до 22:00 <br>
+                                | Выходные с 10:00 до 18:00 <br>
                                 | Доставка с 12:00 до 20:00
-                            
+
                             //-p.fz_13.fw_500
                                 a.gl_link(href='#') Посмотреть на карте
-                                
+
                 //-li
                     .footer_info_unit
                         dl.contacts_list
                             dt адрес
-                            dd г. Санкт-Петербург, <br> 
+                            dd г. Санкт-Петербург, <br>
                                 | ул. Правды, 1, ТЦ «Галерея»
-                                
+
                         .footer_info_control
                             a.gl_link(href='#') Посмотреть на карте
-                            
+
                 //-li
                     .footer_info_unit
                         dl.contacts_list
@@ -322,16 +322,16 @@ mixin footer()
                                     //-li
                                         a.about_link(href='#')
                                             span.i-g
-                                
-                    
+
+
             .copyright_block
                 .copyright
-                    | &copy;  
+                    | &copy;
                     span= year.getFullYear()
                     |  dreamsexpress.biz, Все права защищены.
                 .payments
                     img(src= use_slash + 'images/pay_icons.png')
-                    
+
 mixin aside_right()
     - if (user && user.email)
         .aside_right
@@ -347,13 +347,13 @@ mixin aside_right()
                     a.user_m_link.cartLink(href='/cart' title='Корзина')
                         span.user_m_icon.i-cart
                         span.user_m_counter 6
-                        
+
         .gl_overlay
         .fav_container.favContainer(class= (fav_html && fav_html.length > 0 ? '' : '_empty'))
             .fav_caption
                 span Вам понравилось (#[span.favCounter #{fav_html ? fav_html.length : 0}])
             .fav_close_btn.openFav
-    
+
             .fav_list.mCSB
                 //- comment for gulp
                 - if (fav_html)
@@ -367,7 +367,7 @@ mixin aside_right()
                                 .product_price
                                     span.new_price= item.price
                                         span._cur  грн.
-                    
+
                 //- +loop_while(4)
                     .favUnit.fav_unit
                         .product_item
@@ -387,11 +387,11 @@ mixin aside_right()
                             .product_price
                                 span.new_price 2000
                                     span._cur  грн.
-                                
+
                 .favUnitMarker
-                                    
+
             a.btn_v1.fav_btn.light_blue_btn.clearFavBtn(href='#') Очистить список
-        
+
 mixin aside_left(no_auth)
     .aside_left.mCSBaside
         .aside_menu_holder
@@ -401,7 +401,7 @@ mixin aside_left(no_auth)
                         .aside_m_text: span
                             input.f_input.input_v1(placeholder='Найти товар')
                         button.search_btn.aside_m_icon.i-baby-rattle
-                
+
             .aside_menu_scroller.mCSB
                 ul.aside_menu.nav
                     li.menuItem.bdr_mod.mob_hidden
@@ -416,7 +416,7 @@ mixin aside_left(no_auth)
                                 span.submenu_icon
                                 span.aside_m_icon(class='i-' + aside_menu_icon[i])
                             +aside_submenu(i, item)
-                        
+
                 ul.aside_menu.contacts
                     li.bdr_mod.menuItem
                         a.aside_m_link(href='#')
@@ -424,15 +424,15 @@ mixin aside_left(no_auth)
                             span.submenu_icon
                             span.aside_m_icon(class='i-location')
                         +aside_submenu(7, 'Контакты')
-                
+
         ul.main_menu
             - if (user && (user.role == 'admin' || user.role == 'admin_g'))
                 li
                     a.menu_link(href='/orders' + (dev ? '.html' : '')): span Заказы
-                
+
                 li
                     a.menu_link(href='/add_product' + (dev ? '.html' : '')): span Товары
-                
+
             for item, i in head_menu
                 li
                     - if (i == active)
@@ -446,17 +446,17 @@ mixin aside_left(no_auth)
                     li#user_lk
                         a.menu_link(href='/lk')
                             span= user.email
-            
+
                 li
                     a.menu_link.authBtn.text_upper(href='#' class= ((user && user.email) ? 'user' : ''))
                         span.un_authenticated Войти
                         span.authenticated Выйти
-                
+
     .logo_block.header_logo: a.logo(href= (dev ? 'index.html' : '/'))
         img(src= use_slash + 'images/logo.svg')
 
 mixin aside_submenu(ind, title)
-    
+
     .submenu_holder.mCSB
         case ind
             when 7
@@ -466,22 +466,22 @@ mixin aside_submenu(ind, title)
                         .phone.fz_16.fw_500 (812) 505-10-41
                         p.fz_13.fw_500
                             a.gl_link(href='#') Заказать звонок
-                        
+
                         p email@gmail.com
-                        
+
                         dl.contacts_list
                             dt Режим работы
-                            dd Будни с 9:00 до 22:00 <br> 
-                                | Выходные с 10:00 до 18:00 <br> 
+                            dd Будни с 9:00 до 22:00 <br>
+                                | Выходные с 10:00 до 18:00 <br>
                                 | Доставка с 12:00 до 20:00
-                            
+
                             dt адрес
-                            dd г. Санкт-Петербург, <br> 
+                            dd г. Санкт-Петербург, <br>
                                 | ул. Правды, 1, ТЦ «Галерея»
-        
+
                             p.fz_13.fw_500
                                 a.gl_link(href='#') Посмотреть на карте
-        
+
             default
                 .submenu_w
                     .submenu_inner.mob_hidden
@@ -512,27 +512,27 @@ mixin aside_submenu(ind, title)
                             li: a.gl_link(href='#') Mothercare
                             li: a.gl_link(href='#') Addidas
                             li: a.gl_link(href='#') Reebok
-                        
+
                     //-for item, i in sub_menu
                         li
                             a.submenu_link(href='#')
                                 span=item
-                    
+
 mixin main_slider()
     .main_slider.mainSlider
         +loop_while(4)
             .slide
                 img(src= use_slash + 'images/slide_1.jpg')
                 .slide_description
-                    p В нашем магазине действует акция -30% 
-                        span.mob_hidden <br> 
+                    p В нашем магазине действует акция -30%
+                        span.mob_hidden <br>
                         | на новую коллекцию. Только до конца апреля.
                         span.mob_hidden <br>
                         |  Ждем ваших заказов
-            
+
         .slide_prev.mob_hidden
         .slide_next.mob_hidden
-                            
+
 mixin hit_slider(items)
     .hitSlider.hit_slider_holder(data-all= all_products ? all_products.length : 0)
         .hit_slider
@@ -552,7 +552,7 @@ mixin hit_slider(items)
                                     span._cur  грн.
                             span.new_price= formatPrice(item.price)
                                 span._cur  грн.
-                                
+
             - else
                 +loop_while(6)
                     .slide
@@ -575,7 +575,7 @@ mixin hit_slider(items)
                         .product_price
                             span.new_price 4069
                                 span._cur  грн.
-                                
+
         .slide_prev
         .slide_next
 
@@ -601,10 +601,10 @@ mixin pop_slider()
                 .slide
                     a.product_img(href='product' + (dev ? '.html' : ''))
                         img(src= use_slash + 'images/brand_6.png')
-    
+
         .slide_prev
         .slide_next
-        
+
 mixin breadcrumbs(bc)
     - if (bc && bc.length == 1)
         ul.breadcrumbs
@@ -615,7 +615,7 @@ mixin breadcrumbs(bc)
                         span= item
                     - else
                         a.gl_link(href= use_slash + (item == 'Главная' ? (dev ? 'index.html' : '') : (item == 'Каталог' ? 'catalog' + (dev ? '.html' : '') : 'products' + (dev ? '.html' : ''))))= item
-            
+
     - if (bc && bc.length == 2)
         ul.breadcrumbs
             - var list= bc[0]
@@ -626,18 +626,18 @@ mixin breadcrumbs(bc)
                         span= item
                     - else
                         a.gl_link(href= link[i])= item
-            
+
 mixin dropdown_w(caption)
     .dropdown_w
         .dropdown_caption=caption
         block
-        
+
         ul.dropdown_controls.form_cell
             li
                 a.btn_v1.blue_btn.apply_btn.catApply(href='#') Ok
-            li 
+            li
                 a.gl_link.catReset.blue_link(href='#') Сбросить
-            
+
 mixin cart_unit_controls()
     ul.cart_unit_controls
         li
@@ -648,10 +648,10 @@ mixin cart_unit_controls()
                 .val_btn.minus.disabled -
                 .val_btn.plus +
         li
-            .cart_unit_price 
-                span 1200 
+            .cart_unit_price
+                span 1200
                 span._cur  грн.
-                
+
         li.cart_unit_rm
             a.gl_link(href='#') Удалить
 
@@ -691,7 +691,7 @@ mixin prod_review_info(product_page)
                             button.btn_v1.blue_btn.apply_btn() Купить
                         li
                             a.gl_link.white_link.toggleOneClick(href='#') Отменить
-            
+
         .prod_review_options(class= product_page ? 'prodReviewOptions' : '')
             input.inp_hidden.prodID(value= (product ? product._id : '') name='prod_id')
             //- if (product_page)  // stars
@@ -703,10 +703,10 @@ mixin prod_review_info(product_page)
                         li
                             span.prod_rating
                     li (5)
-    
+
             - if (product && product.colors && product.colors.length)
                 dl.prod_options
-                    dt Цвет: 
+                    dt Цвет:
                     dd &nbsp;
 
                 ul.prod_options_switch
@@ -715,7 +715,7 @@ mixin prod_review_info(product_page)
                             input.inp_hidden(type='radio' name='prod_color')
                             span.check_text
                                 img(src= use_slash + 'images/color_1_big.png')
-    
+
                     - var arr = product.colors.split(',');
                     for item, i in arr
                         - var clr = item.trim();
@@ -727,12 +727,12 @@ mixin prod_review_info(product_page)
                                         span.check_color(style='background:' + clr)
                                     - else
                                         img(src= checkSlash(clr))
-                
+
             - if (product && product.sizes && product.sizes.length)
                 dl.prod_options
-                    dt Размер: 
+                    dt Размер:
                     dd &nbsp;
-    
+
                 ul.prod_options_switch
                     - var arr = product.sizes.split(',');
                     for item, i in arr
@@ -766,12 +766,12 @@ mixin prod_review_info(product_page)
                     label.option_switch
                         input.inp_hidden(type='radio' name='prod_size' disabled)
                         span.check_text: span xxl
-                        
+
             - if (product_page)
                 dl.prod_options
-                    dt Артикул: 
+                    dt Артикул:
                     dd= product.product_code
-                
+
                 .prod_footer_info
                     - if (product.in_stock)
                         .prod_f_inf
@@ -787,13 +787,13 @@ mixin prod_review_info(product_page)
                         .prod_f_inf.delivery
                             span.prod_f_icon.i-truck-side-view-outline
                             span Срок поставки 2-3 дня
-                
+
             - if (!product_page)
-                p Мужские джинсы PlanB, выполненные из плотного денима на основе хлопка. Традиционный силуэт, прямой крой и средняя посадка. 
-                
+                p Мужские джинсы PlanB, выполненные из плотного денима на основе хлопка. Традиционный силуэт, прямой крой и средняя посадка.
+
                 .footer_info_control
                     a.gl_link.prod_link(href='product' + (dev ? '.html' : '')) На страницу товара
-                
+
 mixin order_info(count)
     .orderExpandRow(style='display:none;')
         +loop_while(count)
@@ -805,21 +805,21 @@ mixin order_info(count)
                         .order_cell
                             .cell_val
                                 a.order_name(href='product' + (dev ? '.html' : '')) Трикотажное платье с рисунком
-                            
+
                 .order_cell.col_2_w
                     .cell_val.fw_500 10 шт
                 .order_cell.col_3_w
                     .cell_val
-                        span 40 069 
+                        span 40 069
                         span._cur  грн.
-                    
+
         .order_row.collapsed
             .order_cell.col_1_w &nbsp;
             .order_cell.col_2_w
                 .cell_val.fw_500 ИТОГО
-            .order_cell.col_3_w 
+            .order_cell.col_3_w
                 .cell_val
-                    span 120 069 
+                    span 120 069
                     span._cur  грн.
 
 mixin filter_form(search)
@@ -835,12 +835,12 @@ mixin filter_form(search)
                     .q_search_block
                         input.f_input.input_v3.filterInput(placeholder='Название товара' name='name')
                         button.search_btn.aside_m_icon.i-baby-rattle
-            
+
                 .search_result_info
                     span.filterCounterTxt &nbsp;
                     span.fw_500.filterCounter &nbsp;
                     //-span , уточните категорию
-                    
+
                 ul.search_filters
                     li
                         label.filter_check
@@ -865,7 +865,7 @@ mixin filter_form(search)
                             span.check_btn
                                 span.check_icon.i-baby-wrapped-in-swaddle
                                 span.check_text Верхняя одежда (23)
-                            
+
                 ul.search_categories
                     li
                         .dropdown_holder.catParameter
@@ -881,7 +881,7 @@ mixin filter_form(search)
                                                 label.check_emul.check_v1
                                                     input.inp_hidden(type='checkbox' name=('gender') value= ['', 'f', 'm'][i])
                                                     span.check_text= ['', 'Женщины', 'Мужчины'][i]
-        
+
                     //-li
                         .dropdown_holder.catParameter
                             .dropdown_btn.dropdownBtn
@@ -896,7 +896,7 @@ mixin filter_form(search)
                                                 label.check_emul.check_v1
                                                     input.inp_hidden(type='checkbox' name=('age') value= item)
                                                     span.check_text= plural(item, 'год', 'года', 'лет', true)
-        
+
                     //-li
                         .dropdown_holder.catParameter.active
                             .dropdown_btn.dropdownBtn
@@ -911,7 +911,7 @@ mixin filter_form(search)
                                                 label.check_emul.check_v1
                                                     input.inp_hidden(type='checkbox')
                                                     span.check_text=item
-        
+
                     li
                         .dropdown_holder.catParameter
                             .dropdown_btn.dropdownBtn
@@ -926,7 +926,7 @@ mixin filter_form(search)
                                                 label.check_emul.check_v1
                                                     input.inp_hidden(type='checkbox' name=('size') value= item)
                                                     span.check_text=item
-        
+
                     li
                         .dropdown_holder.catParameter
                             .dropdown_btn.dropdownBtn
@@ -949,8 +949,8 @@ mixin filter_form(search)
                                 .dropdown_caption Цена
                                 .dropdown_val: span.catVal Любая
                             .dropdown_w
-                                .dropdown_caption 
-                                    span Цена 
+                                .dropdown_caption
+                                    span Цена
                                     span._cur  грн.
                                 .cat_list.catList(data-default='Любая')
                                     ul.price_toddler_vals
@@ -958,16 +958,16 @@ mixin filter_form(search)
                                             .input_w: input.filterMin.f_input.input_v4(data-name='price_min' data-inputmask="'alias': 'decimal', 'groupSeparator': ' ', 'digitsOptional': true, 'autoGroup': true, 'prefix' : 'от ', 'suffix': ' ₴' ")
                                         li
                                             .input_w: input.filterMax.f_input.input_v4(data-name='price_max' data-inputmask="'alias': 'decimal', 'groupSeparator': ' ', 'digitsOptional': true, 'autoGroup': true, 'prefix' : 'до ', 'suffix': ' ₴' ")
-                                    
+
                                     .toddler_v1.price_toddler_holder
                                         .priceToddler.price_toddler(data-toddler-min='0' data-toddler-max='50000')
-        
+
                                 ul.dropdown_controls.form_cell
                                     li
                                         a.btn_v1.blue_btn.apply_btn.catApply(href='#') Ok
                                     li
                                         a.gl_link.catReset.blue_link(href='#') Сбросить
-        
+
                     //-li
                         .dropdown_holder.catParameter.dropdown_w_right
                             .dropdown_btn.dropdownBtn
@@ -982,7 +982,7 @@ mixin filter_form(search)
                                                 label.check_emul.check_v1
                                                     input.inp_hidden(type='checkbox')
                                                     span.check_text=item
-        
+
                 ul.search_sort
                     li
                         label.check_v2.check_emul
@@ -994,19 +994,19 @@ mixin filter_form(search)
                             span.check_text хит
                     li
                         span.fz_12 Сортировать по:
-                        
+
                     li
                         input#price_sort_2.inp_hidden(type='text' name='price_desc' value='desc')
                         span.btn_v2.sort_btn.active.sortBtn(data-target='#price_sort_2')
                             span цене
                             span.i-sort-desc.sort_icon
-        
+
                     //-li
                         a.btn_v2.sort_btn(href='#') скидке
-                        
+
                     //-li
                         a.btn_v2.sort_btn(href='#') популярности
-            
+
                 .search_result_info
                     //-p.cool_text Показано 3 товара
 
@@ -1016,7 +1016,7 @@ mixin filter_form(search)
                             +product_item(true)
                         li
                             +product_item(false)
-                        
+
         #filter_tab_2(style='display:none')
             form.filterForm(action='/filter' method='POST')
                 input.inp_hidden.tabActive(type='radio' name='adult' value='false')
@@ -1024,12 +1024,12 @@ mixin filter_form(search)
                     .q_search_block
                         input.f_input.input_v3.filterInput(placeholder='Название товара' name='name')
                         button.search_btn.aside_m_icon.i-baby-rattle
-            
+
                 .search_result_info
                     span.filterCounterTxt &nbsp;
                     span.fw_500.filterCounter &nbsp;
                     //-span , уточните категорию
-                    
+
                 ul.search_filters
                     li
                         label.filter_check
@@ -1054,7 +1054,7 @@ mixin filter_form(search)
                             span.check_btn
                                 span.check_icon.i-baby-wrapped-in-swaddle
                                 span.check_text Верхняя одежда (23)
-                            
+
                 ul.search_categories
                     li
                         .dropdown_holder.catParameter
@@ -1070,7 +1070,7 @@ mixin filter_form(search)
                                                 label.check_emul.check_v1
                                                     input.inp_hidden(type='checkbox' name=('gender') value= ['', 'f', 'm'][i])
                                                     span.check_text=item
-        
+
                     //-li
                         .dropdown_holder.catParameter
                             .dropdown_btn.dropdownBtn
@@ -1085,7 +1085,7 @@ mixin filter_form(search)
                                                 label.check_emul.check_v1
                                                     input.inp_hidden(type='checkbox' name=('age') value= item)
                                                     span.check_text= plural(item, 'год', 'года', 'лет', true)
-        
+
                     //-li
                         .dropdown_holder.catParameter.active
                             .dropdown_btn.dropdownBtn
@@ -1100,7 +1100,7 @@ mixin filter_form(search)
                                                 label.check_emul.check_v1
                                                     input.inp_hidden(type='checkbox')
                                                     span.check_text=item
-        
+
                     li
                         .dropdown_holder.catParameter
                             .dropdown_btn.dropdownBtn
@@ -1116,7 +1116,7 @@ mixin filter_form(search)
                                             label.check_emul.check_v1
                                                 input.inp_hidden(type='checkbox' name=('size') value= val)
                                                 span.check_text= 'рост ' + val + ' см, на ' + plural(n, 'год', 'года', 'лет', true)
-        
+
                     li
                         .dropdown_holder.catParameter
                             .dropdown_btn.dropdownBtn
@@ -1131,7 +1131,7 @@ mixin filter_form(search)
                                                 label.check_emul.check_v1
                                                     input.inp_hidden(type='checkbox' name=('season') value= ['', 's', 'w', 'd'][i])
                                                     span.check_text=item
-        
+
                     li
                         .dropdown_holder.catParameter
                             .dropdown_btn.dropdownBtn
@@ -1139,8 +1139,8 @@ mixin filter_form(search)
                                 .dropdown_caption Цена
                                 .dropdown_val: span.catVal Любая
                             .dropdown_w
-                                .dropdown_caption 
-                                    span Цена 
+                                .dropdown_caption
+                                    span Цена
                                     span._cur  грн.
                                 .cat_list.catList(data-default='Любая')
                                     ul.price_toddler_vals
@@ -1148,16 +1148,16 @@ mixin filter_form(search)
                                             .input_w: input.filterMin.f_input.input_v4(data-name='price_min' data-inputmask="'alias': 'decimal', 'groupSeparator': ' ', 'digitsOptional': true, 'autoGroup': true, 'prefix' : 'от ', 'suffix': ' ₴' ")
                                         li
                                             .input_w: input.filterMax.f_input.input_v4(data-name='price_max' data-inputmask="'alias': 'decimal', 'groupSeparator': ' ', 'digitsOptional': true, 'autoGroup': true, 'prefix' : 'до ', 'suffix': ' ₴' ")
-                                    
+
                                     .toddler_v1.price_toddler_holder
                                         .priceToddler.price_toddler(data-toddler-min='0' data-toddler-max='50000')
-        
+
                                 ul.dropdown_controls.form_cell
                                     li
                                         a.btn_v1.blue_btn.apply_btn.catApply(href='#') Ok
                                     li
                                         a.gl_link.catReset.blue_link(href='#') Сбросить
-        
+
                     //-li
                         .dropdown_holder.catParameter.dropdown_w_right
                             .dropdown_btn.dropdownBtn
@@ -1172,7 +1172,7 @@ mixin filter_form(search)
                                                 label.check_emul.check_v1
                                                     input.inp_hidden(type='checkbox')
                                                     span.check_text=item
-        
+
                 ul.search_sort
                     li
                         label.check_v2.check_emul
@@ -1184,29 +1184,29 @@ mixin filter_form(search)
                             span.check_text хит
                     li
                         span.fz_12 Сортировать по:
-                        
+
                     li
                         input#price_sort.inp_hidden(type='text' name='price_desc' value='desc')
                         span.btn_v2.sort_btn.active.sortBtn(data-target='#price_sort')
                             span цене
                             span.i-sort-desc.sort_icon
-        
+
                     //-li
                         a.btn_v2.sort_btn(href='#') скидке
-                        
+
                     //-li
                         a.btn_v2.sort_btn(href='#') популярности
-                
+
                 .search_result_info
                     //-p.cool_text Показано 3 товара
-            
+
                 ul.q_search_results.filterResults
                     //-+loop_while(2)
                         li
                             +product_item(true)
                         li
                             +product_item(false)
-            
+
 mixin auth_forms(suffix, email)
     .popup_inner
         ul.tab_holder.tab_v2(id= 'auth_switcher' + suffix || '')
@@ -1270,7 +1270,7 @@ mixin auth_forms(suffix, email)
 mixin scripts(page_title, index, news, search, product, lk, cart, add)
     - if (!scripts_in_head)
         - if (no_min)
-            | 
+            |
             | <!--build:js js/main.min.js -->
             script(src= use_slash + 'js/lib/jquery-1.12.1.min.js')
             script(src= use_slash + 'js/lib/jquery-ui-1.11.4.js')
@@ -1282,74 +1282,74 @@ mixin scripts(page_title, index, news, search, product, lk, cart, add)
             script(src= use_slash + 'js/lib/jquery.mCustomScrollbar.min.js')
             script(src= use_slash + 'js/lib/jquery.inputmask.bundle.js')
             script(src= use_slash + 'js/main.js')
-            | 
+            |
             | <!--endbuild-->
         - else
             script(src= use_slash + 'js/main.min.js')
-        
+
         - if (index)
             - if (no_min)
-                | 
+                |
                 | <!--build:js js/index.min.js -->
                 script(src= use_slash + 'js/index.js')
-                | 
+                |
                 | <!--endbuild-->
             - else
                 script(src= use_slash + 'js/index.min.js')
         - if (news)
             - if (no_min)
-                | 
+                |
                 | <!--build:js js/news.min.js -->
                 script(src= use_slash + 'js/lib/imagesloaded.pkgd.min.js')
                 script(src= use_slash + 'js/lib/isotope.pkgd.min.js')
                 script(src= use_slash + 'js/lib/packery-mode.pkgd.js')
                 script(src= use_slash + 'js/news.js')
-                | 
+                |
                 | <!--endbuild-->
             - else
                 script(src= use_slash + 'js/news.min.js')
-    
+
         - if (search)
             //-link(href='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css' rel="stylesheet")
             //-script(src='//cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js')
             - if (no_min)
-                | 
+                |
                 | <!--build:js js/search.min.js -->
                 script(src= use_slash + 'js/lib/nouislider.min.js')
                 script(src= use_slash + 'js/lib/fotorama.js')
                 script(src= use_slash + 'js/search.js')
-                | 
+                |
                 | <!--endbuild-->
             - else
                 script(src= use_slash + 'js/search.min.js')
-    
+
         //- if (lk)
              - if (no_min)
-                | 
+                |
                 | <!--build:js js/lk.min.js -->
                 script(src= use_slash 'js/lk.js')
-                | 
+                |
                 | <!--endbuild-->
              - else
                 script(src= use_slash 'js/lk.min.js')
-    
+
         - if (cart)
             - if (no_min)
-                | 
+                |
                 | <!--build:js js/cart.min.js -->
                 script(src= use_slash + 'js/lib/jquery.inputmask.bundle.js')
                 script(src= use_slash + 'js/cart.js')
-                | 
+                |
                 | <!--endbuild-->
             - else
                 script(src= use_slash + 'js/cart.min.js')
-            
+
         - if (add)
             - if (no_min)
-                | 
+                |
                 | <!--build:js js/add.min.js -->
                 script(src= use_slash + 'js/add.js')
-                | 
+                |
                 | <!--endbuild-->
             - else
                 script(src= use_slash + 'js/add.min.js')
@@ -1358,7 +1358,7 @@ mixin popups(no_auth)
     form.logoutForm.hide(action='/logout' method='POST')
 
     .popup_close_btn.popupClose
-        
+
     #quick_search_popup.popup.popup_v4
         .q_search_block
             form.qSearchForm(action='/q_search' method='POST')
@@ -1366,7 +1366,7 @@ mixin popups(no_auth)
                 button.search_btn.aside_m_icon.i-baby-rattle
                 .adv_search_box
                     a.gl_link(href= use_slash + 'search' + (dev ? '.html' : '')) Перейти к расширенному поиску
-        
+
         .q_search_results_holder.mCSB: ul.searchResults.q_search_results
             //-+loop_while(7)
                 li
@@ -1381,10 +1381,10 @@ mixin popups(no_auth)
                                 span._cur  грн.
                             span.new_price 4069
                                 span._cur  грн.
-                    
+
     #review_popup.popup.popup_v5
         .popup_inner
-            .prod_review 
+            .prod_review
                 .prod_review_photos
                     h3.prod_name Топ и брючки тонкой вязки
                     .fotorama(data-thumbwidth=60, data-thumbheight=60, data-height=340, data-nav="thumbs", data-thumbmargin=3)
@@ -1405,58 +1405,58 @@ mixin popups(no_auth)
             ul#callback_switcher.tab_holder.tab_v1
                 li: a.tab_link(href='#callback_tab_1'): span Перезвоните мне
                 li: a.tab_link(href='#callback_tab_2'): span Задать вопрос
-                
+
             .tabBlock(data-tab-context='#callback_switcher')
                 #callback_tab_1
                     .tab_content
                         form.callbackForm.validateMe(action='/question' method='POST')
                             .form_cell
                                 input.f_input.input_v2(placeholder='Имя' name='name')
-                                
+
                             .form_cell
                                 input.f_input.input_v2(placeholder='Телефон' data-inputmask="'mask': '[+38] (099)-999-99-99', 'clearIncomplete' : true" class='validate[required]' name='phone')
-                                
+
                             .form_cell
                                 button.btn_v1.blue_btn.order_btn Отправить заявку
-                                
+
                 #callback_tab_2(style='display:none')
                     .tab_content
                         form.questionForm.validateMe(action='/question' method='POST')
                             .form_cell
                                 input.f_input.input_v2(placeholder='Имя' name='name')
-                                
+
                             .form_cell
                                 input.f_input.input_v2(placeholder='Телефон' data-inputmask="'mask': '[+38] (099)-999-99-99', 'clearIncomplete' : true" class='validate[required]' name='phone')
-                                
+
                             .form_cell
                                 textarea.f_input.input_v2(placeholder='Вопрос' class='validate[required, minSize[10]]' name='question')
-                                
+
                             .form_cell
                                 button.btn_v1.blue_btn.order_btn Отправить вопрос
-                                
+
     #fail_popup.popup.popup_v3.popup_fail
         .popup_inner.form_cell_v1
             .popup_caption Ошибка
             .popup_msg.failText Вы указали почту, которой нет.  <br>  Попробуйте еще раз
-            
+
             .form_cell
                 //-a.btn_v1.blue_btn.order_btn.mod_2(href='#') Попробовать еще раз
                 a.gl_link.popupClose(href='#') Закрыть
-                                                    
+
     #confirmation_popup.popup.popup_v3.popup_fail
         .popup_inner.form_cell_v1
             .popup_caption.confirmCaption Ошибка
             .popup_msg.confirmText Вы указали почту, которой нет.  <br>  Попробуйте еще раз
-            
+
             .form_cell
                 a.btn_v1.blue_btn.order_btn.mod_2.confirmAction(href='#') Продолжить
                 a.gl_link.popupClose(href='#') Отмена
-                    
+
     #success_popup.popup.popup_v3.popup_success
         .popup_inner.form_cell_v1
             .popup_caption Успех!
-            .popup_msg.successText Новый пароль отправлен на вашу почту. Откройте письмо и пройдите по ссылке 
-            
+            .popup_msg.successText Новый пароль отправлен на вашу почту. Откройте письмо и пройдите по ссылке
+
             .form_cell
                 button.btn_v1.blue_btn.order_btn.mod_3.popupClose Закрыть
 
@@ -1469,24 +1469,24 @@ mixin popups(no_auth)
                 .form_row
                     .form_cell
                         button.btn_v1.blue_btn.order_btn.mod_2 Восстановить пароль
-                        
+
                     .remember_check.form_cell
                         a.gl_link.cool_text.fz_13.fw_500.popupClose(href='#') Отмена
 
     - if (!no_auth)
         #auth_popup.popup.popup_v3
             +auth_forms('_p')
-        
+
     #add2cart_popup.popup.popup_v5
         .popup_cart_title
             .popup_cart_caption.fz_18 Товар добавлен в корзину
-            p 
+            p
                 span Всего: 4 товар (ов) на сумму 1 401 069
                 span._cur  грн.
-        
+
         .popup_cart_body
             p С этим товаром покупают:
-            
+
             ul.cart_items
                 li
                     .product_item
@@ -1496,7 +1496,7 @@ mixin popups(no_auth)
                         .product_price
                             span.new_price 200
                                 span._cur  грн.
-                                
+
                 li
                     .product_item
                         a.product_img(href='product' + (dev ? '.html' : ''))
@@ -1505,7 +1505,7 @@ mixin popups(no_auth)
                         .product_price
                             span.new_price 200
                                 span._cur  грн.
-                                
+
                 li
                     .product_item
                         a.product_img(href='product' + (dev ? '.html' : ''))
@@ -1515,4 +1515,3 @@ mixin popups(no_auth)
                             span.new_price 200
                                 span._cur  грн.
     .preloader
-        

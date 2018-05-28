@@ -2,7 +2,6 @@ var shared = require('../shared.js');
 
 var Products = require('../models/products');
 var slug = require('slug');
-var ObjectID = require('mongodb').ObjectID;
 var fs = require('fs');
 
 exports.all = function (params, cb) {
@@ -18,7 +17,7 @@ exports.all = function (params, cb) {
 };
 
 exports.findById = function (id, cb) {
-  Products.findById(shared.isObjectID(id) ? id : ObjectID(id), function (err, doc) {
+  Products.findById(shared.isObjectID(id) ? id : shared.getObjectID(id), function (err, doc) {
     if (err) {
       // console.log(err);
       return cb.sendStatus(500);
@@ -56,7 +55,7 @@ exports.filter = function (params, cb) {
 
 exports.create = function (req, res) {
 
-  // console.log(req.body);
+   //console.log(req.body);
 
   if (req.body._id && shared.isObjectID(req.body._id)) {
 
@@ -72,7 +71,9 @@ exports.create = function (req, res) {
     //     } else {
 
 
-    Products.findById(req.body._id, function (err, doc) {
+    Products.findById(shared.getObjectID(req.body._id), function (err, doc) {
+        //console.log('doc', doc);
+
       var product = {
         name: req.body.product_name,
         url: doc['url'],
@@ -94,7 +95,7 @@ exports.create = function (req, res) {
         is_hit: req.body.is_hit ? true : false
       };
 
-      Products.update(ObjectID(req.body._id), product, function (err, result) {
+      Products.update(shared.getObjectID(req.body._id), product, function (err, result) {
         if (err) {
           console.log(err);
           return res.sendStatus(500);
@@ -175,7 +176,7 @@ exports.create = function (req, res) {
                                         '</span>' +
                                     '</div>' +
                                 '</div>',
-                            
+
                             prod_info =
                                 '<div class="orderExpandRow" style="display:none;">' +
                                     '<div class="order_row collapsed">' +
@@ -244,14 +245,16 @@ exports.delete = function (req, res) {
   var filter = [{url: req.params.id}];
 
   if (shared.isObjectID(req.params.id)) {
-    filter.push({_id: ObjectID('' + req.params.id)});
+    filter.push({_id: shared.getObjectID('' + req.params.id)});
   }
 
   Products.filter({$or: filter}, function (err, results) {
     var product = results[0];
 
-    if (err)
+    if (err){
       return res.sendStatus(500);
+    }
+
     console.log(results, product._id);
 
     if (results.length) {
@@ -263,14 +266,14 @@ exports.delete = function (req, res) {
             return res.sendStatus(500);
           }
 
-          cleanUp(product.main_img);
+          shared.cleanUp(product.main_img);
 
-          cleanUp(product.hover_img);
+          shared.cleanUp(product.hover_img);
 
           var img_arr = product.img_list.split(',');
 
           for (var i = 0; i < img_arr.length; i++) {
-            cleanUp(img_arr[i]);
+            shared.cleanUp(img_arr[i]);
           }
 
           var colors = product.colors.split(',');
@@ -279,7 +282,7 @@ exports.delete = function (req, res) {
             var clr = colors[i];
 
             if (!shared.isHex(clr)) {
-              cleanUp(clr);
+              shared.cleanUp(clr);
             }
           }
 
@@ -291,30 +294,6 @@ exports.delete = function (req, res) {
     }
   });
 };
-
-function cleanUp(file) {
-  if (file && file.length) {
-
-    var target = '.' + shared.checkSlash(file);
-
-    fs.stat(target, function (err, stats) {
-      // console.log(stats);
-
-      if (err) {
-        return console.error(err);
-      }
-
-      if (/^\.\/uploads/i.test(target) && stats.isFile()) {
-        fs.unlink(target, function (err) {
-          if (err) return console.log(err);
-          console.log('file "' + target + '" deleted successfully');
-        });
-      } else {
-        res.status(200).send({remove_done: false, fail_msg: 'Удаление запрещено.'});
-      }
-    });
-  }
-}
 
 function previewBuilder(hover_img, img_arr, href) {
   var ret = previewLink(hover_img, href), arr = img_arr.split(',');
