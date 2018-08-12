@@ -150,7 +150,7 @@ module.exports = function (passport) {
 
       // check to see if theres already a user with that email
       if (user) {
-        return done(null, false, req.flash('signupMessage', 'Email ' + user.local.email + ' занят'));
+        return done(null, false, req.flash('signupMessage', 'Email занят'));
       } else {
 
         // if there is no user with that email

@@ -5006,6 +5006,14 @@ body {
   @media only screen and (min-width: 1440px) {
     .auth_menu {
       right: 165px; } }
+  @media only screen and (max-width: 959px) {
+    .auth_menu #user_lk {
+      position: absolute;
+      right: -150px;
+      top: 5px;
+      z-index: 3; }
+      .auth_menu #user_lk .menu_link {
+        line-height: 2; } }
 
 .main_menu {
   position: relative;

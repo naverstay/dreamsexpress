@@ -34,7 +34,51 @@ global.print = console.log.bind(console, '##>>');
 mongoose.Promise = global.Promise;
 // assert.equal(query.exec().constructor, global.Promise);
 
-mongoose.connect(db_url, {useMongoClient: true}); // connect to our database
+//mongoose.connect(db_url); // connect to our database
+
+//mongoose.connection.once('open', function () {
+//    logger.info('MongoDB event open');
+//    logger.debug('MongoDB connected [%s]', db_url);
+//
+//    mongoose.connection.on('connected', function () {
+//        logger.info('MongoDB event connected');
+//    });
+//
+//    mongoose.connection.on('disconnected', function () {
+//        logger.warn('MongoDB event disconnected');
+//    });
+//
+//    mongoose.connection.on('reconnected', function () {
+//        logger.info('MongoDB event reconnected');
+//    });
+//
+//    mongoose.connection.on('error', function (err) {
+//        logger.error('MongoDB event error: ' + err);
+//    });
+//
+//    // return resolve();
+//
+//    console.log('start server');
+//
+//    //return server.start();
+//});
+
+mongoose.connect(db_url, {
+    keepAlive: 1,
+    useMongoClient: true,
+    reconnectTries: 300,
+    connectTimeoutMS: 30000
+
+    //useMongoClient: true
+}, function (err) {
+    if (err) {
+        logger.error('MongoDB connection error: ' + err);
+        // return reject(err);
+        process.exit(1);
+    }
+}).then(function (q) {
+
+});
 
 require('./config/passport')(passport); // pass passport for configuration
 
@@ -161,19 +205,23 @@ db.connect(db_url, function (err) {
 });
 
 function logErrors(err, req, res, next) {
-  console.error(err.stack);
-  next(err);
+    console.error('logErrors(err', err.stack);
+    next(err);
 }
 
 function clientErrorHandler(err, req, res, next) {
-  if (req.xhr) {
-    res.status(500).send({error: 'Something failed!'});
-  } else {
-    next(err);
-  }
+    console.log('clientErrorHandler', err);
+
+    if (req.xhr) {
+        res.status(500).send({error: 'Something failed!'});
+    } else {
+        next(err);
+    }
 }
 
 function errorHandler(err, req, res, next) {
+    console.log('errorHandler', err);
+
   if (res.headersSent) {
     return next(err);
   }

@@ -376,6 +376,18 @@
     right: 165px;
   }
 
+  #user_lk {
+    @include respond-to-max($resp_l) {
+      position: absolute;
+      right: -150px;
+      top: 5px;
+      z-index: 3;
+
+      .menu_link {
+        line-height: 2;
+      }
+    }
+  }
 }
 
 .main_menu {

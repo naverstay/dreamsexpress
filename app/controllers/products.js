@@ -171,8 +171,8 @@ exports.create = function (req, res) {
                                         '</span>' +
                                     '</div>' +
                                     '<div class="order_cell col_4">' +
-                                        '<span class="cell_val fw_500">' +
-                                            '<a class="black_link" href="/edit/' + new_url + (counter > 1 ? '-' + counter : '') + '" target="_blank">Редактировать</a>' +
+                                        '<span class="cell_val fw_500 _link_controls">' +
+                                            '<a class="black_link" href="/edit/' + new_url + (counter > 1 ? '-' + counter : '') + '" target="_blank">Редактировать</a><a class="black_link rmProdBtn" href="#" data-id="' + new_url + '" data-name="' + product.name + '">Удалить</a>' +
                                         '</span>' +
                                     '</div>' +
                                 '</div>',
@@ -307,7 +307,7 @@ function previewBuilder(hover_img, img_arr, href) {
 
 function previewLink(img, url) {
   return (img && img.length ?
-  '<a class="order_img" href="/product/"' + url + ' target="_blank">' +
+  '<a class="order_img" href="/product/' + url + '" target="_blank">' +
   '<img src="' + img + '">' +
   '</a>' : '');
 }
